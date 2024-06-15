@@ -1,4 +1,6 @@
 #include "incl/minishell.h"
+#include "signal.h"
+#include <unistd.h>
 
 // void	handle_signal(int sig)
 // {
