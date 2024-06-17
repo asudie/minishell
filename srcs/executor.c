@@ -1,6 +1,9 @@
-#include "incl/minishell.h"
-#include "signal.h"
+#include "../incl/minishell.h"
+#include <signal.h>
 #include <unistd.h>
+#include "../libft/libft.h"
+#include <stdio.h>
+#include <sys/wait.h>
 
 // void	handle_signal(int sig)
 // {
@@ -36,37 +39,63 @@
 // 	}
 // }
 
+// void builtin_cd(char **args) {
+//     char *envp[] = { NULL }; // environment variables (none in this example)
+    
+//     // Path to the executable
+//     char *path = "/bin/cd";
+    
+//     // Arguments for the executable, including the command itself as the first argument
+//     if (execve(path, args, envp) == -1) {
+//         perror("execve failed");
+//     }
+// }
+
+int builtin_echo(t_cmd *cmd) {
+    char *envp[] = { NULL }; // environment variables (none in this example)
+    
+    // Path to the executable
+    char *path = "/bin/echo";
+    
+    // Arguments for the executable, including the command itself as the first argument
+    if (execve(path, cmd->args, envp) == -1) {
+        perror("execve failed");
+		return 0;
+    }
+	return (1);
+}
+
 int	execute_builtin(t_cmd *cmd)
 {
-	if (strcmp(cmd->cmd, "cd") == 0)
+	if (ft_strncmp(cmd->cmd, "cd", 2) == 0)
 	{
-		return (builtin_cd(cmd));
+		// return (builtin_cd(cmd));
 	}
-	else if (strcmp(cmd->cmd, "echo") == 0)
+	else if (ft_strncmp(cmd->cmd, "echo", 4) == 0)
 	{
 		return (builtin_echo(cmd));
 	}
-	else if (strcmp(cmd->cmd, "exit") == 0)
+	else if (ft_strncmp(cmd->cmd, "exit", 4) == 0)
 	{
-		return (builtin_exit(cmd));
+		// return (builtin_exit(cmd));
 	}
-    else if (strcmp(cmd->cmd, "pwd") == 0)
+    else if (ft_strncmp(cmd->cmd, "pwd", 3) == 0)
 	{
-		return (builtin_pwd(cmd));
+		// return (builtin_pwd(cmd));
 	}
-    else if (strcmp(cmd->cmd, "export") == 0)
+    else if (ft_strncmp(cmd->cmd, "export", 6) == 0)
 	{
-		return (builtin_export(cmd));
+		// return (builtin_export(cmd));
 	}
-    else if (strcmp(cmd->cmd, "unset") == 0)
+    else if (ft_strncmp(cmd->cmd, "unset", 5) == 0)
 	{
-		return (builtin_unset(cmd));
+		// return (builtin_unset(cmd));
 	}
-    else if (strcmp(cmd->cmd, "env") == 0)
+    else if (ft_strncmp(cmd->cmd, "env", 3) == 0)
 	{
-		return (builtin_env(cmd));
+		// return (builtin_env(cmd));
 	}
-	return (-1);
+	return (0);
 }
 
 void	execute_cmd(t_cmd *cmd)
@@ -76,29 +105,24 @@ void	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	for (int i = 0; cmd != NULL; i++)
 	{
-		if (is_builtin(cmd))
-		{
-			execute_builtin(cmd);
-		}
-		else
-		{
-			pid = fork();
-			if (pid == 0)
-			{
-				// Child process
-				execve(cmd[i].path, cmd[i].args, environ);
-				exit(EXIT_FAILURE);
-			}
-			else if (pid > 0)
-			{
-				// Parent process
-				wait(NULL);
-			}
-			else
-			{
-				perror("fork");
-			}
-		}
+		execute_builtin(cmd);
+			// pid = fork(); // when we need fork
+			// if (pid == 0)
+			// {
+			// 	// Child process
+			// 	// execve(cmd[i].path, cmd[i].args, environ);
+			// 	// exit(EXIT_FAILURE);
+			// }
+			// else if (pid > 0)
+			// {
+			// 	// Parent process
+			// 	wait(NULL);
+			// }
+			// else
+			// {
+			// 	perror("fork");
+			// }
+		
 	}
 }
 
@@ -119,10 +143,17 @@ int	main(int argc, char **argv, char **envp)
 		// -------------------------------------------------------------------
 		// cmd = malloc(sizeof(t_cmd));
         // EXAMPLE: ls -l > output.txt
-		cmd.cmd = "ls";
-		cmd.args = (char *[]){"ls", "-l", NULL};
+		// cmd.cmd = "ls";
+		// cmd.args = (char *[]){"ls", "-l", NULL};
+		// cmd.in_rd = NULL;
+		// cmd.out_rd = "output.txt";
+		// cmd.append = 0;
+		// cmd.next = NULL;
+
+		cmd.cmd = "echo";
+		cmd.args = (char *[]){"echo", "Hello!", NULL};
 		cmd.in_rd = NULL;
-		cmd.out_rd = "output.txt";
+		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
 		// Execute cmd
