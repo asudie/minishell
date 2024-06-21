@@ -169,9 +169,10 @@ int	execute_builtin(t_cmd *cmd)
 void	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
+	t_cmd *it = cmd;
 
 	// Iterate through each command
-	for (int i = 0; cmd != NULL; i++)
+	while (it)
 	{
 		execute_builtin(cmd);
 			// pid = fork(); // when we need fork
@@ -190,8 +191,22 @@ void	execute_cmd(t_cmd *cmd)
 			// {
 			// 	perror("fork");
 			// }
+			it = it->next;
 		
 	}
+}
+
+void display_prompt(t_cmd *cmd) {
+    char *cwd;
+
+    // Get the current working directory
+	cwd = get_env_var(cmd->envp, "HOME");
+    if (cwd != NULL) {
+        // Print the prompt
+        printf("%s$ ", cwd);
+    } else {
+        perror("get_env_var");
+    }
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -227,8 +242,10 @@ int	main(int argc, char **argv, char **envp)
 		cmd.append = 0;
 		cmd.next = NULL;
 		cmd.envp = envp;
+		// display_prompt(&cmd);
 		// Execute cmd
 		execute_cmd(&cmd);
+		// display_prompt(&cmd);
 		// Free allocated memory
 		// free_input(input);
 		// free_cmd(cmd);
