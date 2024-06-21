@@ -2,7 +2,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include "../libft/libft.h"
-#include <stdio.h>
+#include <stdio.h> // DELETE
 #include <sys/wait.h>
 
 // void	handle_signal(int sig)
@@ -39,17 +39,85 @@
 // 	}
 // }
 
-// void builtin_cd(char **args) {
-//     char *envp[] = { NULL }; // environment variables (none in this example)
-    
-//     // Path to the executable
-//     char *path = "/bin/cd";
-    
-//     // Arguments for the executable, including the command itself as the first argument
-//     if (execve(path, args, envp) == -1) {
-//         perror("execve failed");
-//     }
-// }
+char *get_env_var(char **envr, const char *name) {
+    size_t len = strlen(name);
+    for (int i = 0; envr[i] != NULL; i++) {
+        if (strncmp(envr[i], name, len) == 0 && envr[i][len] == '=') {
+            return envr[i] + len + 1;
+        }
+    }
+    return NULL;
+}
+
+// Helper function to set an environment variable
+void set_env_var(char **envr, const char *name, const char *value) {
+    size_t len = strlen(name);
+    for (int i = 0; envr[i] != NULL; i++) {
+        if (strncmp(envr[i], name, len) == 0 && envr[i][len] == '=') {
+            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value);
+            return;
+        }
+    }
+    // If not found, add new environment variable
+    for (int i = 0; envr[i] != NULL; i++) {
+        if (envr[i][0] == '\0') {
+            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value);
+            return;
+        }
+    }
+}
+
+int builtin_cd(t_cmd *cmd) {
+    char *home_dir;
+    char *oldpwd;
+    char cwd[1024];
+
+    // If no arguments are provided, change to the home directory
+    if (cmd->args[1] == NULL) {
+        home_dir = get_env_var(cmd->envp, "HOME");
+        if (home_dir == NULL) {
+            fprintf(stderr, "cd: HOME not set\n");
+            return 1;
+        }
+        if (chdir(home_dir) != 0) {
+            perror("cd");
+            return 1;
+        }
+    } else if (strcmp(cmd->args[1], "-") == 0) {
+        // Handle 'cd -' to change to the previous directory
+        oldpwd = get_env_var(cmd->envp, "OLDPWD");
+        if (oldpwd == NULL) {
+            fprintf(stderr, "cd: OLDPWD not set\n");
+            return 1;
+        }
+        if (chdir(oldpwd) != 0) {
+            perror("cd");
+            return 1;
+        }
+        printf("%s\n", oldpwd);
+    } else {
+        // Change to the directory provided in args[1]
+        if (chdir(cmd->args[1]) != 0) {
+            perror("cd");
+            return 1;
+        }
+    }
+
+    // Update the PWD and OLDPWD environment variables
+    oldpwd = get_env_var(cmd->envp, "PWD");
+    if (oldpwd != NULL) {
+        set_env_var(cmd->envp, "OLDPWD", oldpwd);
+    }
+
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        set_env_var(cmd->envp, "PWD", cwd);
+    } else {
+        perror("getcwd");
+        return 1;
+    }
+
+    return 0;
+}
 
 int builtin_echo(t_cmd *cmd) {
     char *envp[] = { NULL }; // environment variables (none in this example)
@@ -69,7 +137,7 @@ int	execute_builtin(t_cmd *cmd)
 {
 	if (ft_strncmp(cmd->cmd, "cd", 2) == 0)
 	{
-		// return (builtin_cd(cmd));
+		return (builtin_cd(cmd));
 	}
 	else if (ft_strncmp(cmd->cmd, "echo", 4) == 0)
 	{
@@ -150,12 +218,15 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.append = 0;
 		// cmd.next = NULL;
 
-		cmd.cmd = "echo";
-		cmd.args = (char *[]){"echo", "Hello!", NULL};
+		// cmd.cmd = "echo";
+		// cmd.args = (char *[]){"echo", "Hello!", NULL};
+		cmd.cmd = "cd";
+		cmd.args = (char *[]){"cd", NULL};
 		cmd.in_rd = NULL;
 		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
+		cmd.envp = envp;
 		// Execute cmd
 		execute_cmd(&cmd);
 		// Free allocated memory
@@ -164,3 +235,5 @@ int	main(int argc, char **argv, char **envp)
 	// }
 	return (0);
 }
+
+// gcc executor.c ../libft/*.c -g
