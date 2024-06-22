@@ -133,6 +133,20 @@ int builtin_echo(t_cmd *cmd) {
 	return (1);
 }
 
+int builtin_pwd(t_cmd *cmd) {
+    char *envp[] = { NULL }; // environment variables (none in this example)
+    
+    // Path to the executable
+    char *path = "/bin/pwd";
+    
+    // Arguments for the executable, including the command itself as the first argument
+    if (execve(path, cmd->args, envp) == -1) {
+        perror("execve failed");
+		return 0;
+    }
+	return (1);
+}
+
 int	execute_builtin(t_cmd *cmd)
 {
 	if (ft_strncmp(cmd->cmd, "cd", 2) == 0)
@@ -149,7 +163,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else if (ft_strncmp(cmd->cmd, "pwd", 3) == 0)
 	{
-		// return (builtin_pwd(cmd));
+		return (builtin_pwd(cmd));
 	}
     else if (ft_strncmp(cmd->cmd, "export", 6) == 0)
 	{
@@ -200,10 +214,10 @@ void display_prompt(t_cmd *cmd) {
     char *cwd;
 
     // Get the current working directory
-	cwd = get_env_var(cmd->envp, "HOME");
+	cwd = get_env_var(cmd->envp, "PWD");
     if (cwd != NULL) {
         // Print the prompt
-        printf("%s$ ", cwd);
+        printf("\nminishel:[%s]$ ", cwd);
     } else {
         perror("get_env_var");
     }
@@ -235,8 +249,10 @@ int	main(int argc, char **argv, char **envp)
 
 		// cmd.cmd = "echo";
 		// cmd.args = (char *[]){"echo", "Hello!", NULL};
-		cmd.cmd = "cd";
-		cmd.args = (char *[]){"cd", NULL};
+		// cmd.cmd = "cd";
+		// cmd.args = (char *[]){"cd", "/bin"};
+		cmd.cmd = "pwd";
+		cmd.args = (char *[]){"pwd", NULL};
 		cmd.in_rd = NULL;
 		cmd.out_rd = NULL;
 		cmd.append = 0;
