@@ -4,6 +4,7 @@
 #include "../libft/libft.h"
 #include <stdio.h> // DELETE
 #include <sys/wait.h>
+#include <stdlib.h>
 
 // void	handle_signal(int sig)
 // {
@@ -126,7 +127,7 @@ int builtin_echo(t_cmd *cmd) {
     char *path = "/bin/echo";
     
     // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, envp) == -1) {
+    if (execve(path, cmd->args, cmd->envp) == -1) {
         perror("execve failed");
 		return 0;
     }
@@ -140,11 +141,54 @@ int builtin_pwd(t_cmd *cmd) {
     char *path = "/bin/pwd";
     
     // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, envp) == -1) {
+    if (execve(path, cmd->args, cmd->envp) == -1) {
         perror("execve failed");
 		return 0;
     }
 	return (1);
+}
+
+int builtin_env(t_cmd *cmd) {
+    // char *envp[] = { NULL }; // environment variables (none in this example)
+    
+    // Path to the executable
+    char *path = "/bin/env";
+    
+    // Arguments for the executable, including the command itself as the first argument
+    if (execve(path, cmd->args, cmd->envp) == -1) {
+        perror("execve failed");
+		return 0;
+    }
+	return (1);
+}
+
+int builtin_unset(t_cmd *cmd) {
+    
+     if (cmd->cmd == NULL || *(cmd->cmd) == '\0' || strchr(cmd->cmd, '=') != NULL) {
+        fprintf(stderr, "unsetenv: invalid variable name\n");
+        return -1;  // Invalid variable name
+    }
+
+    size_t len = strlen(cmd->cmd);
+    char **env = cmd->envp;
+    char **next_env = cmd->envp;
+
+    // Iterate over the environ array
+    while (*env) {
+        // Compare the variable name with the current environment variable
+        if (strncmp(*env, cmd->cmd, len) == 0 && (*env)[len] == '=') {
+            // Found the environment variable to remove
+            env++;
+            continue;
+        }
+        // Move the next_env pointer
+        *next_env++ = *env++;
+    }
+
+    // Null-terminate the new environment array
+    *next_env = NULL;
+
+    return 0;  // Success
 }
 
 int	execute_builtin(t_cmd *cmd)
@@ -171,11 +215,11 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else if (ft_strncmp(cmd->cmd, "unset", 5) == 0)
 	{
-		// return (builtin_unset(cmd));
+		return (builtin_unset(cmd));
 	}
     else if (ft_strncmp(cmd->cmd, "env", 3) == 0)
 	{
-		// return (builtin_env(cmd));
+		return (builtin_env(cmd));
 	}
 	return (0);
 }
@@ -251,16 +295,22 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"echo", "Hello!", NULL};
 		// cmd.cmd = "cd";
 		// cmd.args = (char *[]){"cd", "/bin"};
-		cmd.cmd = "pwd";
-		cmd.args = (char *[]){"pwd", NULL};
+		// cmd.cmd = "pwd";
+		// cmd.args = (char *[]){"pwd", NULL};
+		// cmd.cmd = "env";
+		// cmd.args = (char *[]){"env", NULL};
+        
 		cmd.in_rd = NULL;
 		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
 		cmd.envp = envp;
-		// display_prompt(&cmd);
+		// display_prompt(&cmd); 
 		// Execute cmd
-		execute_cmd(&cmd);
+		// execute_cmd(&cmd);
+        cmd.cmd = "unset";
+		cmd.args = (char *[]){"unset", "LC_TIME", NULL};
+        execute_cmd(&cmd);
 		// display_prompt(&cmd);
 		// Free allocated memory
 		// free_input(input);
