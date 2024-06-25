@@ -162,6 +162,39 @@ int builtin_env(t_cmd *cmd) {
 	return (1);
 }
 
+int builtin_export(t_cmd *cmd) {
+    int i = 1; // args[0] is "export", so start with args[1]
+
+    // Loop through all provided arguments
+    while (cmd->args[i]) {
+        char *name = cmd->args[i];
+        char *value = ft_strchr(name, '=');
+
+        if (value) {
+            // Separate name and value
+            *value = '\0';
+            value++;
+
+            // Set the environment variable
+            if (my_setenv(name, value, 1) != 0) {
+                fprintf(stderr, "export: error setting variable %s\n", name);
+                return 1; // Return error status if setting fails
+            }
+        } else {
+            // Just export the existing variable
+            if (getenv(name)) {
+                // Do nothing, it's already in the environment
+            } else {
+                fprintf(stderr, "export: %s: not found\n", name);
+                return 1; // Return error status if the variable is not found
+            }
+        }
+        i++;
+    }
+
+    return 0; // Return success status
+}
+
 int builtin_unset(t_cmd *cmd) {
     
      if (cmd->cmd == NULL || *(cmd->cmd) == '\0' || strchr(cmd->cmd, '=') != NULL) {
@@ -212,7 +245,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else if (ft_strncmp(cmd->cmd, "export", 6) == 0)
 	{
-		// return (builtin_export(cmd));
+		return (builtin_export(cmd));
 	}
     else if (ft_strncmp(cmd->cmd, "unset", 5) == 0)
 	{
