@@ -169,14 +169,14 @@ int builtin_unset(t_cmd *cmd) {
         return -1;  // Invalid variable name
     }
 
-    size_t len = strlen(cmd->cmd);
+    size_t len = strlen(cmd->args[1]);
     char **env = cmd->envp;
     char **next_env = cmd->envp;
 
     // Iterate over the environ array
     while (*env) {
         // Compare the variable name with the current environment variable
-        if (strncmp(*env, cmd->cmd, len) == 0 && (*env)[len] == '=') {
+        if (strncmp(*env, cmd->args[1], len) == 0 && (*env)[len] == '=') {
             // Found the environment variable to remove
             env++;
             continue;
@@ -187,6 +187,7 @@ int builtin_unset(t_cmd *cmd) {
 
     // Null-terminate the new environment array
     *next_env = NULL;
+    
 
     return 0;  // Success
 }
@@ -309,7 +310,10 @@ int	main(int argc, char **argv, char **envp)
 		// Execute cmd
 		// execute_cmd(&cmd);
         cmd.cmd = "unset";
-		cmd.args = (char *[]){"unset", "LC_TIME", NULL};
+		cmd.args = (char *[]){"unset", "USER", NULL};
+        execute_cmd(&cmd);
+        cmd.cmd = "env";
+		cmd.args = (char *[]){"env", NULL};
         execute_cmd(&cmd);
 		// display_prompt(&cmd);
 		// Free allocated memory
