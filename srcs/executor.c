@@ -5,6 +5,7 @@
 #include <stdio.h> // DELETE
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <string.h> //delete
 
 // void	handle_signal(int sig)
 // {
@@ -60,11 +61,16 @@ void set_env_var(char **envr, const char *name, const char *value) {
         }
     }
     // If not found, add new environment variable
-    for (int i = 0; envr[i] != NULL; i++) {
-        if (envr[i][0] == '\0') {
-            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value);
+    int i = 0;
+    while (1) {
+        if (envr[i] == NULL) {
+            envr[i] = malloc(sizeof(char *));
+            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value); // SEGA
+            envr[i + 1] = malloc(sizeof(char *));
+            envr[i + 1] = NULL;
             return;
         }
+        i++;
     }
 }
 
@@ -167,7 +173,7 @@ int builtin_export(t_cmd *cmd) {
 
     // Loop through all provided arguments
     while (cmd->args[i]) {
-        char *name = cmd->args[i];
+        char *name = strdup(cmd->args[i]);
         char *value = ft_strchr(name, '=');
 
         if (value) {
@@ -176,10 +182,8 @@ int builtin_export(t_cmd *cmd) {
             value++;
 
             // Set the environment variable
-            if (my_setenv(name, value, 1) != 0) {
-                fprintf(stderr, "export: error setting variable %s\n", name);
-                return 1; // Return error status if setting fails
-            }
+            set_env_var(cmd->envp, name, value);
+               
         } else {
             // Just export the existing variable
             if (getenv(name)) {
@@ -342,8 +346,10 @@ int	main(int argc, char **argv, char **envp)
 		// display_prompt(&cmd); 
 		// Execute cmd
 		// execute_cmd(&cmd);
-        cmd.cmd = "unset";
-		cmd.args = (char *[]){"unset", "USER", NULL};
+        // cmd.cmd = "unset";
+		// cmd.args = (char *[]){"unset", "USER", NULL};
+        cmd.cmd = "export";
+        cmd.args = (char *[]){"export", "MYVAR=3", NULL};
         execute_cmd(&cmd);
         cmd.cmd = "env";
 		cmd.args = (char *[]){"env", NULL};
