@@ -6,7 +6,7 @@
 /*   By: asmolnya <asmolnya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/15 16:06:47 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/06/15 22:08:36 by asmolnya         ###   ########.fr       */
+/*   Updated: 2024/06/21 18:03:32 by asmolnya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ typedef struct s_cmd
 	char *in_rd;        // Input redirection file, e.g., "input.txt"
 	char *out_rd;       // Output redirection file, e.g., "output.txt"
 	int append;         // Flag for append mode (1 for >>, 0 for >)
+	char **envp;
 	struct s_cmd *next; // Pointer to the next command in case of pipes
 }	t_cmd;
 
