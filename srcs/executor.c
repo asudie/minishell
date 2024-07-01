@@ -140,6 +140,10 @@ int builtin_echo(t_cmd *cmd) {
 	return (1);
 }
 
+int builtin_exit(t_cmd *cmd) {
+    exit;
+}
+
 int builtin_pwd(t_cmd *cmd) {
     char *envp[] = { NULL }; // environment variables (none in this example)
     
@@ -241,7 +245,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
 	else if (ft_strncmp(cmd->cmd, "exit", 4) == 0)
 	{
-		// return (builtin_exit(cmd));
+		return (1);
 	}
     else if (ft_strncmp(cmd->cmd, "pwd", 3) == 0)
 	{
@@ -262,7 +266,7 @@ int	execute_builtin(t_cmd *cmd)
 	return (0);
 }
 
-void	execute_cmd(t_cmd *cmd)
+int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
 	t_cmd *it = cmd;
@@ -270,7 +274,8 @@ void	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	while (it)
 	{
-		execute_builtin(cmd);
+		if(execute_builtin(cmd))
+            return (1);
 			// pid = fork(); // when we need fork
 			// if (pid == 0)
 			// {
@@ -290,6 +295,7 @@ void	execute_cmd(t_cmd *cmd)
 			it = it->next;
 		
 	}
+    return (0);
 }
 
 void display_prompt(t_cmd *cmd) {
@@ -350,10 +356,16 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"unset", "USER", NULL};
         cmd.cmd = "export";
         cmd.args = (char *[]){"export", "MYVAR=3", NULL};
-        execute_cmd(&cmd);
+        if(execute_cmd(&cmd))
+            return 0;
+        cmd.cmd = "exit";
+        cmd.args = (char *[]){"exit", NULL};
+        if(execute_cmd(&cmd))
+            return 0;
         cmd.cmd = "env";
 		cmd.args = (char *[]){"env", NULL};
-        execute_cmd(&cmd);
+        if(execute_cmd(&cmd))
+            return 0;
 		// display_prompt(&cmd);
 		// Free allocated memory
 		// free_input(input);
