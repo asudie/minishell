@@ -311,6 +311,47 @@ void display_prompt(t_cmd *cmd) {
     }
 }
 
+void out_rd(const char *filename) // check if it's working!
+{
+    
+    int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+
+    // Duplicate the file descriptor to stdout
+    int saved_stdout = dup(STDOUT_FILENO);
+    if (saved_stdout == -1) {
+        perror("dup");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (dup2(fd, STDOUT_FILENO) == -1) {
+        perror("dup2");
+        close(fd);
+        close(saved_stdout);
+        exit(EXIT_FAILURE);
+    }
+
+    // Close the target file descriptor as it's no longer needed
+    close(fd);
+
+    // Call the builtin_env function
+    builtin_env();
+
+    // Restore the original stdout
+    if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
+        perror("dup2");
+        close(saved_stdout);
+        exit(EXIT_FAILURE);
+    }
+
+    // Close the saved stdout file descriptor
+    close(saved_stdout);
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_cmd	cmd;
