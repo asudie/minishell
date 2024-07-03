@@ -27,8 +27,9 @@
 
 typedef struct s_cmd
 {
-	char			*cmd;	// The command name, e.g., "ls"
-	char			**args;	// An array of arguments, e.g., ["ls", "-l", NULL]
+	// char			*cmd;	// The command name, e.g., "ls"
+	// char			**args;	// An array of arguments, e.g., ["ls", "-l", NULL]
+	char			*cmd;	// An array of command arguments, e.g., ["ls", "-l", NULL]
 	char			*in_rd;	// Input redirection file, e.g., "input.txt"
 	char			*out_rd;// Output redirection file, e.g., "output.txt"
 	int				append;	// Flag for append mode (1 for >>, 0 for >)
