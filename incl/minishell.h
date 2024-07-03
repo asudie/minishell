@@ -49,6 +49,7 @@ typedef struct s_cmd
 }	t_cmd;
 
 // PARSER
+void	ft_parsing(t_cmd *cmd, char *input);
 
 // EXECUTOR
 int out_rd(t_cmd *cmd);

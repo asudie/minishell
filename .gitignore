@@ -1,4 +1,4 @@
-.vscode/
+.vscode
 minishell
-*.a
 *.o
+*.a
