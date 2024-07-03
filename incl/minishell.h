@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: asmolnya <asmolnya@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/15 16:06:47 by svalchuk          #+#    #+#             */
+/*   Updated: 2024/07/03 21:43:10 by asmolnya         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -37,6 +49,11 @@ typedef struct s_cmd
 	struct s_cmd	*next;	// Pointer to the next command in case of pipes
 }	t_cmd;
 
+// PARSER
 void	ft_parsing(t_cmd *cmd, char *input);
+
+// EXECUTOR
+int out_rd(t_cmd *cmd);
+void print_file_by_fd(int fd);
 
 #endif
