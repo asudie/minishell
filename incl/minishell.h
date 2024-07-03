@@ -6,7 +6,7 @@
 /*   By: asmolnya <asmolnya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/15 16:06:47 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/01 20:30:42 by asmolnya         ###   ########.fr       */
+/*   Updated: 2024/07/03 21:29:15 by asmolnya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,11 @@ typedef struct s_cmd
 	char **envp;
 	struct s_cmd *next; // Pointer to the next command in case of pipes
 }	t_cmd;
+
+// PARSER
+
+// EXECUTOR
+int out_rd(t_cmd *cmd);
+void print_file_by_fd(int fd);
 
 #endif
