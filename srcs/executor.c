@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <string.h> //delete
+#include <fcntl.h>
 
 // void	handle_signal(int sig)
 // {
@@ -140,6 +141,10 @@ int builtin_echo(t_cmd *cmd) {
 	return (1);
 }
 
+int builtin_exit(t_cmd *cmd) {
+    exit;
+}
+
 int builtin_pwd(t_cmd *cmd) {
     char *envp[] = { NULL }; // environment variables (none in this example)
     
@@ -241,7 +246,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
 	else if (ft_strncmp(cmd->cmd, "exit", 4) == 0)
 	{
-		// return (builtin_exit(cmd));
+		return (1);
 	}
     else if (ft_strncmp(cmd->cmd, "pwd", 3) == 0)
 	{
@@ -257,12 +262,31 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else if (ft_strncmp(cmd->cmd, "env", 3) == 0)
 	{
-		return (builtin_env(cmd));
+		return (out_rd(cmd)); // change for builtin_env
 	}
 	return (0);
 }
 
-void	execute_cmd(t_cmd *cmd)
+void print_file_by_fd(int fd) {
+    char buffer[1024];
+    ssize_t bytes_read;
+
+    // Read from the file descriptor in a loop until the end of the file
+    while ((bytes_read = read(fd, buffer, sizeof(buffer))) > 0) {
+        // Write the buffer content to the standard output
+        if (write(STDOUT_FILENO, buffer, bytes_read) != bytes_read) {
+            perror("write");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    if (bytes_read == -1) {
+        perror("read");
+        exit(EXIT_FAILURE);
+    }
+}
+
+int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
 	t_cmd *it = cmd;
@@ -270,7 +294,8 @@ void	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	while (it)
 	{
-		execute_builtin(cmd);
+		if(execute_builtin(cmd))
+            return (1);
 			// pid = fork(); // when we need fork
 			// if (pid == 0)
 			// {
@@ -290,6 +315,7 @@ void	execute_cmd(t_cmd *cmd)
 			it = it->next;
 		
 	}
+    return (0);
 }
 
 void display_prompt(t_cmd *cmd) {
@@ -303,6 +329,49 @@ void display_prompt(t_cmd *cmd) {
     } else {
         perror("get_env_var");
     }
+}
+
+int out_rd(t_cmd *cmd) // check if it's working!
+{
+    
+    int fd = open(cmd->out_rd, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+
+    // Duplicate the file descriptor to stdout
+    int saved_stdout = dup(STDOUT_FILENO);
+    if (saved_stdout == -1) {
+        perror("dup");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (dup2(fd, STDOUT_FILENO) == -1) {
+        perror("dup2");
+        close(fd);
+        close(saved_stdout);
+        exit(EXIT_FAILURE);
+    }
+
+    // Close the target file descriptor as it's no longer needed
+    close(fd);
+
+    // Call the builtin_env function
+    builtin_env(cmd);
+    print_file_by_fd(saved_stdout);
+    // Restore the original stdout
+    if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
+        perror("dup2");
+        close(saved_stdout);
+        exit(EXIT_FAILURE);
+    }
+
+    // Close the saved stdout file descriptor
+    close(saved_stdout);
+
+    return 0;
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -339,7 +408,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"env", NULL};
         
 		cmd.in_rd = NULL;
-		cmd.out_rd = NULL;
+		cmd.out_rd = "out.txt";
 		cmd.append = 0;
 		cmd.next = NULL;
 		cmd.envp = envp;
@@ -348,12 +417,18 @@ int	main(int argc, char **argv, char **envp)
 		// execute_cmd(&cmd);
         // cmd.cmd = "unset";
 		// cmd.args = (char *[]){"unset", "USER", NULL};
-        cmd.cmd = "export";
-        cmd.args = (char *[]){"export", "MYVAR=3", NULL};
-        execute_cmd(&cmd);
+        // cmd.cmd = "export";
+        // cmd.args = (char *[]){"export", "MYVAR=3", NULL};
+        // if(execute_cmd(&cmd))
+        //     return 0;
+        // cmd.cmd = "exit";
+        // cmd.args = (char *[]){"exit", NULL};
+        // if(execute_cmd(&cmd))
+        //     return 0;
         cmd.cmd = "env";
 		cmd.args = (char *[]){"env", NULL};
-        execute_cmd(&cmd);
+        if(execute_cmd(&cmd))
+            return 0;
 		// display_prompt(&cmd);
 		// Free allocated memory
 		// free_input(input);
