@@ -1,7 +1,8 @@
 NAME 			= minishell
 HDRDIR			= incl/
 SRCSDIR			= srcs/
-SRCS			= ${SRCSDIR}main.c
+SRCS			= ${SRCSDIR}main.c \
+				  ${SRCSDIR}ft_parser.c
 OBJS			= $(SRCS:.c=.o)
 CFLAGS 			= -Wall -Wextra -Werror -I$(HDRDIR) -g
 
@@ -13,7 +14,7 @@ CC 				= cc
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT) 
-	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) $(LIBFT) 
+	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) $(LIBFT) -lreadline
 
 $(LIBFT):
 	make -C $(LIBFTDIR)
