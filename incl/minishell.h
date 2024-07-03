@@ -35,4 +35,6 @@ typedef struct s_cmd
 	struct s_cmd	*next;	// Pointer to the next command in case of pipes
 }	t_cmd;
 
+void	ft_parsing(t_cmd *cmd, char *input);
+
 #endif
