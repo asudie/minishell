@@ -206,7 +206,7 @@ int builtin_export(t_cmd *cmd) {
 
 int builtin_unset(t_cmd *cmd) {
     
-     if (cmd->cmd == NULL || *(cmd->cmd) == '\0' || strchr(cmd->cmd, '=') != NULL) {
+     if (cmd->args[0] == NULL || *(cmd->args[0]) == '\0' || strchr(cmd->args[0], '=') != NULL) {
         fprintf(stderr, "unsetenv: invalid variable name\n");
         return -1;  // Invalid variable name
     }
@@ -236,31 +236,31 @@ int builtin_unset(t_cmd *cmd) {
 
 int	execute_builtin(t_cmd *cmd)
 {
-	if (ft_strncmp(cmd->cmd, "cd", 2) == 0)
+	if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
 	{
 		return (builtin_cd(cmd));
 	}
-	else if (ft_strncmp(cmd->cmd, "echo", 4) == 0)
+	else if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
 	{
 		return (builtin_echo(cmd));
 	}
-	else if (ft_strncmp(cmd->cmd, "exit", 4) == 0)
+	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0)
 	{
 		return (1);
 	}
-    else if (ft_strncmp(cmd->cmd, "pwd", 3) == 0)
+    else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
 	{
 		return (builtin_pwd(cmd));
 	}
-    else if (ft_strncmp(cmd->cmd, "export", 6) == 0)
+    else if (ft_strncmp(cmd->args[0], "export", 6) == 0)
 	{
 		return (builtin_export(cmd));
 	}
-    else if (ft_strncmp(cmd->cmd, "unset", 5) == 0)
+    else if (ft_strncmp(cmd->args[0], "unset", 5) == 0)
 	{
 		return (builtin_unset(cmd));
 	}
-    else if (ft_strncmp(cmd->cmd, "env", 3) == 0)
+    else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
 	{
 		return (out_rd(cmd)); // change for builtin_env
 	}
@@ -333,8 +333,11 @@ void display_prompt(t_cmd *cmd) {
 
 int out_rd(t_cmd *cmd) // check if it's working!
 {
-    
-    int fd = open(cmd->out_rd, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    int fd;
+    if(cmd->append)
+        fd = open(cmd->out_rd, O_WRONLY | O_APPEND | O_CREAT, 0644);
+    else
+        fd = open(cmd->out_rd, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd == -1) {
         perror("open");
         exit(EXIT_FAILURE);
@@ -359,7 +362,7 @@ int out_rd(t_cmd *cmd) // check if it's working!
     close(fd);
 
     // Call the builtin_env function
-    builtin_env(cmd);
+    builtin_env(cmd); // here execute
     print_file_by_fd(saved_stdout);
     // Restore the original stdout
     if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
@@ -425,10 +428,12 @@ int	main(int argc, char **argv, char **envp)
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-        cmd.cmd = "env";
 		cmd.args = (char *[]){"env", NULL};
         if(execute_cmd(&cmd))
             return 0;
+        // cmd.append = 1;
+        // if(execute_cmd(&cmd))
+        //     return 0;
 		// display_prompt(&cmd);
 		// Free allocated memory
 		// free_input(input);
