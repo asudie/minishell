@@ -331,7 +331,7 @@ void display_prompt(t_cmd *cmd) {
     }
 }
 
-int out_rd(t_cmd *cmd) // check if it's working!
+int out_rd(t_cmd *cmd)
 {
     int fd;
     if(cmd->append)
@@ -375,6 +375,41 @@ int out_rd(t_cmd *cmd) // check if it's working!
     close(saved_stdout);
 
     return 0;
+}
+
+int in_rd(t_cmd *cmd) // check if it's working!
+{
+    int fd = open(cmd->in_rd, O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+
+       // Fork a child process
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if (pid == 0) { // Child process
+        // Redirect stdin to the file descriptor
+        if (dup2(fd, STDIN_FILENO) == -1) {
+            perror("dup2");
+            close(fd);
+            exit(EXIT_FAILURE);
+        }
+        close(fd);
+
+        // Execute the command
+        if (builtin_env(cmd)) {
+            perror("builtin");
+            exit(EXIT_FAILURE);
+        }
+    } else { // Parent process
+        close(fd);
+        wait(NULL); // Wait for the child process to finish
+    }
 }
 
 int	main(int argc, char **argv, char **envp)
