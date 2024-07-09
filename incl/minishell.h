@@ -1,6 +1,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+# include "../ft_destructor/ft_alloc.h"
 # include "../libft/libft.h"
 # include <readline/readline.h>
 # include <readline/history.h>
@@ -42,5 +43,8 @@ void	ft_parsing(t_cmd *cmd, char *input);
 // EXECUTOR
 int out_rd(t_cmd *cmd);
 void print_file_by_fd(int fd);
+
+// UTILITY
+int	ft_strcmp(char *s1, char *s2);
 
 #endif
