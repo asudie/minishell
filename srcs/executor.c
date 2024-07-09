@@ -8,6 +8,8 @@
 #include <string.h> //delete
 #include <fcntl.h>
 
+#define PATH_MAX 4096
+
 // void	handle_signal(int sig)
 // {
 // 	if (sig == SIGINT)
@@ -141,6 +143,20 @@ int builtin_echo(t_cmd *cmd) {
 	return (1);
 }
 
+int builtin_cat(t_cmd *cmd) {
+    char *envp[] = { NULL }; // environment variables (none in this example)
+    
+    // Path to the executable
+    char *path = "/bin/cat";
+    
+    // Arguments for the executable, including the command itself as the first argument
+    if (execve(path, cmd->args, cmd->envp) == -1) {
+        perror("execve failed");
+		return 0;
+    }
+	return (1);
+}
+
 int builtin_exit(t_cmd *cmd) {
     exit;
 }
@@ -234,6 +250,51 @@ int builtin_unset(t_cmd *cmd) {
     return 0;  // Success
 }
 
+int resolve_full_path(char *command, char *full_path) {
+    char *path = getenv("PATH");
+    if (!path) {
+        return -1;
+    }
+
+    char *dir = strtok(path, ":");
+    while (dir != NULL) {
+        snprintf(full_path, PATH_MAX, "%s/%s", dir, command);
+        if (access(full_path, X_OK) == 0) {
+            return 0;
+        }
+        dir = strtok(NULL, ":");
+    }
+    return -1;
+}
+
+
+int custom(t_cmd *cmd)
+{
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        return -1;
+    }
+    if (pid == 0) { // Child process
+        char full_path[PATH_MAX];
+        if (resolve_full_path(cmd->args[0], full_path) == -1) {
+            fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
+            exit(EXIT_FAILURE);
+        }
+        // Replace the current process image with a new process image
+        if (execve(full_path, cmd->args, cmd->envp) == -1) {
+            perror("execve");
+            exit(EXIT_FAILURE);
+        }
+    } else { // Parent process
+        // Wait for the child process to complete
+        if (wait(NULL) == -1) {
+            perror("wait");
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
 int	execute_builtin(t_cmd *cmd)
 {
 	if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
@@ -243,6 +304,10 @@ int	execute_builtin(t_cmd *cmd)
 	else if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
 	{
 		return (builtin_echo(cmd));
+	}
+    else if (ft_strncmp(cmd->args[0], "cat", 4) == 0)
+	{
+		return (builtin_cat(cmd));
 	}
 	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0)
 	{
@@ -264,6 +329,10 @@ int	execute_builtin(t_cmd *cmd)
 	{
 		return (out_rd(cmd)); // change for builtin_env
 	}
+    else
+    {
+        return (custom(cmd));
+    }
 	return (0);
 }
 
@@ -377,40 +446,40 @@ int out_rd(t_cmd *cmd)
     return 0;
 }
 
-int in_rd(t_cmd *cmd) // check if it's working!
-{
-    int fd = open(cmd->in_rd, O_RDONLY);
-    if (fd == -1) {
-        perror("open");
-        exit(EXIT_FAILURE);
-    }
+// int in_rd(t_cmd *cmd) // check if it's working!
+// {
+//     int fd = open(cmd->in_rd, O_RDONLY);
+//     if (fd == -1) {
+//         perror("open");
+//         exit(EXIT_FAILURE);
+//     }
 
-       // Fork a child process
-    pid_t pid = fork();
-    if (pid == -1) {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    }
+//        // Fork a child process
+//     pid_t pid = fork();
+//     if (pid == -1) {
+//         perror("fork");
+//         exit(EXIT_FAILURE);
+//     }
 
-    if (pid == 0) { // Child process
-        // Redirect stdin to the file descriptor
-        if (dup2(fd, STDIN_FILENO) == -1) {
-            perror("dup2");
-            close(fd);
-            exit(EXIT_FAILURE);
-        }
-        close(fd);
+//     if (pid == 0) { // Child process
+//         // Redirect stdin to the file descriptor
+//         if (dup2(fd, STDIN_FILENO) == -1) {
+//             perror("dup2");
+//             close(fd);
+//             exit(EXIT_FAILURE);
+//         }
+//         close(fd);
 
-        // Execute the command
-        if (builtin_env(cmd)) {
-            perror("builtin");
-            exit(EXIT_FAILURE);
-        }
-    } else { // Parent process
-        close(fd);
-        wait(NULL); // Wait for the child process to finish
-    }
-}
+//         // Execute the command
+//         if (builtin_env(cmd)) {
+//             perror("builtin");
+//             exit(EXIT_FAILURE);
+//         }
+//     } else { // Parent process
+//         close(fd);
+//         wait(NULL); // Wait for the child process to finish
+//     }
+// }
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -446,7 +515,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"env", NULL};
         
 		cmd.in_rd = NULL;
-		cmd.out_rd = "out.txt";
+		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
 		cmd.envp = envp;
@@ -463,7 +532,7 @@ int	main(int argc, char **argv, char **envp)
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		cmd.args = (char *[]){"env", NULL};
+		cmd.args = (char *[]){"custom.c", NULL};
         if(execute_cmd(&cmd))
             return 0;
         // cmd.append = 1;
@@ -476,5 +545,19 @@ int	main(int argc, char **argv, char **envp)
 	// }
 	return (0);
 }
+
+
+// LEFT TO IMPLEMENT
+
+// ◦ ctrl-C displays a new prompt on a new line.
+// ◦ ctrl-D exits the shell.
+// ◦ ctrl-\ does nothing.
+// ◦ Handle environment variables ($ followed by a sequence of characters) which
+// should expand to their values.
+// • Handle $? which should expand to the exit status of the most recently executed
+// foreground pipeline
+// • Implement pipes (| character). The output of each command in the pipeline is
+// connected to the input of the next command via a pipe
+// run random exes
 
 // gcc executor.c ../libft/*.c -g
