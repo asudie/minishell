@@ -1,7 +1,7 @@
-#include "../incl/minishell.h"
+#include "../../incl/minishell.h"
 #include <signal.h>
 #include <unistd.h>
-#include "../libft/libft.h"
+#include "../../libft/libft.h"
 #include <stdio.h> // DELETE
 #include <sys/wait.h>
 #include <stdlib.h>
@@ -252,6 +252,7 @@ int builtin_unset(t_cmd *cmd) {
 
 int resolve_full_path(char *command, char *full_path) {
     char *path = getenv("PATH");
+    // printf("HERE\n");
     if (!path) {
         return -1;
     }
@@ -276,6 +277,9 @@ int custom(t_cmd *cmd)
         return -1;
     }
     if (pid == 0) { // Child process
+        // Print the PID of the child process
+        // printf("Child PID: %d\n", getpid());
+        // fflush(stdout); // Ensure the output is flushed
         char full_path[PATH_MAX];
         if (resolve_full_path(cmd->args[0], full_path) == -1) {
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
@@ -283,6 +287,7 @@ int custom(t_cmd *cmd)
         }
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
+            printf("%s\n", full_path);
             perror("execve");
             exit(EXIT_FAILURE);
         }
@@ -532,7 +537,7 @@ int	main(int argc, char **argv, char **envp)
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		cmd.args = (char *[]){"custom.c", NULL};
+		cmd.args = (char *[]){"custom", NULL};
         if(execute_cmd(&cmd))
             return 0;
         // cmd.append = 1;
