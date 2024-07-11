@@ -332,7 +332,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
 	{
-		return (out_rd(cmd)); // change for builtin_env
+		return (builtin_env(cmd)); // change for builtin_env
 	}
     else
     {
@@ -360,6 +360,15 @@ void print_file_by_fd(int fd) {
     }
 }
 
+int start_exec(t_cmd *cmd)
+{
+    if(cmd->out_rd)
+        return(out_rd(cmd));
+    if(cmd->in_rd)
+        return(in_rd(cmd));
+    return (execute_builtin(cmd));
+}
+
 int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
@@ -368,7 +377,7 @@ int	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	while (it)
 	{
-		if(execute_builtin(cmd))
+		if(start_exec(cmd))
             return (1);
 			// pid = fork(); // when we need fork
 			// if (pid == 0)
@@ -408,6 +417,7 @@ void display_prompt(t_cmd *cmd) {
 int out_rd(t_cmd *cmd)
 {
     int fd;
+    int res;
     if(cmd->append)
         fd = open(cmd->out_rd, O_WRONLY | O_APPEND | O_CREAT, 0644);
     else
@@ -435,9 +445,11 @@ int out_rd(t_cmd *cmd)
     // Close the target file descriptor as it's no longer needed
     close(fd);
 
-    // Call the builtin_env function
-    builtin_env(cmd); // here execute
-    print_file_by_fd(saved_stdout);
+    if(cmd->in_rd)
+        res = in_rd(cmd);
+    else
+        res = execute_builtin(cmd); // here execute
+    // print_file_by_fd(saved_stdout);
     // Restore the original stdout
     if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
         perror("dup2");
@@ -448,43 +460,43 @@ int out_rd(t_cmd *cmd)
     // Close the saved stdout file descriptor
     close(saved_stdout);
 
-    return 0;
+    return res;
 }
 
-// int in_rd(t_cmd *cmd) // check if it's working!
-// {
-//     int fd = open(cmd->in_rd, O_RDONLY);
-//     if (fd == -1) {
-//         perror("open");
-//         exit(EXIT_FAILURE);
-//     }
+int in_rd(t_cmd *cmd) // check if it's working!
+{
+    int fd = open(cmd->in_rd, O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
 
-//        // Fork a child process
-//     pid_t pid = fork();
-//     if (pid == -1) {
-//         perror("fork");
-//         exit(EXIT_FAILURE);
-//     }
+       // Fork a child process
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
 
-//     if (pid == 0) { // Child process
-//         // Redirect stdin to the file descriptor
-//         if (dup2(fd, STDIN_FILENO) == -1) {
-//             perror("dup2");
-//             close(fd);
-//             exit(EXIT_FAILURE);
-//         }
-//         close(fd);
+    if (pid == 0) { // Child process
+        // Redirect stdin to the file descriptor
+        if (dup2(fd, STDIN_FILENO) == -1) {
+            perror("dup2");
+            close(fd);
+            exit(EXIT_FAILURE);
+        }
+        close(fd);
 
-//         // Execute the command
-//         if (builtin_env(cmd)) {
-//             perror("builtin");
-//             exit(EXIT_FAILURE);
-//         }
-//     } else { // Parent process
-//         close(fd);
-//         wait(NULL); // Wait for the child process to finish
-//     }
-// }
+        // Execute the command
+        if (execute_builtin(cmd)) {
+            perror("builtin");
+            exit(EXIT_FAILURE);
+        }
+    } else { // Parent process
+        close(fd);
+        wait(NULL); // Wait for the child process to finish
+    }
+}
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -499,7 +511,7 @@ int	main(int argc, char **argv, char **envp)
 		// // Read input
 		// char *input = read_input();
 		// // Parse input
-		// t_cmd *cmd = parse_input(input);
+		// t_cmd *cmd = parse_input(input); 
 		// -------------------------------------------------------------------
 		// cmd = malloc(sizeof(t_cmd));
         // EXAMPLE: ls -l > output.txt
@@ -519,7 +531,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.cmd = "env";
 		// cmd.args = (char *[]){"env", NULL};
         
-		cmd.in_rd = NULL;
+		cmd.in_rd = "input.txt"; // doesn't find input!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
@@ -537,7 +549,7 @@ int	main(int argc, char **argv, char **envp)
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		cmd.args = (char *[]){"custom", NULL};
+		cmd.args = (char *[]){"print", NULL}; 
         if(execute_cmd(&cmd))
             return 0;
         // cmd.append = 1;
@@ -557,12 +569,10 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-C displays a new prompt on a new line.
 // ◦ ctrl-D exits the shell.
 // ◦ ctrl-\ does nothing.
-// ◦ Handle environment variables ($ followed by a sequence of characters) which
-// should expand to their values.
 // • Handle $? which should expand to the exit status of the most recently executed
 // foreground pipeline
 // • Implement pipes (| character). The output of each command in the pipeline is
 // connected to the input of the next command via a pipe
-// run random exes
+// HEREDOC
 
-// gcc executor.c ../libft/*.c -g
+// gcc executor.c ../../libft/*.c -g
