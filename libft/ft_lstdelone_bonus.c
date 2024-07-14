@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 14:36:30 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/29 15:28:06 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/12 14:06:47 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	ft_lstdelone(t_list *lst, void (*del)(void*))
 	if (lst == NULL || del == NULL)
 		return ;
 	del(lst->content);
-	free(lst);
+	ft_free(lst);
 }
 
 // #include <stdio.h>

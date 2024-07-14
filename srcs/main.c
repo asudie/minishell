@@ -1,26 +1,69 @@
 #include "../incl/minishell.h"
 
-int	main()
+static void	ft_init_minihell(t_mhell *mhell, char **envp);
+static void	ft_minihell(t_mhell *mhell);
+static int	ft_input_check(char *input);
+
+int	main(int argc, char **argv, char **envp)
 {
-    t_cmd *cmd;
-	char *input;
+	t_mhell	mhell;
 
-    ft_alloc_init();
-    // Display a prompt and read input
-    cmd = ft_malloc(sizeof(t_cmd));
-    while ((input = readline(COLOR_YELLOW"minishell$ "COLOR_RESET)) != NULL){
-        // If input is not empty, add it to the history
-        if (*input) {
-            add_history(input);
-        }
-        ft_parsing(cmd, input);
+	(void)argv;
+	ft_alloc_init();
+	if (argc != 1)
+	{
+		printf(ERR_ARG);
+		return (1);
+	}
+	else
+	{
+		ft_init_minihell(&mhell, envp);
+		ft_minihell(&mhell);
+	}
+	ft_destructor();
+	return (0);
+}
 
-        // Process the input
-        printf("You entered: %s\n", input);
-    }
+static void	ft_init_minihell(t_mhell *mhell, char **envp)
+{
+	mhell->env = NULL;
+	mhell->cmd = NULL;
+	ft_init_env(mhell, envp);
+}
 
-    // Clear the history list
-    rl_clear_history();
-    ft_destructor();
+static void	ft_minihell(t_mhell *mhell)
+{
+	char	*input;
+	char	*path;
+
+	while (1)
+	{
+		input = readline("Mhell$ ");
+		if (ft_input_check(input))
+			continue ;
+		add_history(input);
+		if (ft_input_parse(mhell))
+		{
+			//executor(mhell);
+		}
+		ft_free(input);
+	}
+	rl_clear_history();
+	ft_free(path);
+}
+
+static int	ft_input_check(char *input)
+{
+	if (!input)
+	{
+		ft_free(input);
+		printf(COLOR_PURPLE"exit\n"COLOR_RESET);
+		exit(EXIT_SUCCESS);
+	}
+	else if (!*input)
+	{
+		ft_free(input);
+		return (1);
+	}
 	return (0);
 }

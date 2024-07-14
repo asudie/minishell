@@ -4,17 +4,21 @@ HDRDIR			= incl/
 EXECDIR			= exec/
 EXECSRCS		= ${EXECDIR}executor.c
 
-PARSEDIR		= parse/
-PARSESRCS		= ${PARSEDIR}ft_parser.c
+PARSEDIR		= ${SRCSDIR}parse/
+PARSESRCS		= ${PARSEDIR}ft_input_parse.c \
+				#   ${PARSEDIR}ft_init_env.c
 
-UTILDIR			= utils/
-UTILSRCS		= ${UTILDIR}ft_utils.c
+UTILDIR			= ${SRCSDIR}utils/
+UTILSRCS		= ${UTILDIR}ft_utils.c ft_env_utils.c
 
 SRCSDIR			= srcs/
 SRCS			= ${SRCSDIR}main.c \
-				  ${SRCSDIR}${PARSESRCS} \
-				  ${SRCSDIR}${UTILSRCS}
-#				  ${SRCSDIR}${EXECSRCS}
+				  ${PARSEDIR}ft_input_parse.c \
+				  ${PARSEDIR}ft_init_env.c \
+				  ${UTILDIR}ft_utils.c \
+				  ${UTILDIR}ft_env_utils.c
+
+VPATH			= ${SRCSDIR} ${SRCSDIR}parse/ ${SRCSDIR}utils/
 OBJS			= $(SRCS:.c=.o)
 CFLAGS 			= -Wall -Wextra -Werror -I$(HDRDIR) -g
 

@@ -65,9 +65,9 @@ void set_env_var(char **envr, const char *name, const char *value) {
     int i = 0;
     while (1) {
         if (envr[i] == NULL) {
-            envr[i] = malloc(sizeof(char *));
+            envr[i] = ft_malloc(sizeof(char *));
             snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value); // SEGA
-            envr[i + 1] = malloc(sizeof(char *));
+            envr[i + 1] = ft_malloc(sizeof(char *));
             envr[i + 1] = NULL;
             return;
         }
@@ -427,7 +427,7 @@ int	main(int argc, char **argv, char **envp)
 		// // Parse input
 		// t_cmd *cmd = parse_input(input);
 		// -------------------------------------------------------------------
-		// cmd = malloc(sizeof(t_cmd));
+		// cmd = ft_malloc(sizeof(t_cmd));
         // EXAMPLE: ls -l > output.txt
 		// cmd.cmd = "ls";
 		// cmd.args = (char *[]){"ls", "-l", NULL};
@@ -470,7 +470,7 @@ int	main(int argc, char **argv, char **envp)
         // if(execute_cmd(&cmd))
         //     return 0;
 		// display_prompt(&cmd);
-		// Free allocated memory
+		// ft_free allocated memory
 		// free_input(input);
 		// free_cmd(cmd);
 	// }

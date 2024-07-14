@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 14:22:22 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/23 14:34:44 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/12 14:04:36 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	n = ft_strlen(s + start);
 	if (n < len)
 		len = n;
-	str = (char *)malloc((len + 1) * sizeof(char));
+	str = (char *)ft_malloc((len + 1) * sizeof(char));
 	if (str == NULL || s == NULL)
 		return (NULL);
 	i = 0;

@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 16:02:57 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/22 13:36:11 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/12 14:04:55 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ char	*ft_strtrim(char const *s1, char const *set)
 		return (ft_strdup(s1 + end + 1));
 	while (ft_strchr(set, s1[end]) && end >= 0)
 		end--;
-	str = malloc(end - start + 2);
+	str = ft_malloc(end - start + 2);
 	if (str == NULL || s1 == NULL || set == NULL)
 		return (NULL);
 	ft_strlcpy(str, &s1[start], end - start + 2);
