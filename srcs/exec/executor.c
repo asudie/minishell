@@ -1,12 +1,14 @@
-#include "../incl/minishell.h"
+#include "../../incl/minishell.h"
 #include <signal.h>
 #include <unistd.h>
-#include "../libft/libft.h"
+#include "../../libft/libft.h"
 #include <stdio.h> // DELETE
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <string.h> //delete
 #include <fcntl.h>
+
+#define PATH_MAX 4096
 
 // void	handle_signal(int sig)
 // {
@@ -141,6 +143,20 @@ int builtin_echo(t_cmd *cmd) {
 	return (1);
 }
 
+int builtin_cat(t_cmd *cmd) {
+    char *envp[] = { NULL }; // environment variables (none in this example)
+    
+    // Path to the executable
+    char *path = "/bin/cat";
+    
+    // Arguments for the executable, including the command itself as the first argument
+    if (execve(path, cmd->args, cmd->envp) == -1) {
+        perror("execve failed");
+		return 0;
+    }
+	return (1);
+}
+
 int builtin_exit(t_cmd *cmd) {
     exit;
 }
@@ -234,6 +250,56 @@ int builtin_unset(t_cmd *cmd) {
     return 0;  // Success
 }
 
+int resolve_full_path(char *command, char *full_path) {
+    char *path = getenv("PATH");
+    // printf("HERE\n");
+    if (!path) {
+        return -1;
+    }
+
+    char *dir = strtok(path, ":");
+    while (dir != NULL) {
+        snprintf(full_path, PATH_MAX, "%s/%s", dir, command);
+        if (access(full_path, X_OK) == 0) {
+            return 0;
+        }
+        dir = strtok(NULL, ":");
+    }
+    return -1;
+}
+
+
+int custom(t_cmd *cmd)
+{
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        return -1;
+    }
+    if (pid == 0) { // Child process
+        // Print the PID of the child process
+        // printf("Child PID: %d\n", getpid());
+        // fflush(stdout); // Ensure the output is flushed
+        char full_path[PATH_MAX];
+        if (resolve_full_path(cmd->args[0], full_path) == -1) {
+            fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
+            exit(EXIT_FAILURE);
+        }
+        // Replace the current process image with a new process image
+        if (execve(full_path, cmd->args, cmd->envp) == -1) {
+            printf("%s\n", full_path);
+            perror("execve");
+            exit(EXIT_FAILURE);
+        }
+    } else { // Parent process
+        // Wait for the child process to complete
+        if (wait(NULL) == -1) {
+            perror("wait");
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
 int	execute_builtin(t_cmd *cmd)
 {
 	if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
@@ -243,6 +309,10 @@ int	execute_builtin(t_cmd *cmd)
 	else if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
 	{
 		return (builtin_echo(cmd));
+	}
+    else if (ft_strncmp(cmd->args[0], "cat", 4) == 0)
+	{
+		return (builtin_cat(cmd));
 	}
 	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0)
 	{
@@ -262,8 +332,12 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
 	{
-		return (out_rd(cmd)); // change for builtin_env
+		return (builtin_env(cmd)); // change for builtin_env
 	}
+    else
+    {
+        return (custom(cmd));
+    }
 	return (0);
 }
 
@@ -286,6 +360,15 @@ void print_file_by_fd(int fd) {
     }
 }
 
+int start_exec(t_cmd *cmd)
+{
+    if(cmd->out_rd)
+        return(out_rd(cmd));
+    if(cmd->in_rd)
+        return(in_rd(cmd));
+    return (execute_builtin(cmd));
+}
+
 int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
@@ -294,7 +377,7 @@ int	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	while (it)
 	{
-		if(execute_builtin(cmd))
+		if(start_exec(cmd))
             return (1);
 			// pid = fork(); // when we need fork
 			// if (pid == 0)
@@ -334,6 +417,7 @@ void display_prompt(t_cmd *cmd) {
 int out_rd(t_cmd *cmd)
 {
     int fd;
+    int res;
     if(cmd->append)
         fd = open(cmd->out_rd, O_WRONLY | O_APPEND | O_CREAT, 0644);
     else
@@ -361,9 +445,11 @@ int out_rd(t_cmd *cmd)
     // Close the target file descriptor as it's no longer needed
     close(fd);
 
-    // Call the builtin_env function
-    builtin_env(cmd); // here execute
-    print_file_by_fd(saved_stdout);
+    if(cmd->in_rd)
+        res = in_rd(cmd);
+    else
+        res = execute_builtin(cmd); // here execute
+    // print_file_by_fd(saved_stdout);
     // Restore the original stdout
     if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
         perror("dup2");
@@ -374,7 +460,7 @@ int out_rd(t_cmd *cmd)
     // Close the saved stdout file descriptor
     close(saved_stdout);
 
-    return 0;
+    return res;
 }
 
 int in_rd(t_cmd *cmd) // check if it's working!
@@ -402,7 +488,7 @@ int in_rd(t_cmd *cmd) // check if it's working!
         close(fd);
 
         // Execute the command
-        if (builtin_env(cmd)) {
+        if (execute_builtin(cmd)) {
             perror("builtin");
             exit(EXIT_FAILURE);
         }
@@ -425,7 +511,7 @@ int	main(int argc, char **argv, char **envp)
 		// // Read input
 		// char *input = read_input();
 		// // Parse input
-		// t_cmd *cmd = parse_input(input);
+		// t_cmd *cmd = parse_input(input); 
 		// -------------------------------------------------------------------
 		// cmd = ft_malloc(sizeof(t_cmd));
         // EXAMPLE: ls -l > output.txt
@@ -445,8 +531,8 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.cmd = "env";
 		// cmd.args = (char *[]){"env", NULL};
         
-		cmd.in_rd = NULL;
-		cmd.out_rd = "out.txt";
+		cmd.in_rd = "input.txt"; // doesn't find input!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
 		cmd.envp = envp;
@@ -463,7 +549,7 @@ int	main(int argc, char **argv, char **envp)
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		cmd.args = (char *[]){"env", NULL};
+		cmd.args = (char *[]){"print", NULL}; 
         if(execute_cmd(&cmd))
             return 0;
         // cmd.append = 1;
@@ -477,4 +563,16 @@ int	main(int argc, char **argv, char **envp)
 	return (0);
 }
 
-// gcc executor.c ../libft/*.c -g
+
+// LEFT TO IMPLEMENT
+
+// ◦ ctrl-C displays a new prompt on a new line.
+// ◦ ctrl-D exits the shell.
+// ◦ ctrl-\ does nothing.
+// • Handle $? which should expand to the exit status of the most recently executed
+// foreground pipeline
+// • Implement pipes (| character). The output of each command in the pipeline is
+// connected to the input of the next command via a pipe
+// HEREDOC
+
+// gcc executor.c ../../libft/*.c -g
