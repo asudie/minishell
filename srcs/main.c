@@ -12,7 +12,7 @@ int	main(int argc, char **argv, char **envp)
 	ft_alloc_init();
 	if (argc != 1)
 	{
-		printf(ERR_ARG);
+		printf(ERR ERR_ARG);
 		return (1);
 	}
 	else
@@ -38,11 +38,11 @@ static void	ft_minihell(t_mhell *mhell)
 
 	while (1)
 	{
-		input = readline("Mhell$ ");
+		input = readline(YELLOW"Mhell$ "RESET);
 		if (ft_input_check(input))
 			continue ;
 		add_history(input);
-		if (ft_input_parse(mhell))
+		if (ft_input_parse(mhell, input))
 		{
 			//executor(mhell);
 		}
@@ -57,7 +57,7 @@ static int	ft_input_check(char *input)
 	if (!input)
 	{
 		ft_free(input);
-		printf(COLOR_PURPLE"exit\n"COLOR_RESET);
+		printf(PURPLE"exit\n"RESET);
 		exit(EXIT_SUCCESS);
 	}
 	else if (!*input)

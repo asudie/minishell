@@ -17,21 +17,22 @@
 # include <fcntl.h>
 
 // COLORS
-# define COLOR_RESET	"\033[0m"
-# define COLOR_BLACK	"\033[1;30m"
-# define COLOR_RED		"\033[1;31m"
-# define COLOR_GREEN	"\033[1;32m"
-# define COLOR_YELLOW	"\033[1;33m"
-# define COLOR_BLUE		"\033[1;34m"
-# define COLOR_PURPLE	"\033[1;35m"
-# define COLOR_CYAN		"\033[1;36m"
-# define COLOR_WHITE	"\033[1;37m"
-# define TEXT_UNDERLINE	"\033[4m"
-# define TEXT_CROSSED	"\033[9m"
+# define RESET	"\033[0m"
+# define BLACK	"\033[1;30m"
+# define RED		"\033[1;31m"
+# define GREEN	"\033[1;32m"
+# define YELLOW	"\033[1;33m"
+# define BLUE		"\033[1;34m"
+# define PURPLE	"\033[1;35m"
+# define CYAN		"\033[1;36m"
+# define WHITE	"\033[1;37m"
+# define UNDERLINE	"\033[4m"
+# define CROSSED	"\033[9m"
 
 // ERRORS
-# define ERR_ARG "\033[1;31m\n  ERROR » \033[0m \
-	\033[1;34mMinishell can't take arguments!\n\n\033[0m"
+# define ERR		"\033[1;31m\n  ERROR » \033[0m"
+# define ERR_ARG	"\033[1;34mMinishell can't take arguments\n\n\033[0m"
+# define ERR_ALLOC	"\033[1;34mAllocation failed\n\n\033[0m"
 
 extern int				g_signal;
 
@@ -42,12 +43,13 @@ typedef struct s_mhell
 {
 	t_env	*env;
 	t_cmd	*cmd;
+	int		exit_code;
 }	t_mhell;
 
 typedef struct s_env
 {
+	char			*var;
 	char			*val;
-	char			*name;
 	struct s_env	*next;
 }	t_env;
 
@@ -61,7 +63,7 @@ typedef struct s_cmd
 }	t_cmd;
 
 // PARSER
-int		ft_input_parse(t_mhell *mhell);
+int		ft_input_parse(t_mhell *mhell, char *input);
 void	ft_init_env(t_mhell *mhell, char **envp);
 
 // EXECUTOR
@@ -70,5 +72,15 @@ void	print_file_by_fd(int fd);
 
 // UTILITY
 int		ft_strcmp(char *s1, char *s2);
+int		ft_chrpos(const char *s, int c);
+
+void	ft_envadd(t_env **env, char *var, char *val);
+void	ft_envclean(t_env **env);
+
+t_env	*ft_find_env(t_env *env, char *var);
+
+int 	ft_space(char c);
+int 	ft_quote(char c);
+void	ft_quote_type(char c, char *q);
 
 #endif

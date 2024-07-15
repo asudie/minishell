@@ -2,21 +2,23 @@ NAME 			= minishell
 HDRDIR			= incl/
 
 EXECDIR			= exec/
-EXECSRCS		= ${EXECDIR}executor.c
+# EXECSRCS		= ${EXECDIR}executor.c
 
 PARSEDIR		= ${SRCSDIR}parse/
-PARSESRCS		= ${PARSEDIR}ft_input_parse.c \
-				#   ${PARSEDIR}ft_init_env.c
+# PARSESRCS		= ${PARSEDIR}ft_input_parse.c \
+				  ${PARSEDIR}ft_init_env.c
 
 UTILDIR			= ${SRCSDIR}utils/
-UTILSRCS		= ${UTILDIR}ft_utils.c ft_env_utils.c
+# UTILSRCS		= ${UTILDIR}ft_utils.c ft_env_utils.c
 
 SRCSDIR			= srcs/
 SRCS			= ${SRCSDIR}main.c \
 				  ${PARSEDIR}ft_input_parse.c \
 				  ${PARSEDIR}ft_init_env.c \
 				  ${UTILDIR}ft_utils.c \
-				  ${UTILDIR}ft_env_utils.c
+				  ${UTILDIR}ft_env_utils.c \
+				  ${UTILDIR}ft_path_utils.c \
+				  ${UTILDIR}ft_envlst.c
 
 VPATH			= ${SRCSDIR} ${SRCSDIR}parse/ ${SRCSDIR}utils/
 OBJS			= $(SRCS:.c=.o)
