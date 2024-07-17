@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/14 16:26:01 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/22 13:36:34 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/17 16:50:43 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,24 @@ char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 		i++;
 	}
 	return (0);
+}
+
+char	*ft_strstr(char *haystack, char *needle)
+{
+	size_t	len;
+
+	len = ft_strlen(needle);
+	if (!haystack)
+		return (NULL);
+	if (len == 0 || !*needle)
+		return ((char *)haystack);
+	while (*haystack)
+	{
+		if (ft_strncmp(haystack, needle, len) == 0)
+			return ((char *)haystack);
+		haystack++;
+	}
+	return (NULL);
 }
 
 // #include <stdio.h>

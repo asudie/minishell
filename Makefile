@@ -13,10 +13,12 @@ UTILDIR			= ${SRCSDIR}utils/
 
 SRCSDIR			= srcs/
 SRCS			= ${SRCSDIR}main.c \
-				  ${PARSEDIR}ft_input_parse.c \
 				  ${PARSEDIR}ft_init_env.c \
+				  ${PARSEDIR}ft_prompt.c \
+				  ${UTILDIR}ft_error_parse.c \
 				  ${UTILDIR}ft_utils.c \
 				  ${UTILDIR}ft_env_utils.c \
+				  ${UTILDIR}ft_str_utils.c \
 				  ${UTILDIR}ft_path_utils.c \
 				  ${UTILDIR}ft_envlst.c
 

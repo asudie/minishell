@@ -11,6 +11,7 @@
 # include <sys/wait.h>
 # include <termios.h>
 # include <termcap.h>  
+# include <stdbool.h>
 # include <signal.h>
 # include <dirent.h>
 # include <stdio.h>
@@ -63,15 +64,16 @@ typedef struct s_cmd
 }	t_cmd;
 
 // PARSER
-int		ft_input_parse(t_mhell *mhell, char *input);
 void	ft_init_env(t_mhell *mhell, char **envp);
+char	*ft_input_prompt(t_mhell *mhell);
 
 // EXECUTOR
 int		out_rd(t_cmd *cmd);
 void	print_file_by_fd(int fd);
 
 // UTILITY
-int		ft_strcmp(char *s1, char *s2);
+bool	ft_input_error(t_mhell *mhell, char	*input);
+
 int		ft_chrpos(const char *s, int c);
 
 void	ft_envadd(t_env **env, char *var, char *val);
@@ -79,8 +81,7 @@ void	ft_envclean(t_env **env);
 
 t_env	*ft_find_env(t_env *env, char *var);
 
-int 	ft_space(char c);
-int 	ft_quote(char c);
-void	ft_quote_type(char c, char *q);
+int		ft_is_empty(char *str);
+int		ft_is_quote(char c);
 
 #endif
