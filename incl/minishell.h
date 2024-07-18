@@ -43,6 +43,7 @@ void	ft_parsing(t_cmd *cmd, char *input);
 // EXECUTOR
 int out_rd(t_cmd *cmd);
 void print_file_by_fd(int fd);
+int	execute_builtin(t_cmd *cmd);
 
 // UTILITY
 int	ft_strcmp(char *s1, char *s2);
