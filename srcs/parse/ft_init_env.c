@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/12 13:33:41 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/15 16:25:58 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/19 15:02:27 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	ft_init_env(t_mhell *mhell, char **envp)
 		if (ft_fill(&mhell->env, env[i]))
 		{
 			ft_envclean(&mhell->env);
-			printf(ERR ERR_ALLOC);
+			printf(ER ER_ALLOC);
 			exit(EXIT_FAILURE);
 		}
 		i++;

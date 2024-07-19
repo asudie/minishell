@@ -15,7 +15,9 @@ SRCSDIR			= srcs/
 SRCS			= ${SRCSDIR}main.c \
 				  ${PARSEDIR}ft_init_env.c \
 				  ${PARSEDIR}ft_prompt.c \
+				  ${PARSEDIR}ft_cmd_parse.c \
 				  ${UTILDIR}ft_error_parse.c \
+				  ${UTILDIR}ft_error_parse_ext.c \
 				  ${UTILDIR}ft_utils.c \
 				  ${UTILDIR}ft_env_utils.c \
 				  ${UTILDIR}ft_str_utils.c \

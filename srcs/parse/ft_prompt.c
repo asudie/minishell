@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 16:13:50 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/17 19:09:43 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/19 14:16:18 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static char	*ft_prompt_exit_code(t_mhell *mhell, char *input)
 {
 	char	*prompt;
 	char	*tmp;
-	char 	*code;
+	char	*code;
 
 	prompt = ft_strjoin(YELLOW"Minishell:"WHITE, input);
 	if (mhell->exit_code == 0)

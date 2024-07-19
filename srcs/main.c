@@ -1,7 +1,7 @@
 #include "../incl/minishell.h"
 
 static t_mhell	*ft_init_minihell(t_mhell *mhell, char **envp);
-static int	ft_minihell(t_mhell *mhell);
+static int		ft_minihell(t_mhell *mhell);
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -9,7 +9,7 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argv && argc > 1)
 	{
-		printf(ERR ERR_ARG);
+		printf(ER ER_ARG);
 		return (EXIT_FAILURE);
 	}
 	ft_alloc_init();
@@ -32,11 +32,20 @@ static int	ft_minihell(t_mhell *mhell)
 	while (1)
 	{
 		input = ft_input_prompt(mhell);
+		if (ft_atoi(input) >= 0)
+			mhell->exit_code = ft_atoi(input);
 		if (ft_input_error(mhell, input))
 			continue ;
-		// if (ft_input_parse(mhell, input))
+		// if (ft_input_parse(mhell->cmd, input))
 		// {
-		// 	//executor(mhell);
+			// for (t_cmd *cmd = mhell->cmd; cmd != NULL; cmd = cmd->next) {
+			// 	printf("Command: ");
+			// 	for (int i = 0; cmd->args[i]; i++){
+			// 		printf("%s ", cmd->args[i]);
+			// 	}
+			// 	printf("\n");
+			// }
+			//executor(mhell);
 		// }
 		ft_free(input);
 	}
