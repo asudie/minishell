@@ -44,6 +44,8 @@
 // 	}
 // }
 
+
+
 char *get_env_var(char **envr, const char *name) {
     size_t len = strlen(name);
     for (int i = 0; envr[i] != NULL; i++) {
@@ -300,6 +302,41 @@ int custom(t_cmd *cmd)
     }
 }
 
+int in_rd(t_cmd *cmd) // check if it's working!
+{
+    int fd = open(cmd->in_rd, O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+
+       // Fork a child process
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if (pid == 0) { // Child process
+        // Redirect stdin to the file descriptor
+        if (dup2(fd, STDIN_FILENO) == -1) {
+            perror("dup2");
+            close(fd);
+            exit(EXIT_FAILURE);
+        }
+        close(fd);
+
+        // Execute the command
+        if (execute_builtin(cmd)) {
+            perror("builtin");
+            exit(EXIT_FAILURE);
+        }
+    } else { // Parent process
+        close(fd);
+        wait(NULL); // Wait for the child process to finish
+    }
+}
+
 int	execute_builtin(t_cmd *cmd)
 {
 	if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
@@ -463,40 +500,7 @@ int out_rd(t_cmd *cmd)
     return res;
 }
 
-int in_rd(t_cmd *cmd) // check if it's working!
-{
-    int fd = open(cmd->in_rd, O_RDONLY);
-    if (fd == -1) {
-        perror("open");
-        exit(EXIT_FAILURE);
-    }
 
-       // Fork a child process
-    pid_t pid = fork();
-    if (pid == -1) {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    }
-
-    if (pid == 0) { // Child process
-        // Redirect stdin to the file descriptor
-        if (dup2(fd, STDIN_FILENO) == -1) {
-            perror("dup2");
-            close(fd);
-            exit(EXIT_FAILURE);
-        }
-        close(fd);
-
-        // Execute the command
-        if (execute_builtin(cmd)) {
-            perror("builtin");
-            exit(EXIT_FAILURE);
-        }
-    } else { // Parent process
-        close(fd);
-        wait(NULL); // Wait for the child process to finish
-    }
-}
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -531,7 +535,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.cmd = "env";
 		// cmd.args = (char *[]){"env", NULL};
         
-		cmd.in_rd = "input.txt"; // doesn't find input!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		cmd.in_rd = "/workspaces/42_minishell/srcs/exec/input.txt"; // doesn't find input!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
@@ -543,15 +547,15 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"unset", "USER", NULL};
         // cmd.cmd = "export";
         // cmd.args = (char *[]){"export", "MYVAR=3", NULL};
-        // if(execute_cmd(&cmd))
-        //     return 0;
+        if(execute_cmd(&cmd))
+           return 0;
         // cmd.cmd = "exit";
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		cmd.args = (char *[]){"print", NULL}; 
+		/*cmd.args = (char *[]){"print", NULL}; 
         if(execute_cmd(&cmd))
-            return 0;
+            return 0; */
         // cmd.append = 1;
         // if(execute_cmd(&cmd))
         //     return 0;
@@ -575,4 +579,4 @@ int	main(int argc, char **argv, char **envp)
 // connected to the input of the next command via a pipe
 // HEREDOC
 
-// gcc executor.c ../../libft/*.c -g
+// 

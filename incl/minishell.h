@@ -75,8 +75,9 @@ char	*ft_input_prompt(t_mhell *mhell);
 bool	ft_input_parse(t_cmd **cmd, char *input);
 
 // EXECUTOR
-int		out_rd(t_cmd *cmd);
-void	print_file_by_fd(int fd);
+int out_rd(t_cmd *cmd);
+void print_file_by_fd(int fd);
+int	execute_builtin(t_cmd *cmd);
 
 // UTILITY
 bool	ft_input_error(t_mhell *mhell, char	*input);
