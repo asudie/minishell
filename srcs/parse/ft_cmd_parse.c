@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 22:22:44 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/19 15:03:48 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/22 00:49:09 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,12 @@ bool	ft_input_parse(t_cmd **cmd, char *input)
 // {
 // 	while (*str)
 // 	{
-		
+
 // 	}
 // 	return (0);
 // }
 
+/* 
 
 
 
@@ -47,15 +48,14 @@ bool	ft_input_parse(t_cmd **cmd, char *input)
 
 
 
-
-
+ */
 // static void	ft_replace_pipes(char *str, char delimiter);
 // static void	ft_restore_pipes(char **cmd);
 
 // int	ft_input_parse(t_mhell *mhell, char *input)
 // {
 // 	char	**cmd;
-	
+
 // 	(void)mhell;
 // 	ft_replace_pipes(input, '"');
 // 	ft_replace_pipes(input, '\'');

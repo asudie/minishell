@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 15:14:37 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/19 16:20:55 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/22 00:48:45 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static bool	ft_out_red(const char *str, int i);
 bool	ft_check_oper(const char *str)
 {
 	int	state;
-	int nb;
+	int	nb;
 	int	i;
 
 	i = 0;
@@ -50,7 +50,7 @@ bool	ft_check_oper(const char *str)
 
 static bool	ft_in_red(const char *str, int i)
 {
-	int nb;
+	int	nb;
 
 	nb = 0;
 	while (str[i] && str[i] == '<')
@@ -73,7 +73,7 @@ static bool	ft_in_red(const char *str, int i)
 
 static bool	ft_out_red(const char *str, int i)
 {
-	int nb;
+	int	nb;
 
 	nb = 0;
 	while (str[i] && str[i] == '>')

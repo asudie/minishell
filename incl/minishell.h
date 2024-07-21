@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ****** <******@student.42wolfsburg.de>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/17 22:22:44 by ******           #+#    #+#              */
+/*   Updated: 2024/07/22 00:43:38 by ******           ###   ########.fr       */
+/*                                                                           */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -31,8 +43,8 @@
 # define CROSSED	"\033[9m"
 
 // ERRORS
-# define ER			"\033[1;31m\n  ERROR » \033[0m\033[1;34m"
-# define ER_MHELL	"\033[1;31mminishell: \033[0m\033[1;34m"
+# define ER			"\033[1;31m\n  ERROR » \033[1;34m"
+# define ER_MHELL	"\033[1;31mminishell: \033[1;34m"
 # define ER_ARG		"Minishell can't take arguments\n\n\033[0m"
 # define ER_ALLOC	"Allocation failed\n\n\033[0m"
 # define ER_QUOTE_S	"single quatation is not closed\n\033[0m"
@@ -75,9 +87,9 @@ char	*ft_input_prompt(t_mhell *mhell);
 bool	ft_input_parse(t_cmd **cmd, char *input);
 
 // EXECUTOR
-int out_rd(t_cmd *cmd);
-void print_file_by_fd(int fd);
-int	execute_builtin(t_cmd *cmd);
+int		out_rd(t_cmd *cmd);
+void	print_file_by_fd(int fd);
+int		execute_builtin(t_cmd *cmd);
 
 // UTILITY
 bool	ft_input_error(t_mhell *mhell, char	*input);

@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 21:38:22 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/19 20:00:19 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/22 00:47:34 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ bool	ft_input_error(t_mhell *mhell, char	*input)
 	if (!input || ft_is_empty(input))
 		return (false);
 	if (!ft_check_pipe(input) || !ft_unclosed_quotes(input)
-		|| !ft_invalid_chars(input) || !ft_invalid_oper(input) || !ft_check_oper(input))
+		|| !ft_invalid_chars(input) || !ft_invalid_oper(input)
+		|| !ft_check_oper(input))
 	{
 		mhell->exit_code = 2;
 		return (false);
