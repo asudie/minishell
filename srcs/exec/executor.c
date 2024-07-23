@@ -273,26 +273,30 @@ int resolve_full_path(char *command, char *full_path) {
 
 int custom(t_cmd *cmd)
 {
+    
     pid_t pid = fork();
     if (pid == -1) {
         perror("fork");
         return -1;
     }
+    
     if (pid == 0) { // Child process
-        // Print the PID of the child process
-        // printf("Child PID: %d\n", getpid());
-        // fflush(stdout); // Ensure the output is flushed
         char full_path[PATH_MAX];
+        
         if (resolve_full_path(cmd->args[0], full_path) == -1) {
+            
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
             exit(EXIT_FAILURE);
         }
+        
+        // doesn't go here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
             printf("%s\n", full_path);
             perror("execve");
             exit(EXIT_FAILURE);
         }
+        
     } else { // Parent process
         // Wait for the child process to complete
         if (wait(NULL) == -1) {
@@ -300,6 +304,7 @@ int custom(t_cmd *cmd)
             exit(EXIT_FAILURE);
         }
     }
+    return(0);
 }
 
 int in_rd(t_cmd *cmd) // check if it's working!
@@ -331,6 +336,7 @@ int in_rd(t_cmd *cmd) // check if it's working!
             perror("builtin");
             exit(EXIT_FAILURE);
         }
+        return 0;
     } else { // Parent process
         close(fd);
         wait(NULL); // Wait for the child process to finish
@@ -535,7 +541,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.cmd = "env";
 		// cmd.args = (char *[]){"env", NULL};
         
-		cmd.in_rd = "/workspaces/42_minishell/srcs/exec/input.txt"; // doesn't find input!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt"; // doesn't find input!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
@@ -547,15 +553,15 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"unset", "USER", NULL};
         // cmd.cmd = "export";
         // cmd.args = (char *[]){"export", "MYVAR=3", NULL};
-        if(execute_cmd(&cmd))
-           return 0;
+        // if(execute_cmd(&cmd))
+        //    return 0;
         // cmd.cmd = "exit";
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		/*cmd.args = (char *[]){"print", NULL}; 
+		cmd.args = (char *[]){"print", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL}; 
         if(execute_cmd(&cmd))
-            return 0; */
+            return 0; 
         // cmd.append = 1;
         // if(execute_cmd(&cmd))
         //     return 0;
@@ -579,4 +585,4 @@ int	main(int argc, char **argv, char **envp)
 // connected to the input of the next command via a pipe
 // HEREDOC
 
-// 
+// gcc executor.c ../../libft/*.c -g
