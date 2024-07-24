@@ -254,11 +254,11 @@ int builtin_unset(t_cmd *cmd) {
 
 int resolve_full_path(char *command, char *full_path) {
     char *path = getenv("PATH");
-    // printf("HERE\n");
+    
     if (!path) {
         return -1;
     }
-
+    
     char *dir = strtok(path, ":");
     while (dir != NULL) {
         snprintf(full_path, PATH_MAX, "%s/%s", dir, command);
@@ -292,6 +292,7 @@ int custom(t_cmd *cmd)
         // doesn't go here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
+            
             printf("%s\n", full_path);
             perror("execve");
             exit(EXIT_FAILURE);
@@ -304,6 +305,7 @@ int custom(t_cmd *cmd)
             exit(EXIT_FAILURE);
         }
     }
+    
     return(0);
 }
 
@@ -333,9 +335,11 @@ int in_rd(t_cmd *cmd) // check if it's working!
 
         // Execute the command
         if (execute_builtin(cmd)) {
+            
             perror("builtin");
             exit(EXIT_FAILURE);
         }
+        
         return 0;
     } else { // Parent process
         close(fd);
@@ -541,7 +545,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.cmd = "env";
 		// cmd.args = (char *[]){"env", NULL};
         
-		cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt"; // doesn't find input!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
 		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
@@ -559,7 +563,7 @@ int	main(int argc, char **argv, char **envp)
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		cmd.args = (char *[]){"print", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL}; 
+		cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
         if(execute_cmd(&cmd))
             return 0; 
         // cmd.append = 1;
@@ -582,7 +586,7 @@ int	main(int argc, char **argv, char **envp)
 // • Handle $? which should expand to the exit status of the most recently executed
 // foreground pipeline
 // • Implement pipes (| character). The output of each command in the pipeline is
-// connected to the input of the next command via a pipe
-// HEREDOC
+// connected to the input of the next command via a pipe <--------------------------------------------DO THIS
+// HEREDOC??
 
 // gcc executor.c ../../libft/*.c -g
