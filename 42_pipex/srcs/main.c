@@ -19,7 +19,7 @@ static void		ft_input_process(t_pipex *pipex, char *path, \
 static void		ft_output_process(t_pipex *pipex, char *path, \
 									int output, int *fd);
 
-int	main(int argc, char **argv, char **envp)
+int	pipex(int argc, char **argv, char **envp)
 {
 	t_pipex	pipex;
 

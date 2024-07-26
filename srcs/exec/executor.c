@@ -379,7 +379,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
 	{
-		return (builtin_env(cmd)); // change for builtin_env
+		return (builtin_env(cmd));
 	}
     else
     {
@@ -422,26 +422,25 @@ int	execute_cmd(t_cmd *cmd)
 	t_cmd *it = cmd;
 
 	// Iterate through each command
+    // HOW  TO PUT OUTPUT TO NEXT INPUT ??????? USING PIPEX ????? <----------------------------------------------------HERE
 	while (it)
 	{
-		if(start_exec(cmd))
-            return (1);
-			// pid = fork(); // when we need fork
-			// if (pid == 0)
-			// {
-			// 	// Child process
-			// 	// execve(cmd[i].path, cmd[i].args, environ);
-			// 	// exit(EXIT_FAILURE);
-			// }
-			// else if (pid > 0)
-			// {
-			// 	// Parent process
-			// 	wait(NULL);
-			// }
-			// else
-			// {
-			// 	perror("fork");
-			// }
+        pid = fork(); // when we need fork
+			if (pid == 0)
+			{
+				if(start_exec(cmd)) 
+                    return (1);
+			}
+			else if (pid > 0)
+			{
+				// Parent process
+				wait(NULL);
+			}
+			else
+			{
+				perror("fork");
+			}
+			
 			it = it->next;
 		
 	}
@@ -526,7 +525,7 @@ int	main(int argc, char **argv, char **envp)
 		// char *input = read_input();
 		// // Parse input
 		// t_cmd *cmd = parse_input(input); 
-		// -------------------------------------------------------------------
+		// 
 		// cmd = malloc(sizeof(t_cmd));
         // EXAMPLE: ls -l > output.txt
 		// cmd.cmd = "ls";
@@ -587,6 +586,6 @@ int	main(int argc, char **argv, char **envp)
 // foreground pipeline
 // • Implement pipes (| character). The output of each command in the pipeline is
 // connected to the input of the next command via a pipe <--------------------------------------------DO THIS
-// HEREDOC??
 
-// gcc executor.c ../../libft/*.c -g
+
+// gcc executor.c ../../libft/*.c ../../42_pipex/*.c -g

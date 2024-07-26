@@ -3,6 +3,7 @@
 
 # include "../ft_destructor/ft_alloc.h"
 # include "../libft/libft.h"
+#include "../42_pipex/incl/pipex.h"
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/types.h>
