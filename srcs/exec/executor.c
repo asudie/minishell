@@ -421,10 +421,17 @@ int	execute_cmd(t_cmd *cmd)
 	pid_t	pid;
 	t_cmd *it = cmd;
 
+    // CREATE IN OUT FILES
+    // IN = NULL
+    
+
 	// Iterate through each command
     // HOW  TO PUT OUTPUT TO NEXT INPUT ??????? USING PIPEX ????? <----------------------------------------------------HERE
 	while (it)
 	{
+        // CLEAN OUT FILE
+        // OUT_RD(OUT FILE)
+        // PIPEX
         pid = fork(); // when we need fork
 			if (pid == 0)
 			{
@@ -442,7 +449,7 @@ int	execute_cmd(t_cmd *cmd)
 			}
 			
 			it = it->next;
-		
+            // IN FILE = OUT FILE
 	}
     return (0);
 }
