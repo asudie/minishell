@@ -10,7 +10,8 @@
 /*																			*/
 /* ************************************************************************** */
 
-#include "../incl/pipex.h"
+// #include "../incl/pipex.h"
+#include "../../incl/minishell.h"
 
 static t_pipex	ft_init_pipex(char **argv, char **envp);
 static void		ft_pipex(t_pipex *pipex);
@@ -80,39 +81,30 @@ static void	ft_pipex(t_pipex *pipex)
 	free(pipex->path2);
 }
 
-static void	ft_input_process(t_pipex *pipex, char *path, int input, int *fd)
+static void	ft_input_process(t_cmd *cmd, int input, int *fd)
 {
-	if (input == -1)
-		ft_error_output(pipex->input_file, "No such file or directory\n", 1);
-	if (path == NULL)
-		ft_error_output(pipex->cmd1[0], "command not found\n", 127);
 	close(fd[0]);
-	dup2(fd[1], STDOUT_FILENO);
+	dup2(fd[1], STDOUT_FILENO); // WHAT IS THIS!!!!!!!
 	close(fd[1]);
-	dup2(input, STDIN_FILENO);
+	dup2(input, STDIN_FILENO); // WHAT IS THIS!!!!!!!
 	close(input);
-	if (execve(path, pipex->cmd1, pipex->envp) == -1)
+	if (start_exec(cmd) != 0)
 		ft_error_output(NULL, "input process fails\n", 1);
 }
 
-static void	ft_output_process(t_pipex *pipex, char *path, int output, int *fd)
+static void	ft_output_process(t_cmd *cmd, int output, int *fd)
 {
 	pid_t	pid;
 	int		status;
-
-	if (output == -1)
-		ft_error_output(pipex->output_file, "No such file or directory\n", 1);
-	if (path == NULL)
-		ft_error_output(pipex->cmd2[0], "command not found\n", 127);
 	pid = fork();
 	if (pid == 0)
 	{
 		close(fd[1]);
-		dup2(fd[0], STDIN_FILENO);
+		dup2(fd[0], STDIN_FILENO); // WHAT IS THIS!!!!!!!
 		close(fd[0]);
-		dup2(output, STDOUT_FILENO);
+		dup2(output, STDOUT_FILENO); // WHAT IS THIS!!!!!!!
 		close(output);
-		if (execve(path, pipex->cmd2, pipex->envp) == -1)
+		if (start_exec(cmd) != 0)
 			ft_error_output(NULL, "output process fails\n", 1);
 	}
 	else if (pid > 0)

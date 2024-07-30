@@ -420,19 +420,31 @@ int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
 	t_cmd *it = cmd;
+    int		input;
+	int		output;
+	int		fd[2];
 
-    // CREATE IN OUT FILES
-    // IN = NULL
-    
+    int input = open("input", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    int output = open("output", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (input == -1 || output == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
 
 	// Iterate through each command
-    // HOW  TO PUT OUTPUT TO NEXT INPUT ??????? USING PIPEX ????? <----------------------------------------------------HERE
+    // in pipex  ft_input_process FIX <----------------------------------------------------HERE
 	while (it)
 	{
-        // CLEAN OUT FILE
-        // OUT_RD(OUT FILE)
-        // PIPEX
-        pid = fork(); // when we need fork
+        if (pipe(fd) == -1)
+		ft_error_output(NULL, "Pipe\n", 1);
+        pid = fork();
+        if (pid == 0)
+            ft_input_process(it, input, fd);
+        close(fd[1]);
+        waitpid(pid, NULL, 0);
+        it = it->next;
+        ft_output_process(it, output, fd);
+        close(fd[0]);
 			if (pid == 0)
 			{
 				if(start_exec(cmd)) 
@@ -448,9 +460,12 @@ int	execute_cmd(t_cmd *cmd)
 				perror("fork");
 			}
 			
-			it = it->next;
+			// it = it->next;
             // IN FILE = OUT FILE
 	}
+
+    // Close the file
+    // close(file_fd);
     return (0);
 }
 
