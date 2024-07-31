@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/12 13:33:41 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/19 15:02:27 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/31 15:09:12 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 static char	**ft_get_env(char **envp);
 static int	ft_fill(t_env **env, char *str);
+static int	ft_chrpos(const char *s, int c);
 static void	ft_set_lvl(t_mhell *mhell);
 
 void	ft_init_env(t_mhell *mhell, char **envp)
@@ -84,6 +85,18 @@ static int	ft_fill(t_env **env, char *str)
 	if (code != EXIT_FAILURE)
 		ft_envadd(env, var, val);
 	return (code);
+}
+
+static int	ft_chrpos(const char *s, int c)
+{
+	int	i;
+
+	i = 0;
+	while (s[i] && s[i] != (unsigned char)c)
+		i++;
+	if (s[i] == (unsigned char)c)
+		return (i + 1);
+	return (-1);
 }
 
 static void	ft_set_lvl(t_mhell *mhell)

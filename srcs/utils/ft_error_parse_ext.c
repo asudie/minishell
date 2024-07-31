@@ -6,89 +6,79 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 15:14:37 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/22 00:48:45 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/31 12:00:23 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../incl/minishell.h"
 
-static bool	ft_in_red(const char *str, int i);
-static bool	ft_out_red(const char *str, int i);
+static bool	ft_pipe_nb(const char *str);
+static bool	ft_redirects(const char *str);
+static bool	ft_rdin(const char *str);
+static bool	ft_rdout(const char *str);
 
 bool	ft_check_oper(const char *str)
 {
 	int	state;
-	int	nb;
 	int	i;
 
 	i = 0;
 	state = 0;
-	nb = 0;
-	while (str[i])
+	if (!ft_pipe_nb(str))
+		return (printf(ER_MHELL ER_SX_CHR, '|'), false);
+	if (!ft_redirects(str))
+		return (false);
+	return (true);
+}
+
+static bool	ft_pipe_nb(const char *str)
+{
+	int	state;
+	int	i;
+
+	i = -1;
+	state = 0;
+	while (str[++i])
 	{
 		ft_quote_state(str[i], &state);
-		if (state == 0 && (str[i] == '<' || str[i] == '>'))
+		if (state == 0 && str[i] == '|')
 		{
-			if (str[i] == '<')
-				return (ft_in_red(str, i));
-			else if (str[i] == '>')
-				return (ft_out_red(str, i));
-		}
-		else if (state == 0 && str[i] == '|')
-		{
-			if (nb > 1)
-			{
-				printf(ER_MHELL ER_SX_CHR, '|');
+			i++;
+			while (ft_is_space(str[i]))
+				i++;
+			if (str[i] == '|')
 				return (false);
-			}
-			nb++;
 		}
-		i++;
 	}
 	return (true);
 }
 
-static bool	ft_in_red(const char *str, int i)
+static bool	ft_redirects(const char *str)
 {
-	int	nb;
+	int	state;
+	int	i;
 
-	nb = 0;
-	while (str[i] && str[i] == '<')
+	i = -1;
+	state = 0;
+	while(str[++i])
 	{
-		nb++;
-		i++;
-	}
-	if (nb >= 3)
-	{
-		if (nb >= 3 && nb <= 4)
-			printf(ER_MHELL ER_SX_CHR, '<');
-		else if (nb == 5)
-			printf(ER_MHELL ER_SX_STR, "<<");
-		else if (nb >= 6)
-			printf(ER_MHELL ER_SX_STR, "<<<");
-		return (false);
+		ft_quote_state(str[i], &state);
+		if (state == 0 && str[i] == '<' && !ft_rdin(str))
+			return (false);
+		if (state == 0 && str[i] == '>' && !ft_rdout(str))
+			return (false);
 	}
 	return (true);
 }
 
-static bool	ft_out_red(const char *str, int i)
+static bool	ft_rdin(const char *str)
 {
-	int	nb;
-
-	nb = 0;
-	while (str[i] && str[i] == '>')
-	{
-		nb++;
-		i++;
-	}
-	if (nb >= 3)
-	{
-		if (nb == 3)
-			printf(ER_MHELL ER_SX_CHR, '>');
-		else if (nb >= 4)
-			printf(ER_MHELL ER_SX_STR, ">>");
-		return (false);
-	}
+	(void)str;
 	return (true);
+}
+
+static bool	ft_rdout(const char *str)
+{
+	(void)str;
 	return (true);
 }

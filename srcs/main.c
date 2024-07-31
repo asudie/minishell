@@ -32,6 +32,7 @@ static t_mhell	*ft_init_minihell(t_mhell *mhell, char **envp)
 {
 	mhell->env = NULL;
 	mhell->cmd = NULL;
+	mhell->cmd->envp = envp;
 	mhell->exit_code = EXIT_SUCCESS;
 	ft_init_env(mhell, envp);
 	return (mhell);
@@ -44,11 +45,12 @@ static int	ft_minihell(t_mhell *mhell)
 	while (1)
 	{
 		input = ft_input_prompt(mhell);
+		printf("%s\n", input);
 		if (ft_atoi(input) >= 0)
 			mhell->exit_code = ft_atoi(input);
 		if (ft_input_error(mhell, input))
 			continue ;
-		// if (ft_input_parse(mhell->cmd, input))
+		// if (ft_input_parse(mhell, input))
 		// {
 			// for (t_cmd *cmd = mhell->cmd; cmd != NULL; cmd = cmd->next) {
 			// 	printf("Command: ");
@@ -57,7 +59,7 @@ static int	ft_minihell(t_mhell *mhell)
 			// 	}
 			// 	printf("\n");
 			// }
-			//executor(mhell);
+			//exitcode = executor(mhell->cmd);
 		// }
 		ft_free(input);
 	}

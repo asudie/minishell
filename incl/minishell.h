@@ -78,13 +78,14 @@ typedef struct s_cmd
 	char			*out_rd;// Output redirection file, e.g., "output.txt"
 	int				append;	// Flag for append mode (1 for >>, 0 for >)
 	char			*heredoc;// Content for heredoc input, NULL if not used
+	char			**envp;
 	struct s_cmd	*next;	// Pointer to the next command in case of pipes
 }	t_cmd;
 
 // PARSER
 void	ft_init_env(t_mhell *mhell, char **envp);
 char	*ft_input_prompt(t_mhell *mhell);
-bool	ft_input_parse(t_cmd **cmd, char *input);
+bool	ft_input_parse(t_mhell *mhell, char *input);
 
 // EXECUTOR
 int		out_rd(t_cmd *cmd);
@@ -94,12 +95,9 @@ int		execute_builtin(t_cmd *cmd);
 // UTILITY
 bool	ft_input_error(t_mhell *mhell, char	*input);
 
-int		ft_chrpos(const char *s, int c);
-
+t_env	*ft_find_env(t_env *env, char *var);
 void	ft_envadd(t_env **env, char *var, char *val);
 void	ft_envclean(t_env **env);
-
-t_env	*ft_find_env(t_env *env, char *var);
 
 bool	ft_is_empty(char *str);
 bool	ft_is_space(char c);

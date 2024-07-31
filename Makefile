@@ -13,16 +13,15 @@ UTILDIR			= ${SRCSDIR}utils/
 
 SRCSDIR			= srcs/
 SRCS			= ${SRCSDIR}main.c \
-				  ${PARSEDIR}ft_init_env.c \
 				  ${PARSEDIR}ft_prompt.c \
 				  ${PARSEDIR}ft_cmd_parse.c \
 				  ${UTILDIR}ft_error_parse.c \
 				  ${UTILDIR}ft_error_parse_ext.c \
-				  ${UTILDIR}ft_utils.c \
-				  ${UTILDIR}ft_env_utils.c \
 				  ${UTILDIR}ft_str_utils.c \
-				  ${UTILDIR}ft_path_utils.c \
-				  ${UTILDIR}ft_envlst.c
+				  ${UTILDIR}ft_utils.c \
+				  ${UTILDIR}ft_init_env.c \
+				  ${UTILDIR}ft_env_utils.c \
+				  ${UTILDIR}ft_path_utils.c
 
 VPATH			= ${SRCSDIR} ${SRCSDIR}parse/ ${SRCSDIR}utils/
 OBJS			= $(SRCS:.c=.o)
