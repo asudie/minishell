@@ -181,7 +181,7 @@ int builtin_env(t_cmd *cmd) {
     // char *envp[] = { NULL }; // environment variables (none in this example)
     
     // Path to the executable
-    char *path = "/bin/env";
+    char *path = "/bin/env"; // CHANGE TO BUILDIN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
     // Arguments for the executable, including the command itself as the first argument
     if (execve(path, cmd->args, cmd->envp) == -1) {
@@ -288,8 +288,6 @@ int custom(t_cmd *cmd)
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
             exit(EXIT_FAILURE);
         }
-        
-        // doesn't go here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
             
@@ -424,12 +422,12 @@ int	execute_cmd(t_cmd *cmd)
 	int		output;
 	int		fd[2];
 
-    int input = open("input", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    int output = open("output", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (input == -1 || output == -1) {
-        perror("open");
-        exit(EXIT_FAILURE);
-    }
+    // int input = open("input", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    // int output = open("output", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    // if (input == -1 || output == -1) {
+    //     perror("open");
+    //     exit(EXIT_FAILURE);
+    // }
 
 	// Iterate through each command
     // in pipex  ft_input_process FIX <----------------------------------------------------HERE

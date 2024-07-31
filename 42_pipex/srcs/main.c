@@ -57,29 +57,29 @@ static t_pipex	ft_init_pipex(char **argv, char **envp)
 	return (pipex);
 }
 
-static void	ft_pipex(t_pipex *pipex)
-{
-	pid_t	pid;
-	int		input;
-	int		output;
-	int		fd[2];
+// static void	ft_pipex(t_pipex *pipex)
+// {
+// 	pid_t	pid;
+// 	int		input;
+// 	int		output;
+// 	int		fd[2];
 
-	if (pipex->cmd1[0] == NULL || pipex->cmd2[0] == NULL)
-		ft_error_output(NULL, "Invalid command\n", 1);
-	input = open(pipex->input_file, O_RDONLY, 0777);
-	output = open(pipex->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	if (pipe(fd) == -1)
-		ft_error_output(NULL, "Pipe\n", 1);
-	pid = fork();
-	if (pid == 0)
-		ft_input_process(pipex, pipex->path1, input, fd);
-	close(fd[1]);
-	waitpid(pid, NULL, 0);
-	ft_output_process(pipex, pipex->path2, output, fd);
-	close(fd[0]);
-	free(pipex->path1);
-	free(pipex->path2);
-}
+// 	if (pipex->cmd1[0] == NULL || pipex->cmd2[0] == NULL)
+// 		ft_error_output(NULL, "Invalid command\n", 1);
+// 	input = open(pipex->input_file, O_RDONLY, 0777);
+// 	output = open(pipex->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+// 	if (pipe(fd) == -1)
+// 		ft_error_output(NULL, "Pipe\n", 1);
+// 	pid = fork();
+// 	if (pid == 0)
+// 		ft_input_process(pipex, pipex->path1, input, fd);
+// 	close(fd[1]);
+// 	waitpid(pid, NULL, 0);
+// 	ft_output_process(pipex, pipex->path2, output, fd);
+// 	close(fd[0]);
+// 	free(pipex->path1);
+// 	free(pipex->path2);
+// }
 
 static void	ft_input_process(t_cmd *cmd, int input, int *fd)
 {
@@ -114,3 +114,32 @@ static void	ft_output_process(t_cmd *cmd, int output, int *fd)
 			exit(1);
 	}
 }
+
+// void execute_pipeline(char ***commands) {
+//     int num_cmds = count_commands(commands);
+//     int pipefd[2];
+//     pid_t pid;
+//     int fd_in = 0; // First process should read from stdin
+
+//     for (int i = 0; i < num_cmds; i++) {
+//         pipe(pipefd);
+
+//         if ((pid = fork()) == -1) {
+//             perror("fork");
+//             exit(EXIT_FAILURE);
+//         } else if (pid == 0) {
+//             dup2(fd_in, STDIN_FILENO); // Redirect stdin to fd_in
+//             if (i < num_cmds - 1)
+//                 dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
+
+//             close(pipefd[0]);
+//             execvp(commands[i][0], commands[i]);
+//             perror("execvp");
+//             exit(EXIT_FAILURE);
+//         } else {
+//             wait(NULL); // Wait for child to finish
+//             close(pipefd[1]);
+//             fd_in = pipefd[0]; // Save the read end of the pipe for the next command
+//         }
+//     }
+// }
