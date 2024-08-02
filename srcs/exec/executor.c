@@ -132,17 +132,29 @@ int builtin_cd(t_cmd *cmd) {
 }
 
 int builtin_echo(t_cmd *cmd) {
-    char *envp[] = { NULL }; // environment variables (none in this example)
-    
-    // Path to the executable
-    char *path = "/bin/echo";
-    
-    // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, cmd->envp) == -1) {
-        perror("execve failed");
-		return 0;
+    int newline = 1; // Flag to determine if we should print a newline
+    int i = 1; // Start with the first argument after the program name
+
+    // Check for the -n option
+    if (ft_strcmp(cmd->args[1], "-n") == 0) {
+        newline = 0;
+        i = 2; // Skip the -n argument
     }
-	return (1);
+
+    // Print the arguments
+    for (; cmd->args[i]; i++) {
+        ft_printf("%s", cmd->args[i]);
+        if (i < argc - 1) {  // WHAT IZ DIIS
+            printf(" "); // Print a space between arguments
+        }
+    }
+
+    // Print the newline if the -n option was not provided
+    if (newline) {
+        printf("\n");
+    }
+
+    return 1;
 }
 
 int builtin_cat(t_cmd *cmd) {
@@ -164,29 +176,25 @@ int builtin_exit(t_cmd *cmd) {
 }
 
 int builtin_pwd(t_cmd *cmd) {
-    char *envp[] = { NULL }; // environment variables (none in this example)
-    
-    // Path to the executable
-    char *path = "/bin/pwd";
-    
-    // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, cmd->envp) == -1) {
-        perror("execve failed");
-		return 0;
+    char cwd[PATH_MAX]; // Buffer to store the current working directory
+
+    // Get the current working directory
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        // Print the current working directory
+        ft_printf("%s\n", cwd);
+    } else {
+        // Handle the error
+        perror("getcwd() error");
+        return 0;
     }
-	return (1);
+
+    return 1;
 }
 
 int builtin_env(t_cmd *cmd) {
-    // char *envp[] = { NULL }; // environment variables (none in this example)
-    
-    // Path to the executable
-    char *path = "/bin/env"; // CHANGE TO BUILDIN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
-    // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, cmd->envp) == -1) {
-        perror("execve failed");
-		return 0;
+    for (int i = 0; cmd->envp[i] != NULL; i++) {
+        // Print each environment variable
+        ft_printf("%s\n", cmd->envp[i]);
     }
 	return (1);
 }
@@ -355,7 +363,7 @@ int	execute_builtin(t_cmd *cmd)
 	{
 		return (builtin_echo(cmd));
 	}
-    else if (ft_strncmp(cmd->args[0], "cat", 4) == 0)
+    else if (ft_strncmp(cmd->args[0], "cat", 4) == 0) // put that to find the path part
 	{
 		return (builtin_cat(cmd));
 	}
@@ -381,7 +389,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else
     {
-        return (custom(cmd));
+        return (custom(cmd));  // FIXME: put search for the bin from feveryn's pipex
     }
 	return (0);
 }
@@ -414,71 +422,103 @@ int start_exec(t_cmd *cmd)
     return (execute_builtin(cmd));
 }
 
+// int	execute_cmd(t_cmd *cmd) // STARTING PIPEX VERSION
+// {
+// 	pid_t	pid;
+// 	t_cmd *it = cmd;
+//     int		input;
+// 	int		output;
+// 	int		fd[2];
+
+//     // int input = open("input", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+//     // int output = open("output", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+//     // if (input == -1 || output == -1) {
+//     //     perror("open");
+//     //     exit(EXIT_FAILURE);
+//     // }
+
+// 	// Iterate through each command
+//     // in pipex  ft_input_process FIX <----------------------------------------------------HERE
+// 	while (it)
+// 	{
+//         if (pipe(fd) == -1)
+// 		ft_error_output(NULL, "Pipe\n", 1);
+//         pid = fork();
+//         if (pid == 0)
+//             ft_input_process(it, input, fd);
+//         close(fd[1]);
+//         waitpid(pid, NULL, 0);
+//         it = it->next;
+//         ft_output_process(it, output, fd);
+//         close(fd[0]);
+// 			if (pid == 0)
+// 			{
+// 				if(start_exec(cmd)) 
+//                     return (1);
+// 			}
+// 			else if (pid > 0)
+// 			{
+// 				// Parent process
+// 				wait(NULL);
+// 			}
+// 			else
+// 			{
+// 				perror("fork");
+// 			}
+			
+// 			// it = it->next;
+//             // IN FILE = OUT FILE
+// 	}
+
+//     // Close the file
+//     // close(file_fd);
+//     return (0);
+// }
+
 int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
 	t_cmd *it = cmd;
-    int		input;
-	int		output;
-	int		fd[2];
-
-    // int input = open("input", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    // int output = open("output", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    // if (input == -1 || output == -1) {
-    //     perror("open");
-    //     exit(EXIT_FAILURE);
-    // }
 
 	// Iterate through each command
-    // in pipex  ft_input_process FIX <----------------------------------------------------HERE
 	while (it)
 	{
-        if (pipe(fd) == -1)
-		ft_error_output(NULL, "Pipe\n", 1);
-        pid = fork();
-        if (pid == 0)
-            ft_input_process(it, input, fd);
-        close(fd[1]);
-        waitpid(pid, NULL, 0);
-        it = it->next;
-        ft_output_process(it, output, fd);
-        close(fd[0]);
-			if (pid == 0)
-			{
-				if(start_exec(cmd)) 
-                    return (1);
-			}
-			else if (pid > 0)
-			{
-				// Parent process
-				wait(NULL);
-			}
-			else
-			{
-				perror("fork");
-			}
-			
-			// it = it->next;
-            // IN FILE = OUT FILE
+		if(start_exec(cmd))
+            return (1);
+			// pid = fork(); // when we need fork
+			// if (pid == 0)
+			// {
+			// 	// Child process
+			// 	// execve(cmd[i].path, cmd[i].args, environ);
+			// 	// exit(EXIT_FAILURE);
+			// }
+			// else if (pid > 0)
+			// {
+			// 	// Parent process
+			// 	wait(NULL);
+			// }
+			// else
+			// {
+			// 	perror("fork");
+			// }
+			it = it->next;
+		
 	}
-
-    // Close the file
-    // close(file_fd);
     return (0);
 }
 
-void display_prompt(t_cmd *cmd) {
-    char *cwd;
+// void display_prompt(t_cmd *cmd) {
+//     char *cwd;
 
-    // Get the current working directory
-	cwd = get_env_var(cmd->envp, "PWD");
-    if (cwd != NULL) {
-        // Print the prompt
-        printf("\nminishel:[%s]$ ", cwd);
-    } else {
-        perror("get_env_var");
-    }
-}
+//     // Get the current working directory
+// 	cwd = get_env_var(cmd->envp, "PWD");
+//     if (cwd != NULL) {
+//         // Print the prompt
+//         printf("\nminishel:[%s]$ ", cwd);
+//     } else {
+//         perror("get_env_var");
+//     }
+// }
 
 int out_rd(t_cmd *cmd)
 {
@@ -539,9 +579,6 @@ int	main(int argc, char **argv, char **envp)
 	// init_environment(envp);
 	// while (1)
 	// {
-		// Display prompt
-		// display_prompt();
-		// // Read input
 		// char *input = read_input();
 		// // Parse input
 		// t_cmd *cmd = parse_input(input); 
@@ -550,7 +587,7 @@ int	main(int argc, char **argv, char **envp)
         // EXAMPLE: ls -l > output.txt
 		// cmd.cmd = "ls";
 		// cmd.args = (char *[]){"ls", "-l", NULL};
-		// cmd.in_rd = NULL;
+		cmd.in_rd = NULL;
 		// cmd.out_rd = "output.txt";
 		// cmd.append = 0;
 		// cmd.next = NULL;
@@ -559,16 +596,19 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"echo", "Hello!", NULL};
 		// cmd.cmd = "cd";
 		// cmd.args = (char *[]){"cd", "/bin"};
-		// cmd.cmd = "pwd";
-		// cmd.args = (char *[]){"pwd", NULL};
-		// cmd.cmd = "env";
+		
+        //PWD
+		cmd.args = (char *[]){"pwd", NULL};
+
+        // ENV
 		// cmd.args = (char *[]){"env", NULL};
         
-		cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
+		// cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
 		cmd.out_rd = NULL;
 		cmd.append = 0;
 		cmd.next = NULL;
 		cmd.envp = envp;
+        cmd.in_rd = NULL;
 		// display_prompt(&cmd); 
 		// Execute cmd
 		// execute_cmd(&cmd);
@@ -582,7 +622,7 @@ int	main(int argc, char **argv, char **envp)
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
+		// cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
         if(execute_cmd(&cmd))
             return 0; 
         // cmd.append = 1;
@@ -604,6 +644,7 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
 // foreground pipeline
+// echo -n
 // • Implement pipes (| character). The output of each command in the pipeline is
 // connected to the input of the next command via a pipe <--------------------------------------------DO THIS
 
