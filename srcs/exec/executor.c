@@ -136,7 +136,7 @@ int builtin_echo(t_cmd *cmd) {
     int i = 1; // Start with the first argument after the program name
 
     // Check for the -n option
-    if (ft_strcmp(cmd->args[1], "-n") == 0) {
+    if (ft_strncmp(cmd->args[1], "-n", 3) == 0) {
         newline = 0;
         i = 2; // Skip the -n argument
     }
@@ -144,8 +144,8 @@ int builtin_echo(t_cmd *cmd) {
     // Print the arguments
     for (; cmd->args[i]; i++) {
         ft_printf("%s", cmd->args[i]);
-        if (i < argc - 1) {  // WHAT IZ DIIS
-            printf(" "); // Print a space between arguments
+        if (cmd->args[i + 1] != NULL) { 
+            ft_printf(" "); // Print a space between arguments
         }
     }
 
@@ -598,7 +598,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"cd", "/bin"};
 		
         //PWD
-		cmd.args = (char *[]){"pwd", NULL};
+		cmd.args = (char *[]){"echo", "-n", "ho", "hi", NULL};
 
         // ENV
 		// cmd.args = (char *[]){"env", NULL};
