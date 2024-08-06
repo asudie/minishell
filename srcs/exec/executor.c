@@ -504,30 +504,47 @@ int	execute_cmd(t_cmd *cmd)
         }
     }
 
-// put the loop from main.c from pipex here
-
 	// Iterate through each command
 	while (it)
 	{
-		if(start_exec(cmd))
-            return (1);
-			// pid = fork(); // when we need fork
-			// if (pid == 0)
-			// {
-			// 	// Child process
-			// 	// execve(cmd[i].path, cmd[i].args, environ);
-			// 	// exit(EXIT_FAILURE);
-			// }
-			// else if (pid > 0)
-			// {
-			// 	// Parent process
-			// 	wait(NULL);
-			// }
-			// else
-			// {
-			// 	perror("fork");
-			// }
-			it = it->next;
+        pid = fork();
+        if (pid == -1) {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        } else if (pid == 0) 
+        {
+            // Child process
+
+            // Redirect input from previous pipe if not the first command
+            if (i > 0) {
+                dup2(pipefd[(i - 1) * 2], STDIN_FILENO);
+            }
+
+            // Redirect output to next pipe if not the last command
+            if (i < num_cmds - 1) {
+                dup2(pipefd[i * 2 + 1], STDOUT_FILENO);
+            }
+
+            // Close all pipe file descriptors
+            for (j = 0; j < 2 * (num_cmds - 1); j++) {
+                close(pipefd[j]);
+            }
+            if(start_exec(cmd))
+                return (1);
+        } else
+        {
+            // Parent process
+            // Close all pipe file descriptors
+            for (i = 0; i < 2 * (num_cmds - 1); i++) {
+                close(pipefd[i]);
+            }
+
+            // Wait for all child processes to finish
+            for (i = 0; i < num_cmds; i++) {
+                wait(NULL);
+            }
+        }
+		it = it->next;
 		
 	}
     return (0);
@@ -672,7 +689,9 @@ int	main(int argc, char **argv, char **envp)
 // Long paths for comands???
 // foreground pipeline
 // • Implement pipes (| character). The output of each command in the pipeline is
-// connected to the input of the next command via a pipe <--------------------------------------------DO THIS
+// connected to the input of the next command via a pipe 
 
+
+// TEST PIPES AND DELETE PIPE FROM MAIN.C <--------------------------------------------DO THIS
 
 // gcc executor.c ../../libft/*.c ../../42_pipex/*.c -g

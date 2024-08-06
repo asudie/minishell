@@ -73,7 +73,7 @@ static t_pipex	ft_init_pipex(char **argv, char **envp)
 // 	pid = fork();
 // 	if (pid == 0)
 // 		ft_input_process(pipex, pipex->path1, input, fd);
-// 	close(fd[1]);
+// 	close(fd[1]); 1 - out 0 - in
 // 	waitpid(pid, NULL, 0);
 // 	ft_output_process(pipex, pipex->path2, output, fd);
 // 	close(fd[0]);
@@ -115,31 +115,72 @@ static void	ft_output_process(t_cmd *cmd, int output, int *fd)
 	}
 }
 
-// void execute_pipeline(char ***commands) {
-//     int num_cmds = count_commands(commands);
-//     int pipefd[2];
+// void execute_pipeline(char **commands, char **envp) {
+//     int num_cmds = 0;
+//     while (commands[num_cmds] != NULL) num_cmds++;
+    
+//     int pipefd[2 * (num_cmds - 1)];
 //     pid_t pid;
-//     int fd_in = 0; // First process should read from stdin
+//     int i, j;
 
-//     for (int i = 0; i < num_cmds; i++) {
-//         pipe(pipefd);
+//     // Create pipes
+//     for (i = 0; i < (num_cmds - 1); i++) {
+//         if (pipe(pipefd + i * 2) == -1) {
+//             perror("pipe");
+//             exit(EXIT_FAILURE);
+//         }
+//     }
 
-//         if ((pid = fork()) == -1) {
+//     // Fork processes and execute commands
+//     for (i = 0; i < num_cmds; i++) {
+//         pid = fork();
+//         if (pid == -1) {
 //             perror("fork");
 //             exit(EXIT_FAILURE);
 //         } else if (pid == 0) {
-//             dup2(fd_in, STDIN_FILENO); // Redirect stdin to fd_in
-//             if (i < num_cmds - 1)
-//                 dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
+//             // Child process
 
-//             close(pipefd[0]);
-//             execvp(commands[i][0], commands[i]);
+//             // Redirect input from previous pipe if not the first command
+//             if (i > 0) {
+//                 dup2(pipefd[(i - 1) * 2], STDIN_FILENO);
+//             }
+
+//             // Redirect output to next pipe if not the last command
+//             if (i < num_cmds - 1) {
+//                 dup2(pipefd[i * 2 + 1], STDOUT_FILENO);
+//             }
+
+//             // Close all pipe file descriptors
+//             for (j = 0; j < 2 * (num_cmds - 1); j++) {
+//                 close(pipefd[j]);
+//             }
+
+//             // Split command into program and arguments
+//             char *args[256];
+//             char *cmd = strdup(commands[i]);
+//             char *token = strtok(cmd, " ");
+//             int k = 0;
+//             while (token != NULL) {
+//                 args[k++] = token;
+//                 token = strtok(NULL, " ");
+//             }
+//             args[k] = NULL;
+
+//             // Execute the command
+//             execvp(args[0], args);
 //             perror("execvp");
 //             exit(EXIT_FAILURE);
-//         } else {
-//             wait(NULL); // Wait for child to finish
-//             close(pipefd[1]);
-//             fd_in = pipefd[0]; // Save the read end of the pipe for the next command
 //         }
+//     }
+
+//     // Parent process
+//     // Close all pipe file descriptors
+//     for (i = 0; i < 2 * (num_cmds - 1); i++) {
+//         close(pipefd[i]);
+//     }
+
+//     // Wait for all child processes to finish
+//     for (i = 0; i < num_cmds; i++) {
+//         wait(NULL);
 //     }
 // }
