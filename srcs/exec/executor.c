@@ -475,10 +475,36 @@ int start_exec(t_cmd *cmd)
 //     return (0);
 // }
 
+int count_commands(t_cmd *cmd) // check if it works
+{
+    t_cmd *it = cmd;
+    int num_cmds = 0;
+
+    while (it != NULL) 
+    {
+        num_cmds++;
+        it = it->next;
+    }
+    return num_cmds;
+}
+
 int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
 	t_cmd *it = cmd;
+    int num_cmds = count_commands(cmd);
+    int pipefd[2 * (num_cmds - 1)];
+    int i, j;
+
+        // Create pipes
+    for (i = 0; i < (num_cmds - 1); i++) {
+        if (pipe(pipefd + i * 2) == -1) {
+            perror("pipe");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+// put the loop from main.c from pipex here
 
 	// Iterate through each command
 	while (it)
@@ -643,8 +669,8 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-D exits the shell.
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
+// Long paths for comands???
 // foreground pipeline
-// echo -n
 // • Implement pipes (| character). The output of each command in the pipeline is
 // connected to the input of the next command via a pipe <--------------------------------------------DO THIS
 
