@@ -269,7 +269,7 @@ int resolve_full_path(char *command, char *full_path) {
     
     char *dir = strtok(path, ":");
     while (dir != NULL) {
-        snprintf(full_path, PATH_MAX, "%s/%s", dir, command);
+        snprintf(full_path, PATH_MAX, "%s/%s", dir, command); // change for forbidden
         if (access(full_path, X_OK) == 0) {
             return 0;
         }
@@ -292,7 +292,6 @@ int custom(t_cmd *cmd)
         char full_path[PATH_MAX];
         
         if (resolve_full_path(cmd->args[0], full_path) == -1) {
-            
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
             exit(EXIT_FAILURE);
         }
@@ -389,7 +388,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else
     {
-        return (custom(cmd));  // FIXME: put search for the bin from feveryn's pipex
+        return (custom(cmd)); 
     }
 	return (0);
 }
@@ -422,58 +421,6 @@ int start_exec(t_cmd *cmd)
     return (execute_builtin(cmd));
 }
 
-// int	execute_cmd(t_cmd *cmd) // STARTING PIPEX VERSION
-// {
-// 	pid_t	pid;
-// 	t_cmd *it = cmd;
-//     int		input;
-// 	int		output;
-// 	int		fd[2];
-
-//     // int input = open("input", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-//     // int output = open("output", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-//     // if (input == -1 || output == -1) {
-//     //     perror("open");
-//     //     exit(EXIT_FAILURE);
-//     // }
-
-// 	// Iterate through each command
-//     // in pipex  ft_input_process FIX <----------------------------------------------------HERE
-// 	while (it)
-// 	{
-//         if (pipe(fd) == -1)
-// 		ft_error_output(NULL, "Pipe\n", 1);
-//         pid = fork();
-//         if (pid == 0)
-//             ft_input_process(it, input, fd);
-//         close(fd[1]);
-//         waitpid(pid, NULL, 0);
-//         it = it->next;
-//         ft_output_process(it, output, fd);
-//         close(fd[0]);
-// 			if (pid == 0)
-// 			{
-// 				if(start_exec(cmd)) 
-//                     return (1);
-// 			}
-// 			else if (pid > 0)
-// 			{
-// 				// Parent process
-// 				wait(NULL);
-// 			}
-// 			else
-// 			{
-// 				perror("fork");
-// 			}
-			
-// 			// it = it->next;
-//             // IN FILE = OUT FILE
-// 	}
-
-//     // Close the file
-//     // close(file_fd);
-//     return (0);
-// }
 
 int count_commands(t_cmd *cmd) // check if it works
 {
@@ -616,7 +563,7 @@ int out_rd(t_cmd *cmd)
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_cmd	cmd;
+	t_cmd	*cmd = malloc(sizeof(t_cmd));
 
 	// Initialize environment variables
 	// init_environment(envp);
@@ -630,7 +577,7 @@ int	main(int argc, char **argv, char **envp)
         // EXAMPLE: ls -l > output.txt
 		// cmd.cmd = "ls";
 		// cmd.args = (char *[]){"ls", "-l", NULL};
-		cmd.in_rd = NULL;
+		cmd->in_rd = NULL;
 		// cmd.out_rd = "output.txt";
 		// cmd.append = 0;
 		// cmd.next = NULL;
@@ -641,17 +588,24 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"cd", "/bin"};
 		
         //PWD
-		cmd.args = (char *[]){"echo", "-n", "ho", "hi", NULL};
+		cmd->args = (char *[]){"ls", NULL};
 
         // ENV
 		// cmd.args = (char *[]){"env", NULL};
         
 		// cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
-		cmd.out_rd = NULL;
-		cmd.append = 0;
-		cmd.next = NULL;
-		cmd.envp = envp;
-        cmd.in_rd = NULL;
+		cmd->out_rd = "ls_out";
+		cmd->append = 0;
+		cmd->next = malloc(sizeof(t_cmd));
+		cmd->envp = envp;
+        cmd->in_rd = NULL;
+
+        cmd->next->args = (char *[]){"grep", "*.c", NULL}; // ONLY PRINTS LS AND NOT GREP
+        cmd->out_rd = NULL;
+		cmd->append = 0;
+		cmd->next = NULL;
+		cmd->envp = envp;
+        cmd->in_rd = NULL;
 		// display_prompt(&cmd); 
 		// Execute cmd
 		// execute_cmd(&cmd);
@@ -666,7 +620,7 @@ int	main(int argc, char **argv, char **envp)
         // if(execute_cmd(&cmd))
         //     return 0;
 		// cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
-        if(execute_cmd(&cmd))
+        if(execute_cmd(cmd))
             return 0; 
         // cmd.append = 1;
         // if(execute_cmd(&cmd))
@@ -686,7 +640,7 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-D exits the shell.
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
-// Long paths for comands???
+// • Long paths for comands???
 // foreground pipeline
 // • Implement pipes (| character). The output of each command in the pipeline is
 // connected to the input of the next command via a pipe 
