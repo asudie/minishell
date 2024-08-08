@@ -443,13 +443,15 @@ int	execute_cmd(t_cmd *cmd)
     int pipefd[2 * (num_cmds - 1)];
     int i, j;
 
-        // Create pipes
+    // Create pipes
     for (i = 0; i < (num_cmds - 1); i++) {
         if (pipe(pipefd + i * 2) == -1) {
             perror("pipe");
             exit(EXIT_FAILURE);
         }
     }
+
+    i = 0; // Initialize i to 0 before loop
 
 	// Iterate through each command
 	while (it)
@@ -476,39 +478,32 @@ int	execute_cmd(t_cmd *cmd)
             for (j = 0; j < 2 * (num_cmds - 1); j++) {
                 close(pipefd[j]);
             }
-            if(start_exec(cmd))
-                return (1);
-        } else
-        {
-            // Parent process
-            // Close all pipe file descriptors
-            for (i = 0; i < 2 * (num_cmds - 1); i++) {
-                close(pipefd[i]);
-            }
 
-            // Wait for all child processes to finish
-            for (i = 0; i < num_cmds; i++) {
-                wait(NULL);
-            }
+            // Execute the command
+            if(start_exec(it))
+                return (1);
+            exit(EXIT_SUCCESS); 
         }
-		it = it->next;
-		
-	}
+        
+        // Parent process, move to the next command
+        it = it->next;
+        i++;
+    }
+
+    // Close all pipe file descriptors in the parent
+    for (j = 0; j < 2 * (num_cmds - 1); j++) {
+        close(pipefd[j]);
+    }
+
+    // Wait for all child processes to finish
+    for (i = 0; i < num_cmds; i++) {
+        wait(NULL);
+    }
+
     return (0);
 }
 
-// void display_prompt(t_cmd *cmd) {
-//     char *cwd;
 
-//     // Get the current working directory
-// 	cwd = get_env_var(cmd->envp, "PWD");
-//     if (cwd != NULL) {
-//         // Print the prompt
-//         printf("\nminishel:[%s]$ ", cwd);
-//     } else {
-//         perror("get_env_var");
-//     }
-// }
 
 int out_rd(t_cmd *cmd)
 {
@@ -594,18 +589,18 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"env", NULL};
         
 		// cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
-		cmd->out_rd = "ls_out";
+		cmd->out_rd = NULL;
 		cmd->append = 0;
 		cmd->next = malloc(sizeof(t_cmd));
 		cmd->envp = envp;
         cmd->in_rd = NULL;
 
-        cmd->next->args = (char *[]){"grep", "*.c", NULL}; // ONLY PRINTS LS AND NOT GREP
-        cmd->out_rd = NULL;
-		cmd->append = 0;
-		cmd->next = NULL;
-		cmd->envp = envp;
-        cmd->in_rd = NULL;
+        cmd->next->args = (char *[]){"grep", ".c", NULL}; // ONLY PRINTS LS AND NOT GREP
+        cmd->next->out_rd = NULL;
+		cmd->next->append = 0;
+		cmd->next->next = NULL;
+		cmd->next->envp = envp;
+        cmd->next->in_rd = NULL;
 		// display_prompt(&cmd); 
 		// Execute cmd
 		// execute_cmd(&cmd);
@@ -648,4 +643,4 @@ int	main(int argc, char **argv, char **envp)
 
 // TEST PIPES AND DELETE PIPE FROM MAIN.C <--------------------------------------------DO THIS
 
-// gcc executor.c ../../libft/*.c ../../42_pipex/*.c -g
+// gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c -g
