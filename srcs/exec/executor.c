@@ -260,7 +260,14 @@ int builtin_unset(t_cmd *cmd) {
     return 0;  // Success
 }
 
-int resolve_full_path(char *command, char *full_path) {
+int resolve_full_path(t_cmd *cmd, char *full_path) {
+    // Check for absolute
+    if (access(cmd->args[0], X_OK) == 0)
+    {
+        full_path = cmd->args[0]; // memory?
+        return 0;
+    } 
+            
     char *path = getenv("PATH");
     
     if (!path) {
@@ -269,7 +276,7 @@ int resolve_full_path(char *command, char *full_path) {
     
     char *dir = strtok(path, ":");
     while (dir != NULL) {
-        snprintf(full_path, PATH_MAX, "%s/%s", dir, command); // change for forbidden
+        snprintf(full_path, PATH_MAX, "%s/%s", dir, cmd->args[0]); // change for forbidden
         if (access(full_path, X_OK) == 0) {
             return 0;
         }
@@ -291,7 +298,7 @@ int custom(t_cmd *cmd)
     if (pid == 0) { // Child process
         char full_path[PATH_MAX];
         
-        if (resolve_full_path(cmd->args[0], full_path) == -1) {
+        if (resolve_full_path(cmd, full_path) == -1) {
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
             exit(EXIT_FAILURE);
         }
@@ -636,11 +643,5 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
 // • Long paths for comands???
-// foreground pipeline
-// • Implement pipes (| character). The output of each command in the pipeline is
-// connected to the input of the next command via a pipe 
-
-
-// TEST PIPES AND DELETE PIPE FROM MAIN.C <--------------------------------------------DO THIS
 
 // gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c -g
