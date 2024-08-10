@@ -441,6 +441,7 @@ int count_commands(t_cmd *cmd)
 int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
+    int     status;
 	t_cmd *it = cmd;
     int num_cmds = count_commands(cmd);
     int pipefd[2 * (num_cmds - 1)];
@@ -499,10 +500,16 @@ int	execute_cmd(t_cmd *cmd)
     }
 
     // Wait for all child processes to finish
+    // NOT SURE ABOUT THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     for (i = 0; i < num_cmds; i++) {
-        wait(NULL);
+        waitpid(pid, &status, 0);
     }
-
+    if (WIFEXITED(status)) {
+            cmd->last_exit_status = WEXITSTATUS(status);
+        } else {
+            cmd->last_exit_status = 1; // Non-normal exit, set to 1
+        }
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     return (0);
 }
 
