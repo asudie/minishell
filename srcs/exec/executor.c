@@ -260,11 +260,11 @@ int builtin_unset(t_cmd *cmd) {
     return 0;  // Success
 }
 
-int resolve_full_path(t_cmd *cmd, char *full_path) {
+int resolve_full_path(t_cmd *cmd, char **full_path) {
     // Check for absolute
     if (access(cmd->args[0], X_OK) == 0)
     {
-        full_path = cmd->args[0]; // memory?
+        *full_path = cmd->args[0];
         return 0;
     } 
             
@@ -276,8 +276,8 @@ int resolve_full_path(t_cmd *cmd, char *full_path) {
     
     char *dir = strtok(path, ":");
     while (dir != NULL) {
-        snprintf(full_path, PATH_MAX, "%s/%s", dir, cmd->args[0]); // change for forbidden
-        if (access(full_path, X_OK) == 0) {
+        snprintf(*full_path, PATH_MAX, "%s/%s", dir, cmd->args[0]); // change for forbidden
+        if (access(*full_path, X_OK) == 0) {
             return 0;
         }
         dir = strtok(NULL, ":");
@@ -288,7 +288,7 @@ int resolve_full_path(t_cmd *cmd, char *full_path) {
 
 int custom(t_cmd *cmd)
 {
-    
+    char *full_path;
     pid_t pid = fork();
     if (pid == -1) {
         perror("fork");
@@ -296,16 +296,16 @@ int custom(t_cmd *cmd)
     }
     
     if (pid == 0) { // Child process
-        char full_path[PATH_MAX];
+        full_path = malloc(sizeof(char) * PATH_MAX);
         
-        if (resolve_full_path(cmd, full_path) == -1) {
+        if (resolve_full_path(cmd, &full_path) == -1) {
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
             exit(EXIT_FAILURE);
         }
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
-            
-            printf("%s\n", full_path);
+            // printf("HERE\n");
+            // printf("%s\n", full_path);
             perror("execve");
             exit(EXIT_FAILURE);
         }
@@ -317,7 +317,7 @@ int custom(t_cmd *cmd)
             exit(EXIT_FAILURE);
         }
     }
-    
+    free(full_path);
     return(0);
 }
 
@@ -367,11 +367,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
 	else if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
 	{
-		return (builtin_echo(cmd));
-	}
-    else if (ft_strncmp(cmd->args[0], "cat", 4) == 0) // put that to find the path part
-	{
-		return (builtin_cat(cmd));
+        return (builtin_echo(cmd));
 	}
 	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0)
 	{
@@ -429,7 +425,7 @@ int start_exec(t_cmd *cmd)
 }
 
 
-int count_commands(t_cmd *cmd) // check if it works
+int count_commands(t_cmd *cmd)
 {
     t_cmd *it = cmd;
     int num_cmds = 0;
@@ -590,7 +586,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"cd", "/bin"};
 		
         //PWD
-		cmd->args = (char *[]){"ls", NULL};
+		cmd->args = (char *[]){"/home/asmolnya/Projects/minishell/srcs/exec/print", "custom.c", NULL};
 
         // ENV
 		// cmd.args = (char *[]){"env", NULL};
@@ -598,16 +594,17 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
 		cmd->out_rd = NULL;
 		cmd->append = 0;
-		cmd->next = malloc(sizeof(t_cmd));
+		cmd->next = NULL;
 		cmd->envp = envp;
         cmd->in_rd = NULL;
 
-        cmd->next->args = (char *[]){"grep", ".c", NULL}; // ONLY PRINTS LS AND NOT GREP
-        cmd->next->out_rd = NULL;
-		cmd->next->append = 0;
-		cmd->next->next = NULL;
-		cmd->next->envp = envp;
-        cmd->next->in_rd = NULL;
+        // cmd->next->args = (char *[]){"grep", ".c", NULL};
+        // cmd->next->out_rd = NULL;
+		// cmd->next->append = 0;
+		// cmd->next->next = NULL;
+		// cmd->next->envp = envp;
+        // cmd->next->in_rd = NULL;
+
 		// display_prompt(&cmd); 
 		// Execute cmd
 		// execute_cmd(&cmd);
@@ -642,6 +639,5 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-D exits the shell.
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
-// • Long paths for comands???
 
 // gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c -g
