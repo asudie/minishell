@@ -6,13 +6,13 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 13:57:22 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/29 15:11:09 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/02 20:56:25 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-t_list	*ft_lstlast(t_list *lst)
+t_list	*ft_lstlast_libft(t_list *lst)
 {
 	while (lst)
 	{

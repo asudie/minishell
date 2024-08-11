@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/23 16:48:40 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/12 14:05:59 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/02 20:47:12 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ t_list	*ft_lstnew(void *content)
 {
 	t_list	*node;
 
-	node = (t_list *)ft_malloc(sizeof(*node));
+	node = ft_malloc(sizeof(t_list));
 	if (node == NULL)
 		return (NULL);
 	node->content = content;

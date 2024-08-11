@@ -1,42 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_path_utils.c                                    :+:      :+:    :+:   */
+/*   ft_hrdc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/11 16:40:01 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/09 19:16:57 by svalchuk         ###   ########.fr       */
+/*   Created: 2024/08/11 14:51:49 by svalchuk          #+#    #+#             */
+/*   Updated: 2024/08/11 15:36:32 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../incl/minishell.h"
 
-char	*ft_find_path(char *cmd, char *path)
+int	ft_hrdc(t_mhell *mhell, int order)
 {
-	char	**paths;
-	char	*tmp;
-	char	*res;
-	int		fd;
-	int		i;
+	int	hrdc;
+	int	in;
+	int	i;
 
 	i = 0;
-	paths = ft_split(path + 5, ':');
-	while (paths[i] != NULL)
+	hrdc = 0;
+	while (i++ < order)
 	{
-		tmp = ft_strjoin(paths[i], "/");
-		res = ft_strjoin(tmp, cmd);
-		ft_free(tmp);
-		fd = open(res, O_RDONLY);
-		if (fd != -1)
-		{
-			close(fd);
-			ft_free_array(paths);
-			return (res);
-		}
-		ft_free(res);
-		i++;
+		if (mhell->tkn_l > 1 && mhell->tkn[i].type == hrdc && (i + 1) < mhell->cmd && mhell->tkn[i + 1].type == text)
+			hrdc++;
 	}
-	ft_free_array(paths);
-	return (NULL);
+	if (!hrdc)
+		return (0);
+	ft_alloc_cmd();
+	i = 0;
+	in = 0;
+	while (i++ < order)
+	{
+		if (mhell->tkn[i].type == hrdc)
+			ft_fill_hrdc();
+	}
+	return (hrdc);
 }

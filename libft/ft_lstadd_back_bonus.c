@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 14:35:54 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/29 15:16:56 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/02 20:58:16 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 			*lst = new;
 		else
 		{
-			tmp = ft_lstlast(*lst);
+			tmp = ft_lstlast_libft(*lst);
 			tmp->next = new;
 		}
 	}

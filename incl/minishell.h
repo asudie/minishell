@@ -51,17 +51,24 @@
 # define ER_QUOTE_D	"double quatation is not closed\n\033[0m"
 # define ER_SX_CHR	"syntax error near unexpected token `%c'\n\033[0m"
 # define ER_SX_STR	"syntax error near unexpected token `%s'\n\033[0m"
-
-extern int				g_signal;
+# define ER_TKN		"Error creating string for tokens\n\033[0m"
+# define ER_HRDC	"Error creating heredocs\n\033[0m"
+# define ER_HRDC_NB	"Error creating heredoc number string\n\033[0m"
+# define ER_HRDC_FN	"Error creating heredoc file name\n\033[0m"
+# define ER_HRDC_FK	"Error forking for heredoc\n\033[0m"
 
 typedef struct s_env	t_env;
+typedef struct s_tkn	t_tkn;
 typedef struct s_cmd	t_cmd;
 
 typedef struct s_mhell
 {
-	t_env	*env;
-	t_cmd	*cmd;
+	char	*cmd_line;
 	int		exit_code;
+	t_env	*env;
+	t_tkn	*tkn;
+	int		tkn_l;
+	t_cmd	*cmd;
 }	t_mhell;
 
 typedef struct s_env
@@ -71,13 +78,30 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
+typedef enum e_type
+{
+	null,
+	text,
+	pipe,
+	hrdc,
+	rdin,
+	append,
+	rdout,
+}	t_type;
+
+typedef struct s_tkn
+{
+	char	*token;
+	t_type	type;
+}	t_tkn;
+
 typedef struct s_cmd
 {
 	char			**args;	// An array of command arguments["ls", "-l", NULL]
 	char			*in_rd;	// Input redirection file, e.g., "input.txt"
 	char			*out_rd;// Output redirection file, e.g., "output.txt"
 	int				append;	// Flag for append mode (1 for >>, 0 for >)
-	char			*heredoc;// Content for heredoc input, NULL if not used
+	char			**heredoc;
 	char			**envp;
 	struct s_cmd	*next;	// Pointer to the next command in case of pipes
 }	t_cmd;
@@ -85,7 +109,9 @@ typedef struct s_cmd
 // PARSER
 void	ft_init_env(t_mhell *mhell, char **envp);
 char	*ft_input_prompt(t_mhell *mhell);
-bool	ft_input_parse(t_mhell *mhell, char *input);
+bool	ft_input_parse(t_mhell *mhell);
+void	ft_substr_dollar(t_mhell *mhell, char **str, int state);
+void	ft_tokenize(t_mhell *mhell, char *str);
 
 // EXECUTOR
 int		out_rd(t_cmd *cmd);
@@ -98,11 +124,20 @@ bool	ft_input_error(t_mhell *mhell, char	*input);
 t_env	*ft_find_env(t_env *env, char *var);
 void	ft_envadd(t_env **env, char *var, char *val);
 void	ft_envclean(t_env **env);
+char	*ft_envcut(char *str);
+
+char	**ft_split_savediv(char *str, char c);
+int		ft_strchr_pos(char *s, int c);
+
+char	*ft_arrjoin(char **arr);
+void	ft_free_array(char **arr);
 
 bool	ft_is_empty(char *str);
 bool	ft_is_space(char c);
 void	ft_skip_spaces(char **str);
+int		ft_conc_space(char curr, char next);
 bool	ft_is_quote(char c);
 void	ft_quote_state(int c, int *state);
+int		ft_is_spec(char *str);
 
 #endif

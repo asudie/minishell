@@ -1,27 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_cmd_parse.c                                     :+:      :+:    :+:   */
+/*   ft_arr_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/17 22:22:44 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/31 16:00:30 by svalchuk         ###   ########.fr       */
+/*   Created: 2024/08/08 15:17:57 by svalchuk          #+#    #+#             */
+/*   Updated: 2024/08/08 18:17:38 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../incl/minishell.h"
 
-bool	ft_input_parse(t_mhell *mhell, char *input)
+char	*ft_arrjoin(char **arr)
 {
-	char	*cmd_line;
+	char	*str;
+	int		i;
 
-	(void)mhell;
-	while (*input)
+	i = 0;
+	while (arr[i])
 	{
-		ft_skip_spaces(&input);
-		cmd_line = input;
-		// ft_find_next_cmd(cmd, &input, &cmd_line);
+		if (!i)
+			str = ft_strdup(arr[i]);
+		if (arr[i + 1])
+			str = ft_strjoin(str, arr[i + 1]);
+		if (!str)
+			exit(printf(ER ER_ALLOC));
+		i++;
 	}
-	return (true);
+	return (str);
+}
+
+void	ft_free_array(char **arr)
+{
+	int	i;
+
+	i = 0;
+	while (arr[i])
+	{
+		ft_free(arr[i]);
+		i++;
+	}
+	ft_free(arr);
 }

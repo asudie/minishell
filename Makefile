@@ -14,11 +14,16 @@ UTILDIR			= ${SRCSDIR}utils/
 SRCSDIR			= srcs/
 SRCS			= ${SRCSDIR}main.c \
 				  ${PARSEDIR}ft_prompt.c \
-				  ${PARSEDIR}ft_cmd_parse.c \
+				  ${PARSEDIR}ft_input_parse.c \
+				  ${PARSEDIR}ft_dollar.c \
+				  ${PARSEDIR}ft_tokenize.c \
+				  ${PARSEDIR}ft_hrdc.c \
 				  ${UTILDIR}ft_error_parse.c \
 				  ${UTILDIR}ft_error_parse_ext.c \
 				  ${UTILDIR}ft_str_utils.c \
+				  ${UTILDIR}ft_arr_utils.c \
 				  ${UTILDIR}ft_utils.c \
+				  ${UTILDIR}ft_split_savediv.c \
 				  ${UTILDIR}ft_init_env.c \
 				  ${UTILDIR}ft_env_utils.c \
 				  ${UTILDIR}ft_path_utils.c

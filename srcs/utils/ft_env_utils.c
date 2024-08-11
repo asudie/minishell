@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/15 15:39:12 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/31 15:07:19 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/09 19:15:56 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,4 +59,18 @@ void	ft_envclean(t_env **env)
 		ft_free(*env);
 		*env = tmp;
 	}
+}
+
+char	*ft_envcut(char *str)
+{
+	char	*name;
+	int		i;
+
+	i = 0;
+	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
+		i++;
+	name = ft_substr(str, 0, i);
+	if (!name)
+		exit(printf(ER ER_ALLOC));
+	return (name);
 }

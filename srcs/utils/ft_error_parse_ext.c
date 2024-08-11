@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 15:14:37 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/07/31 12:00:23 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/08 18:16:31 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static bool	ft_redirects(const char *str)
 
 	i = -1;
 	state = 0;
-	while(str[++i])
+	while (str[++i])
 	{
 		ft_quote_state(str[i], &state);
 		if (state == 0 && str[i] == '<' && !ft_rdin(str))
