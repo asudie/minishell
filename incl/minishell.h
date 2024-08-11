@@ -45,7 +45,7 @@ void	ft_parsing(t_cmd *cmd, char *input);
 // EXECUTOR
 int out_rd(t_cmd *cmd);
 int in_rd(t_cmd *cmd);
-void print_file_by_fd(int fd);
+int print_file_by_fd(int fd);
 int	execute_builtin(t_cmd *cmd);
 int start_exec(t_cmd *cmd);
 
