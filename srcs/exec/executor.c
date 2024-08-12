@@ -291,35 +291,34 @@ int resolve_full_path(t_cmd *cmd, char **full_path) {
 int custom(t_cmd *cmd)
 {
     char *full_path;
-    pid_t pid = fork();
-    if (pid == -1) {
-        perror("fork");
-        return -1;
-    }
-    
-    if (pid == 0) { // Child process
-        full_path = malloc(sizeof(char) * PATH_MAX);
-        
+    // pid_t pid = fork();
+    // if (pid == -1) {
+    //     perror("fork");
+    //     return -1;
+    // }
+    // if (pid == 0) { // Child process
         if (resolve_full_path(cmd, &full_path) == -1) {
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
+            // printf("CUSTOM RETURN 1 HERE\n");
             return 1;
         }
+        full_path = malloc(sizeof(char) * PATH_MAX);
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
             // printf("HERE\n");
             // printf("%s\n", full_path);
+            free(full_path);
             perror("execve");
             return 1;
         }
-        
-    } else { // Parent process
-        // Wait for the child process to complete
-        if (wait(NULL) == -1) {
-            perror("wait");
-            return 1;
-        }
-    }
-    free(full_path);
+        free(full_path);
+    // } else { // Parent process
+    //     // Wait for the child process to complete
+    //     if (wait(NULL) == -1) {
+    //         perror("wait");
+    //         return 1;
+    //     }
+    // }
     return(0);
 }
 
@@ -393,7 +392,9 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else
     {
+        // printf("exec_buildin: %d\n", custom(cmd));
         return (custom(cmd)); 
+        // return 1;
     }
 	return (0);
 }
@@ -424,8 +425,9 @@ int start_exec(t_cmd *cmd)
         return(out_rd(cmd));
     if(cmd->in_rd)
         return(in_rd(cmd));
-    printf("res = %d.    ", execute_builtin(cmd));
-    return (0);
+    // printf("start_execres = %d\n", execute_builtin(cmd));
+    return (execute_builtin(cmd));
+    // return 0;
 }
 
 
@@ -486,12 +488,12 @@ int	execute_cmd(t_cmd *cmd)
             for (j = 0; j < 2 * (num_cmds - 1); j++) {
                 close(pipefd[j]);
             }
-
             // Execute the command
+            // printf("")
             exit_status = start_exec(it); // this happens twice!
-            printf("HOW MANY TIMES.    ");
-            if(exit_status)
-                return (1);
+            // printf("here\n");
+            printf("HOW MANY TIMES exit_status = %d\n", exit_status);
+            exit(exit_status);
             return (0); 
         }
         
@@ -509,7 +511,7 @@ int	execute_cmd(t_cmd *cmd)
     for (i = 0; i < num_cmds; i++) {
         waitpid(pid, &status, 0);
     }
-    printf("Exit status: %d\n", exit_status);
+    // printf("Exit status: %d\n", exit_status);
     return (0);
 }
 
@@ -593,7 +595,7 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"cd", "/bin"};
 		
         //PWD
-		cmd->args = (char *[]){"/home/asmolnya/Projects/minishell/srcs/exec/print", "custom.c", NULL};
+		cmd->args = (char *[]){"/home", NULL};
 
         // ENV
 		// cmd.args = (char *[]){"env", NULL};
@@ -627,7 +629,11 @@ int	main(int argc, char **argv, char **envp)
         //     return 0;
 		// cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
         if(execute_cmd(cmd))
+        {
+            
             return 0; 
+        }
+            printf("FINALE %d\n", exit_status); // WHY HER IT'S 0??????????????????????????????????????????????????????
         // cmd->next->args = (char *[]){"echo", "$?" NULL};
         // cmd.append = 1;
         // if(execute_cmd(&cmd))
