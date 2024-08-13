@@ -653,5 +653,6 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-D exits the shell.
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
+// • HEREDOC
 
 // gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c -g
