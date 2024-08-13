@@ -10,6 +10,8 @@
 
 #define PATH_MAX 4096
 
+int exit_status = 0;
+
 // void	handle_signal(int sig)
 // {
 // 	if (sig == SIGINT)
@@ -132,17 +134,29 @@ int builtin_cd(t_cmd *cmd) {
 }
 
 int builtin_echo(t_cmd *cmd) {
-    char *envp[] = { NULL }; // environment variables (none in this example)
-    
-    // Path to the executable
-    char *path = "/bin/echo";
-    
-    // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, cmd->envp) == -1) {
-        perror("execve failed");
-		return 0;
+    int newline = 1; // Flag to determine if we should print a newline
+    int i = 1; // Start with the first argument after the program name
+
+    // Check for the -n option
+    if (ft_strncmp(cmd->args[1], "-n", 3) == 0) {
+        newline = 0;
+        i = 2; // Skip the -n argument
     }
-	return (1);
+
+    // Print the arguments
+    for (; cmd->args[i]; i++) {
+        ft_printf("%s", cmd->args[i]);
+        if (cmd->args[i + 1] != NULL) { 
+            ft_printf(" "); // Print a space between arguments
+        }
+    }
+
+    // Print the newline if the -n option was not provided
+    if (newline) {
+        printf("\n");
+    }
+
+    return 1;
 }
 
 int builtin_cat(t_cmd *cmd) {
@@ -164,29 +178,25 @@ int builtin_exit(t_cmd *cmd) {
 }
 
 int builtin_pwd(t_cmd *cmd) {
-    char *envp[] = { NULL }; // environment variables (none in this example)
-    
-    // Path to the executable
-    char *path = "/bin/pwd";
-    
-    // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, cmd->envp) == -1) {
-        perror("execve failed");
-		return 0;
+    char cwd[PATH_MAX]; // Buffer to store the current working directory
+
+    // Get the current working directory
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        // Print the current working directory
+        ft_printf("%s\n", cwd);
+    } else {
+        // Handle the error
+        perror("getcwd() error");
+        return 0;
     }
-	return (1);
+
+    return 1;
 }
 
 int builtin_env(t_cmd *cmd) {
-    // char *envp[] = { NULL }; // environment variables (none in this example)
-    
-    // Path to the executable
-    char *path = "/bin/env";
-    
-    // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, cmd->envp) == -1) {
-        perror("execve failed");
-		return 0;
+    for (int i = 0; cmd->envp[i] != NULL; i++) {
+        // Print each environment variable
+        ft_printf("%s\n", cmd->envp[i]);
     }
 	return (1);
 }
@@ -252,17 +262,24 @@ int builtin_unset(t_cmd *cmd) {
     return 0;  // Success
 }
 
-int resolve_full_path(char *command, char *full_path) {
+int resolve_full_path(t_cmd *cmd, char **full_path) {
+    // Check for absolute
+    if (access(cmd->args[0], X_OK) == 0)
+    {
+        *full_path = cmd->args[0];
+        return 0;
+    } 
+            
     char *path = getenv("PATH");
-    // printf("HERE\n");
+    
     if (!path) {
         return -1;
     }
-
+    
     char *dir = strtok(path, ":");
     while (dir != NULL) {
-        snprintf(full_path, PATH_MAX, "%s/%s", dir, command);
-        if (access(full_path, X_OK) == 0) {
+        snprintf(*full_path, PATH_MAX, "%s/%s", dir, cmd->args[0]); // change for forbidden
+        if (access(*full_path, X_OK) == 0) {
             return 0;
         }
         dir = strtok(NULL, ":");
@@ -273,33 +290,36 @@ int resolve_full_path(char *command, char *full_path) {
 
 int custom(t_cmd *cmd)
 {
-    pid_t pid = fork();
-    if (pid == -1) {
-        perror("fork");
-        return -1;
-    }
-    if (pid == 0) { // Child process
-        // Print the PID of the child process
-        // printf("Child PID: %d\n", getpid());
-        // fflush(stdout); // Ensure the output is flushed
-        char full_path[PATH_MAX];
-        if (resolve_full_path(cmd->args[0], full_path) == -1) {
+    char *full_path;
+    // pid_t pid = fork();
+    // if (pid == -1) {
+    //     perror("fork");
+    //     return -1;
+    // }
+    // if (pid == 0) { // Child process
+        if (resolve_full_path(cmd, &full_path) == -1) {
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
-            exit(EXIT_FAILURE);
+            // printf("CUSTOM RETURN 1 HERE\n");
+            return 1;
         }
+        full_path = malloc(sizeof(char) * PATH_MAX);
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
-            printf("%s\n", full_path);
+            // printf("HERE\n");
+            // printf("%s\n", full_path);
+            free(full_path);
             perror("execve");
-            exit(EXIT_FAILURE);
+            return 1;
         }
-    } else { // Parent process
-        // Wait for the child process to complete
-        if (wait(NULL) == -1) {
-            perror("wait");
-            exit(EXIT_FAILURE);
-        }
-    }
+        free(full_path);
+    // } else { // Parent process
+    //     // Wait for the child process to complete
+    //     if (wait(NULL) == -1) {
+    //         perror("wait");
+    //         return 1;
+    //     }
+    // }
+    return(0);
 }
 
 int in_rd(t_cmd *cmd) // check if it's working!
@@ -307,14 +327,14 @@ int in_rd(t_cmd *cmd) // check if it's working!
     int fd = open(cmd->in_rd, O_RDONLY);
     if (fd == -1) {
         perror("open");
-        exit(EXIT_FAILURE);
+        return (1);
     }
 
        // Fork a child process
     pid_t pid = fork();
     if (pid == -1) {
         perror("fork");
-        exit(EXIT_FAILURE);
+        return (1);
     }
 
     if (pid == 0) { // Child process
@@ -322,15 +342,18 @@ int in_rd(t_cmd *cmd) // check if it's working!
         if (dup2(fd, STDIN_FILENO) == -1) {
             perror("dup2");
             close(fd);
-            exit(EXIT_FAILURE);
+            return (1);
         }
         close(fd);
 
         // Execute the command
         if (execute_builtin(cmd)) {
+            
             perror("builtin");
-            exit(EXIT_FAILURE);
+            return (1);
         }
+        
+        return 0;
     } else { // Parent process
         close(fd);
         wait(NULL); // Wait for the child process to finish
@@ -345,11 +368,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
 	else if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
 	{
-		return (builtin_echo(cmd));
-	}
-    else if (ft_strncmp(cmd->args[0], "cat", 4) == 0)
-	{
-		return (builtin_cat(cmd));
+        return (builtin_echo(cmd));
 	}
 	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0)
 	{
@@ -369,16 +388,18 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
 	{
-		return (builtin_env(cmd)); // change for builtin_env
+		return (builtin_env(cmd));
 	}
     else
     {
-        return (custom(cmd));
+        // printf("exec_buildin: %d\n", custom(cmd));
+        return (custom(cmd)); 
+        // return 1;
     }
 	return (0);
 }
 
-void print_file_by_fd(int fd) {
+int print_file_by_fd(int fd) {
     char buffer[1024];
     ssize_t bytes_read;
 
@@ -387,14 +408,15 @@ void print_file_by_fd(int fd) {
         // Write the buffer content to the standard output
         if (write(STDOUT_FILENO, buffer, bytes_read) != bytes_read) {
             perror("write");
-            exit(EXIT_FAILURE);
+            return (1);
         }
     }
 
     if (bytes_read == -1) {
         perror("read");
-        exit(EXIT_FAILURE);
+        return (1);
     }
+    return (0);
 }
 
 int start_exec(t_cmd *cmd)
@@ -403,53 +425,97 @@ int start_exec(t_cmd *cmd)
         return(out_rd(cmd));
     if(cmd->in_rd)
         return(in_rd(cmd));
+    // printf("start_execres = %d\n", execute_builtin(cmd));
     return (execute_builtin(cmd));
+    // return 0;
+}
+
+
+int count_commands(t_cmd *cmd)
+{
+    t_cmd *it = cmd;
+    int num_cmds = 0;
+
+    while (it != NULL) 
+    {
+        num_cmds++;
+        it = it->next;
+    }
+    return num_cmds;
 }
 
 int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
+    int     status;
 	t_cmd *it = cmd;
+    int num_cmds = count_commands(cmd);
+    int pipefd[2 * (num_cmds - 1)];
+    int i, j;
+
+    // Create pipes
+    for (i = 0; i < (num_cmds - 1); i++) {
+        if (pipe(pipefd + i * 2) == -1) {
+            perror("pipe");
+            return (1);
+        }
+    }
+
+    i = 0; // Initialize i to 0 before loop
 
 	// Iterate through each command
 	while (it)
 	{
-		if(start_exec(cmd))
+        pid = fork();
+        if (pid == -1) {
+            perror("fork");
             return (1);
-			// pid = fork(); // when we need fork
-			// if (pid == 0)
-			// {
-			// 	// Child process
-			// 	// execve(cmd[i].path, cmd[i].args, environ);
-			// 	// exit(EXIT_FAILURE);
-			// }
-			// else if (pid > 0)
-			// {
-			// 	// Parent process
-			// 	wait(NULL);
-			// }
-			// else
-			// {
-			// 	perror("fork");
-			// }
-			it = it->next;
-		
-	}
+        } else if (pid == 0) 
+        {
+            // Child process
+
+            // Redirect input from previous pipe if not the first command
+            if (i > 0) {
+                dup2(pipefd[(i - 1) * 2], STDIN_FILENO);
+            }
+
+            // Redirect output to next pipe if not the last command
+            if (i < num_cmds - 1) {
+                dup2(pipefd[i * 2 + 1], STDOUT_FILENO);
+            }
+
+            // Close all pipe file descriptors
+            for (j = 0; j < 2 * (num_cmds - 1); j++) {
+                close(pipefd[j]);
+            }
+            // Execute the command
+            // printf("")
+            exit_status = start_exec(it); // this happens twice!
+            // printf("here\n");
+            printf("HOW MANY TIMES exit_status = %d\n", exit_status);
+            exit(exit_status);
+            return (0); 
+        }
+        
+        // Parent process, move to the next command
+        it = it->next;
+        i++;
+    }
+
+    // Close all pipe file descriptors in the parent
+    for (j = 0; j < 2 * (num_cmds - 1); j++) {
+        close(pipefd[j]);
+    }
+
+    // Wait for all child processes to finish
+    for (i = 0; i < num_cmds; i++) {
+        waitpid(pid, &status, 0);
+    }
+    // printf("Exit status: %d\n", exit_status);
     return (0);
 }
 
-void display_prompt(t_cmd *cmd) {
-    char *cwd;
 
-    // Get the current working directory
-	cwd = get_env_var(cmd->envp, "PWD");
-    if (cwd != NULL) {
-        // Print the prompt
-        printf("\nminishel:[%s]$ ", cwd);
-    } else {
-        perror("get_env_var");
-    }
-}
 
 int out_rd(t_cmd *cmd)
 {
@@ -461,7 +527,7 @@ int out_rd(t_cmd *cmd)
         fd = open(cmd->out_rd, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd == -1) {
         perror("open");
-        exit(EXIT_FAILURE);
+        return (1);
     }
 
     // Duplicate the file descriptor to stdout
@@ -469,14 +535,14 @@ int out_rd(t_cmd *cmd)
     if (saved_stdout == -1) {
         perror("dup");
         close(fd);
-        exit(EXIT_FAILURE);
+        return (1);
     }
 
     if (dup2(fd, STDOUT_FILENO) == -1) {
         perror("dup2");
         close(fd);
         close(saved_stdout);
-        exit(EXIT_FAILURE);
+        return (1);
     }
 
     // Close the target file descriptor as it's no longer needed
@@ -491,7 +557,7 @@ int out_rd(t_cmd *cmd)
     if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
         perror("dup2");
         close(saved_stdout);
-        exit(EXIT_FAILURE);
+        return (1);
     }
 
     // Close the saved stdout file descriptor
@@ -504,24 +570,21 @@ int out_rd(t_cmd *cmd)
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_cmd	cmd;
+	t_cmd	*cmd = malloc(sizeof(t_cmd));
 
 	// Initialize environment variables
 	// init_environment(envp);
 	// while (1)
 	// {
-		// Display prompt
-		// display_prompt();
-		// // Read input
 		// char *input = read_input();
 		// // Parse input
 		// t_cmd *cmd = parse_input(input); 
-		// -------------------------------------------------------------------
-		// cmd = ft_malloc(sizeof(t_cmd));
+		// 
+		// cmd = malloc(sizeof(t_cmd));
         // EXAMPLE: ls -l > output.txt
 		// cmd.cmd = "ls";
 		// cmd.args = (char *[]){"ls", "-l", NULL};
-		// cmd.in_rd = NULL;
+		// cmd->in_rd = NULL;
 		// cmd.out_rd = "output.txt";
 		// cmd.append = 0;
 		// cmd.next = NULL;
@@ -530,16 +593,27 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"echo", "Hello!", NULL};
 		// cmd.cmd = "cd";
 		// cmd.args = (char *[]){"cd", "/bin"};
-		// cmd.cmd = "pwd";
-		// cmd.args = (char *[]){"pwd", NULL};
-		// cmd.cmd = "env";
+		
+        //PWD
+		cmd->args = (char *[]){"/home", NULL};
+
+        // ENV
 		// cmd.args = (char *[]){"env", NULL};
         
-		cmd.in_rd = "/workspaces/42_minishell/srcs/exec/input.txt"; // doesn't find input!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		cmd.out_rd = NULL;
-		cmd.append = 0;
-		cmd.next = NULL;
-		cmd.envp = envp;
+		// cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
+		cmd->out_rd = NULL;
+		cmd->append = 0;
+		cmd->next = NULL;
+		cmd->envp = envp;
+        cmd->in_rd = NULL;
+
+        // cmd->next->args = (char *[]){"grep", ".c", NULL};
+        // cmd->next->out_rd = NULL;
+		// cmd->next->append = 0;
+		// cmd->next->next = NULL;
+		// cmd->next->envp = envp;
+        // cmd->next->in_rd = NULL;
+
 		// display_prompt(&cmd); 
 		// Execute cmd
 		// execute_cmd(&cmd);
@@ -547,15 +621,20 @@ int	main(int argc, char **argv, char **envp)
 		// cmd.args = (char *[]){"unset", "USER", NULL};
         // cmd.cmd = "export";
         // cmd.args = (char *[]){"export", "MYVAR=3", NULL};
-        if(execute_cmd(&cmd))
-           return 0;
+        // if(execute_cmd(&cmd))
+        //    return 0;
         // cmd.cmd = "exit";
         // cmd.args = (char *[]){"exit", NULL};
         // if(execute_cmd(&cmd))
         //     return 0;
-		/*cmd.args = (char *[]){"print", NULL}; 
-        if(execute_cmd(&cmd))
-            return 0; */
+		// cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
+        if(execute_cmd(cmd))
+        {
+            
+            return 0; 
+        }
+            printf("FINALE %d\n", exit_status); // WHY HER IT'S 0??????????????????????????????????????????????????????
+        // cmd->next->args = (char *[]){"echo", "$?" NULL};
         // cmd.append = 1;
         // if(execute_cmd(&cmd))
         //     return 0;
@@ -574,9 +653,5 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-D exits the shell.
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
-// foreground pipeline
-// • Implement pipes (| character). The output of each command in the pipeline is
-// connected to the input of the next command via a pipe
-// HEREDOC
 
-// 
+// gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c -g

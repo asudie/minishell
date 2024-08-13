@@ -24,18 +24,20 @@ void print_file_content(int fd) {
 }
 
 int main(int argc, char *argv[]) {
+    int fd = open(argv[1], O_RDONLY);
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <file_descriptor>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    int fd = atoi(argv[1]);
+    // int fd = atoi(argv[1]);
     if (fd <= 0) {
         fprintf(stderr, "Invalid file descriptor: %d\n", fd);
         exit(EXIT_FAILURE);
     }
 
     print_file_content(fd);
+    // printf("File %s is received\n", );
 
     return 0;
 }

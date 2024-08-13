@@ -15,6 +15,8 @@
 
 # include "../ft_destructor/ft_alloc.h"
 # include "../libft/libft.h"
+#include "../42_pipex/incl/pipex.h"
+#include "../42_pipex/ft_printf/ft_printf.h"
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/types.h>
@@ -108,9 +110,19 @@ void	ft_substr_dollar(t_mhell *mhell, char **str, int state);
 void	ft_tokenize(t_mhell *mhell, char *str);
 
 // EXECUTOR
-int		out_rd(t_cmd *cmd);
-void	print_file_by_fd(int fd);
-int		execute_builtin(t_cmd *cmd);
+int out_rd(t_cmd *cmd);
+int in_rd(t_cmd *cmd);
+int print_file_by_fd(int fd);
+int	execute_builtin(t_cmd *cmd);
+int start_exec(t_cmd *cmd);
+
+// PIPEX
+void	ft_validate_cmd(char **argv);
+void	ft_validate_file(char **argv);
+void	ft_error_output(char *path, char *msg, int code);
+void	ft_free_array(char **array);
+char	*ft_find_path(char *cmd, char *path);
+char	**ft_separate(char *a, char d);
 
 // UTILITY
 bool	ft_input_error(t_mhell *mhell, char	*input);
