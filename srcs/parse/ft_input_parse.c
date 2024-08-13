@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_cmd_parse.c                                     :+:      :+:    :+:   */
+/*   ft_input_parse.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 22:22:44 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/11 14:58:35 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/13 18:13:18 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ bool	ft_input_parse(t_mhell *mhell)
 		if (ft_hrdc(mhell, order))
 			return (false);
 	}
+	ft_open_quotes(mhell);
+	if (order < 0)
+		ft_create_cmd(mhell);
 	mhell->exit_code = 0;
 	return (ft_free(input), true);
 }

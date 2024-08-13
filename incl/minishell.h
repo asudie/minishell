@@ -51,11 +51,6 @@
 # define ER_QUOTE_D	"double quatation is not closed\n\033[0m"
 # define ER_SX_CHR	"syntax error near unexpected token `%c'\n\033[0m"
 # define ER_SX_STR	"syntax error near unexpected token `%s'\n\033[0m"
-# define ER_TKN		"Error creating string for tokens\n\033[0m"
-# define ER_HRDC	"Error creating heredocs\n\033[0m"
-# define ER_HRDC_NB	"Error creating heredoc number string\n\033[0m"
-# define ER_HRDC_FN	"Error creating heredoc file name\n\033[0m"
-# define ER_HRDC_FK	"Error forking for heredoc\n\033[0m"
 
 typedef struct s_env	t_env;
 typedef struct s_tkn	t_tkn;
@@ -101,7 +96,6 @@ typedef struct s_cmd
 	char			*in_rd;	// Input redirection file, e.g., "input.txt"
 	char			*out_rd;// Output redirection file, e.g., "output.txt"
 	int				append;	// Flag for append mode (1 for >>, 0 for >)
-	char			**heredoc;
 	char			**envp;
 	struct s_cmd	*next;	// Pointer to the next command in case of pipes
 }	t_cmd;
