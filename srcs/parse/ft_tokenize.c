@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 15:22:12 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/11 14:37:29 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/14 15:09:46 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ static void	ft_prep_token_arr(t_mhell *mhell, char *str)
 	int	len;
 	int	i;
 
-	i = 0;
+	i = -1;
 	len = 0;
-	while (str[i])
+	while (str[++i])
 	{
 		if (ft_is_space(str[i]))
 			continue ;
@@ -58,7 +58,6 @@ static void	ft_prep_token_arr(t_mhell *mhell, char *str)
 		else
 			i += ft_strskip(&str[i]) - 1;
 		len++;
-		i++;
 	}
 	mhell->tkn = ft_malloc(sizeof(t_tkn) * len);
 	mhell->tkn_l = len;
@@ -71,13 +70,13 @@ static int	ft_strskip(char *str)
 
 	i = 0;
 	state = 0;
-	while (str[i] && !ft_is_space(str[i]) && !ft_is_space(str[i]))
+	while (str[i] && !ft_is_spec(&str[i]) && !ft_is_space(str[i]))
 	{
 		ft_quote_state(str[i], &state);
 		if (state != 0)
 		{
 			i++;
-			while (str[i] && state != 0)
+			while (str[i] && ((state == 1 && str[i] != '\'') || (state == 2 && str[i] != '"')))
 				i++;
 			ft_quote_state(str[i], &state);
 		}
@@ -89,15 +88,15 @@ static int	ft_strskip(char *str)
 static t_type	ft_token_type(char *str)
 {
 	if (*str == '|')
-		return (pipe);
+		return (_pipe);
 	else if (*str == *(str + 1) && *str == '<')
-		return (hrdc);
+		return (_hrdc);
 	else if (*str == '<')
-		return (rdin);
+		return (_rdin);
 	else if (*str == *(str + 1) && *str == '>')
-		return (append);
+		return (_append);
 	else if (*str == '>')
-		return (rdout);
+		return (_rdout);
 	else
-		return (text);
+		return (_text);
 }

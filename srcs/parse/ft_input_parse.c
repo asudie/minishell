@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 22:22:44 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/13 18:13:18 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/14 19:05:41 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,28 +15,28 @@
 static char	*ft_trim_input(char *str);
 static void	ft_prep_input(char **input, char *str);
 static void	ft_replace_dollar(t_mhell *mhell, char **str);
-static int	ft_token_order(t_mhell *mhell);
+// static int	ft_token_order(t_mhell *mhell;
 
 bool	ft_input_parse(t_mhell *mhell)
 {
 	char	*input;
-	int		order;
+	// int		order;
 
-	if (ft_input_error(mhell, mhell->cmd_line))
+	if (!ft_input_error(mhell, mhell->cmd_line))
 		return (false);
 	input = ft_trim_input(mhell->cmd_line);
 	ft_replace_dollar(mhell, &input);
 	if (!*input)
 		return (mhell->exit_code = 0, ft_free(input), false);
 	ft_tokenize(mhell, input);
-	order = ft_token_order(mhell);
-	if (order >= 0)
-	{
-		if (ft_hrdc(mhell, order))
-			return (false);
-	}
+	// order = ft_token_order(mhell);
+	// if (order >= 0)
+	// {
+	// 	if (ft_hrdc(mhell, order))
+	// 		return (false);
+	// }
 	ft_open_quotes(mhell);
-	if (order < 0)
+	// if (order < 0)
 		ft_create_cmd(mhell);
 	mhell->exit_code = 0;
 	return (ft_free(input), true);
@@ -100,7 +100,7 @@ static void	ft_replace_dollar(t_mhell *mhell, char **str)
 	state = 0;
 	while (arr[i])
 	{
-		ft_substr_dollar(mhell, &arr[i], state);
+		ft_substr_dollar(mhell, &arr[i], &state);
 		i++;
 	}
 	ft_free(*str);
@@ -108,22 +108,22 @@ static void	ft_replace_dollar(t_mhell *mhell, char **str)
 	ft_free_array(arr);
 }
 
-static int	ft_token_order(t_mhell *mhell)
-{
-	t_tkn	*tkn;
-	int		i;
+// static int	ft_token_order(t_mhell *mhell)
+// {
+// 	t_tkn	*tkn;
+// 	int		i;
 
-	i = 0;
-	tkn = mhell->tkn;
-	while (i < mhell->tkn_l)
-	{
-		if (tkn[i].type == pipe && ((i - 1) < 0 || (i + 1) >= mhell->tkn_l))
-			return (printf(ER_MHELL ER_SX_STR, tkn[i].token), mhell->exit_code = 2);
-		else if (tkn[i].type > pipe && (i + 1) >= mhell->tkn_l)
-			return (printf(ER_MHELL ER_SX_STR, "newline"), mhell->exit_code = 2);
-		else if (tkn[i].type > pipe && mhell->tkn[i + 1].type > 1)
-			return (printf(ER_MHELL ER_SX_STR, tkn[i + 1].token), mhell->exit_code = 2);
-		i++;
-	}
-	return (-1);
-}
+// 	i = 0;
+// 	tkn = mhell->tkn;
+// 	while (i < mhell->tkn_l)
+// 	{
+// 		if (tkn[i].type == _pipe && ((i - 1) < 0 || (i + 1) >= mhell->tkn_l))
+// 			return (printf(ER_MHELL ER_SX_STR, tkn[i].token), mhell->exit_code = 2);
+// 		else if (tkn[i].type > _pipe && (i + 1) >= mhell->tkn_l)
+// 			return (printf(ER_MHELL ER_SX_STR, "newline"), mhell->exit_code = 2);
+// 		else if (tkn[i].type > _pipe && mhell->tkn[i + 1].type > 1)
+// 			return (printf(ER_MHELL ER_SX_STR, tkn[i + 1].token), mhell->exit_code = 2);
+// 		i++;
+// 	}
+// 	return (-1);
+// }

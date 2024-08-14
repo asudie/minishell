@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/05 17:52:28 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/09 19:14:11 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/13 23:38:41 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@ static char	*ft_replace(t_mhell *mhell, char *str);
 static int	ft_question_mark(char *str);
 static char	*ft_replace_var(char *str, int *i, t_env *env);
 
-void	ft_substr_dollar(t_mhell *mhell, char **str, int state)
+void	ft_substr_dollar(t_mhell *mhell, char **str, int *state)
 {
 	char	*new;
 	int		i;
 
-	i = ft_not_replace(*str, state);
+	i = ft_not_replace(*str, *state);
 	if (i >= 0)
 		new = ft_strdup(&(*str)[i]);
 	else
@@ -32,7 +32,7 @@ void	ft_substr_dollar(t_mhell *mhell, char **str, int state)
 	i = 0;
 	while ((*str)[i])
 	{
-		ft_quote_state((*str)[i], &state);
+		ft_quote_state((*str)[i], state);
 		i++;
 	}
 	ft_free(*str);

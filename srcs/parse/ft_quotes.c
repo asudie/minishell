@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:14:17 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/13 19:01:18 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/14 19:04:42 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ void	ft_open_quotes(t_mhell *mhell)
 {
 	int	i;
 
-	i = 0;
-	while (i++ < mhell->tkn_l)
+	i = -1;
+	while (++i < mhell->tkn_l)
 		ft_tkn_quotes(&mhell->tkn[i]);
 }
 
@@ -34,17 +34,19 @@ static void	ft_tkn_quotes(t_tkn *tkn)
 	i = 0;
 	j = 0;
 	state = 0;
-	if (tkn->type > text)
+	if (tkn->type > _text)
 		return ;
 	str = ft_alloc_new_tkn(*tkn);
-	while (tkn->token[i++])
+	while (tkn->token[i])
 	{
-		if (!(((state == 1 && tkn->token[i] == '\'') || (state == 2 && tkn->token[i] == '"')) || (state == 0 && tkn->token[i] == ft_is_quote(tkn->token[i]))))
+		ft_quote_state(tkn->token[i], &state);
+		if (((state == 1 && tkn->token[i] != '\'') || (state == 2 && tkn->token[i] != '"')) || (state == 0 && ft_is_spec(&tkn->token[i]) == 0))
 		{
 			str[j] = tkn->token[i];
 			j++;
 		}
 		ft_quote_state(tkn->token[i], &state);
+		i++;
 	}
 	ft_free(tkn->token);
 	tkn->token = str;
@@ -58,9 +60,9 @@ static char	*ft_alloc_new_tkn(t_tkn tkn)
 
 	len = 0;
 	state = 0;
-	while (*tkn.token && tkn.type == text)
+	while (*tkn.token && tkn.type == _text)
 	{
-		if (!(((state == 1 && *tkn.token == '\'') || (state == 2 && *tkn.token == '"')) || (state == 0 && *tkn.token == ft_is_quote(*tkn.token))))
+		if (((state == 1 && *tkn.token != '\'') || (state == 2 && *tkn.token != '"')) || (state == 0 && ft_is_spec(&*tkn.token) == 0))
 			len++;
 		ft_quote_state(*tkn.token, &state);
 		tkn.token++;

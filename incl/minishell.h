@@ -63,8 +63,9 @@ typedef struct s_mhell
 	char	*cmd_line;
 	int		exit_code;
 	t_env	*env;
-	t_tkn	*tkn;
 	int		tkn_l;
+	t_tkn	*tkn;
+	int		cmd_l;
 	t_cmd	*cmd;
 }	t_mhell;
 
@@ -77,13 +78,13 @@ typedef struct s_env
 
 typedef enum e_type
 {
-	null,
-	text,
-	pipe,
-	hrdc,
-	rdin,
-	append,
-	rdout,
+	_null,
+	_text,
+	_pipe,
+	_hrdc,
+	_rdin,
+	_append,
+	_rdout,
 }	t_type;
 
 typedef struct s_tkn
@@ -91,6 +92,13 @@ typedef struct s_tkn
 	char	*token;
 	t_type	type;
 }	t_tkn;
+
+typedef struct s_cnt
+{
+	int						arg;
+	int						in;
+	int						out;
+}							t_cnt;
 
 typedef struct s_cmd
 {
@@ -106,7 +114,7 @@ typedef struct s_cmd
 void	ft_init_env(t_mhell *mhell, char **envp);
 char	*ft_input_prompt(t_mhell *mhell);
 bool	ft_input_parse(t_mhell *mhell);
-void	ft_substr_dollar(t_mhell *mhell, char **str, int state);
+void	ft_substr_dollar(t_mhell *mhell, char **str, int *state);
 void	ft_tokenize(t_mhell *mhell, char *str);
 
 // EXECUTOR
@@ -126,6 +134,8 @@ char	**ft_separate(char *a, char d);
 
 // UTILITY
 bool	ft_input_error(t_mhell *mhell, char	*input);
+void	ft_open_quotes(t_mhell *mhell);
+void	ft_create_cmd(t_mhell *mshell);
 
 t_env	*ft_find_env(t_env *env, char *var);
 void	ft_envadd(t_env **env, char *var, char *val);

@@ -34,19 +34,18 @@ static int	ft_minihell(t_mhell *mhell)
 		{
 			// if (ft_exit(mhell))
 			// 	continue ;
-			// executor(mhell->cmd);
+			// mhell->exit_code = execute_cmd(mhell->cmd);
 		}
 		// ft_clean_cmd_data(mhell);
 		ft_free(mhell->cmd_line);
 	}
-	rl_clear_history();
 	ft_destructor();
 	return (mhell->exit_code);
 }
 
 static t_mhell	*ft_init_minihell(t_mhell *mhell, char **envp)
 {
-	mhell->cmd_line = NULL;
+	// mhell->cmd_line = NULL;
 	mhell->exit_code = EXIT_SUCCESS;
 	mhell->env = NULL;
 	mhell->tkn = NULL;
