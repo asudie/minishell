@@ -48,10 +48,12 @@ static t_mhell	*ft_init_minihell(t_mhell *mhell, char **envp)
 	// mhell->cmd_line = NULL;
 	mhell->exit_code = EXIT_SUCCESS;
 	mhell->env = NULL;
-	mhell->tkn = NULL;
 	mhell->tkn_l = 0;
+	mhell->tkn = NULL;
+	mhell->cmd_l = 0;
+	mhell->cmd->append = 0;
+	mhell->cmd->heredoc = 0;
 	mhell->cmd->envp = envp;
-	mhell->cmd = NULL;
 	ft_init_env(mhell, envp);
 	return (mhell);
 }

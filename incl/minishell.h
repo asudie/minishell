@@ -93,7 +93,7 @@ typedef struct s_tkn
 	t_type	type;
 }	t_tkn;
 
-typedef struct s_cnt
+typedef struct s_size
 {
 	int						arg;
 	int						in;
@@ -106,6 +106,7 @@ typedef struct s_cmd
 	char			*in_rd;	// Input redirection file, e.g., "input.txt"
 	char			*out_rd;// Output redirection file, e.g., "output.txt"
 	int				append;	// Flag for append mode (1 for >>, 0 for >)
+	int				heredoc;
 	char			**envp;
 	struct s_cmd	*next;	// Pointer to the next command in case of pipes
 }	t_cmd;
