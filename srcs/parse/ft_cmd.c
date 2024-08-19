@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 19:11:40 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/15 17:01:25 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/19 15:15:09 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,35 +22,68 @@ void	ft_print_tkn(t_mhell *mhell)
 	}
 }
 
-static void	ft_fill_cmd(t_mhell *mhell, int cmd, int *tkn);
-static void	ft_prep_cmd(t_mhell *mhell);
-static void	ft_init_cmd(t_mhell *mhell, int len, int *i);
+void	ft_print_cmd(t_cmd *cmd)
+{
+	printf("\n");
+	for (int i = 0; cmd->args[i]; i++)
+			printf("args[%i]: %s\n", i, cmd->args[i]);
+	printf("rdin: %s\n", cmd->in_rd);
+	printf("rdout: %s\n", cmd->out_rd);
+	printf("append: %i\n", cmd->append);
+	printf("heredoc: %i\n", cmd->heredoc);
+}
+
+void	ft_prep_cmd(t_mhell *mhell);
+void	ft_init_cmd(t_mhell *mhell, int *i, t_cmd *cmd);
+void	ft_alloc_cmd(int args, int in, int out, t_cmd	*cmd);
 
 void	ft_create_cmd(t_mhell *mhell)
 {
 	ft_print_tkn(mhell);
+	t_cmd	*cmd;
 	int	i;
-	int	j;
 
 	i = 0;
-	j = 0;
 	ft_prep_cmd(mhell);
-	while (i < mhell->cmd_l)
+	cmd = mhell->cmd;
+	while (mhell->tkn)
 	{
-		ft_fill_cmd(mhell, i, &j);
-		j++;
+		printf("here\n");
+		if (mhell->tkn[i].type == _pipe)
+			cmd = cmd->next;
+		else if (mhell->tkn[i].type == _rdin || mhell->tkn[i].type == _hrdc)
+		{
+			if (mhell->tkn[i].type == _hrdc)
+				cmd->heredoc = 1;
+			i++;
+			cmd->in_rd = ft_strdup(mhell->tkn[i].token);
+		}
+		else if (mhell->tkn[i].type == _rdout || mhell->tkn[i].type == _append)
+		{
+			if (mhell->tkn[i].type == _append)
+				cmd->append = 1;
+			i++;
+			cmd->out_rd = ft_strdup(mhell->tkn[i].token);
+		}
+		else
+		{
+			cmd->args[i] = mhell->tkn[i].token;
+			printf("here\n");
+			i++;
+		}
 		i++;
 	}
-	
+	mhell->cmd = cmd;
 }
 
-static void	ft_prep_cmd(t_mhell *mhell)
+void	ft_prep_cmd(t_mhell *mhell)
 {
+	t_cmd *cmd;
 	int	len;
 	int	i;
 
 	i = 0;
-	len = 1;
+	len = 0;
 	while (i < mhell->tkn_l)
 	{
 		if (mhell->tkn[i].type == _pipe)
@@ -63,77 +96,51 @@ static void	ft_prep_cmd(t_mhell *mhell)
 	len = 0;
 	while (len < mhell->cmd_l && i < mhell->tkn_l)
 	{
-		ft_init_cmd(mhell, len, &i);
-		len++;
+		ft_init_cmd(mhell, &i, cmd);
 		i++;
+		len++;
+		cmd = cmd->next;
 	}
+	mhell->cmd = cmd;
 }
 
-static void	ft_init_cmd(t_mhell *mhell, int len, int *i)
+void	ft_init_cmd(t_mhell *mhell, int *i, t_cmd *cmd)
 {
-	int	arg;
+	int	args;
 	int	in;
 	int	out;
 
-	arg = 0;
-	in = 0;
 	out = 0;
+	in = 0;
+	args = 0;
 	while (mhell->tkn && *i < mhell->tkn_l && mhell->tkn[*i].token && mhell->tkn[*i].type != _pipe)
 	{
 		if (mhell->tkn[*i].type == _text)
-			arg++;
+			args++;
 		else
 		{
 			if (mhell->tkn[*i].type == _rdin || mhell->tkn[*i].type == _hrdc)
-				in++;
+			{
+				(*i)++;
+				in = ft_strlen(mhell->tkn[*i].token);
+			}
 			else if (mhell->tkn[*i].type == _rdout || mhell->tkn[*i].type == _append)
-				out++;
-			(*i)++;
-		}
+			{
+				(*i)++;
+				out = ft_strlen(mhell->tkn[*i].token);
+			}
+		}		
 		(*i)++;
 	}
-	mhell->cmd[len].args = ft_malloc(sizeof(char *) * (arg + 1));
-	mhell->cmd[len].in_rd = ft_malloc(sizeof(char *) * in);
-	mhell->cmd[len].out_rd = ft_malloc(sizeof(char *) * out);
-	mhell->cmd[len].args[arg] = NULL;
+	ft_alloc_cmd(args, in, out, cmd);
 }
 
-static void	ft_fill_cmd(t_mhell *mhell, int cmd, int *tkn)
+void	ft_alloc_cmd(int args, int in, int out, t_cmd *cmd)
 {
-	int	i;
-
-	i = 0;
-	while (*tkn < mhell->tkn_l && mhell->tkn[*tkn].type != _pipe)
-	{
-		if (mhell->tkn[*tkn].type == _rdin || mhell->tkn[*tkn].type == _hrdc)
-		{
-			if (mhell->tkn[*tkn].type == _hrdc)
-				mhell->cmd[cmd].heredoc = 1;
-			(*tkn)++;
-			if (mhell->tkn[*tkn].type == _text)
-				mhell->cmd[cmd].in_rd = ft_strdup(mhell->tkn[*tkn].token);
-		}
-		else if (mhell->tkn[*tkn].type == _rdout || mhell->tkn[*tkn].type == _append)
-		{
-			if (mhell->tkn[*tkn].type == _append)
-				mhell->cmd[cmd].append = 1;
-			(*tkn)++;
-			if (mhell->tkn[*tkn].type == _text)
-				mhell->cmd[cmd].out_rd = ft_strdup(mhell->tkn[*tkn].token);
-		}
-		else
-		{
-			mhell->cmd[cmd].args[i] = mhell->tkn[*tkn].token;
-			i++;
-		}
-		for (int i = 0; mhell->cmd[cmd].args[i]; i++)
-			printf("args[%i]: %s", i, mhell->cmd[cmd].args[i]);
-		printf("rdin: %s", mhell->cmd[cmd].in_rd);
-		printf("rdout: %s", mhell->cmd[cmd].out_rd);
-		printf("append: %i", mhell->cmd[cmd].append);
-		printf("heredoc: %i", mhell->cmd[cmd].heredoc);
-		(*tkn)++;
-	}
+	cmd->args = ft_malloc(sizeof(char *) * (args + 1));
+	cmd->args[args] = NULL;
+	cmd->in_rd = ft_malloc(sizeof(char *) * in);
+	cmd->out_rd = ft_malloc(sizeof(char *) * out);
 }
 
 /*

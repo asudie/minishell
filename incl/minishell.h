@@ -62,6 +62,7 @@ typedef struct s_mhell
 {
 	char	*cmd_line;
 	int		exit_code;
+	char	**envp;
 	t_env	*env;
 	int		tkn_l;
 	t_tkn	*tkn;
@@ -93,13 +94,6 @@ typedef struct s_tkn
 	t_type	type;
 }	t_tkn;
 
-typedef struct s_size
-{
-	int						arg;
-	int						in;
-	int						out;
-}							t_cnt;
-
 typedef struct s_cmd
 {
 	char			**args;	// An array of command arguments["ls", "-l", NULL]
@@ -107,7 +101,6 @@ typedef struct s_cmd
 	char			*out_rd;// Output redirection file, e.g., "output.txt"
 	int				append;	// Flag for append mode (1 for >>, 0 for >)
 	int				heredoc;
-	char			**envp;
 	struct s_cmd	*next;	// Pointer to the next command in case of pipes
 }	t_cmd;
 
