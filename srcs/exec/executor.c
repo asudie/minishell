@@ -566,6 +566,16 @@ int out_rd(t_cmd *cmd)
     return res;
 }
 
+void sigint_handler(int signum) {
+    (void)signum;  // Avoid unused parameter warning
+    // Print a newline and a new prompt
+    write(STDOUT_FILENO, "\n", 1);
+    // write(STDOUT_FILENO, "minishell$ ", 11); NEW PROMPT!!!
+}
+
+void sigquit_handler(int signum) {
+    (void)signum;  // Ignore the signal
+}
 
 
 int	main(int argc, char **argv, char **envp)
@@ -574,12 +584,22 @@ int	main(int argc, char **argv, char **envp)
 
 	// Initialize environment variables
 	// init_environment(envp);
+
+    // Set up signal handlers
+    // signal(SIGINT, sigint_handler);  // Handle Ctrl+C
+    // signal(SIGQUIT, sigquit_handler);  // Ignore Ctrl+\/
+
 	// while (1)
 	// {
-		// char *input = read_input();
-		// // Parse input
-		// t_cmd *cmd = parse_input(input); 
-		// 
+
+    // Read input (you would implement your actual input handling here)
+        char buffer[1024];
+        // if (fgets(buffer, sizeof(buffer), stdin) == NULL) {  CTRL-D
+        //     if (feof(stdin)) {
+        //         break;
+        //     }
+        // }
+		
 		// cmd = malloc(sizeof(t_cmd));
         // EXAMPLE: ls -l > output.txt
 		// cmd.cmd = "ls";
@@ -654,5 +674,7 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
 // • HEREDOC
+
+// • remove global var for exit code $?-> do when merging with severyn
 
 // gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c -g
