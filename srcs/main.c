@@ -34,8 +34,7 @@ static int	ft_minihell(t_mhell *mhell)
 		{
 			// mhell->exit_code = execute_cmd(mhell->cmd, envp);
 		}
-		// ft_clean_cmd_data(mhell);
-		ft_free(mhell->cmd_line);
+		ft_free_mhell_data(mhell);
 	}
 	ft_destructor();
 	return (mhell->exit_code);

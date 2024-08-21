@@ -139,6 +139,12 @@ char	**ft_separate(char *a, char d);
 bool	ft_input_error(t_mhell *mhell, char	*input);
 void	ft_open_quotes(t_mhell *mhell);
 void	ft_create_cmd(t_mhell *mshell);
+void	ft_free_mhell_data(t_mhell *mhell);
+
+void	ft_cmdadd_back(t_cmd **lst, t_cmd *new);
+t_cmd	*ft_cmdlast(t_cmd *lst);
+void	ft_cmdclear(t_cmd **lst, void (*del)(void*));
+void	ft_cmddelone(t_cmd *lst, void (*del)(void*));
 
 t_env	*ft_find_env(t_env *env, char *var);
 void	ft_envadd(t_env **env, char *var, char *val);
@@ -158,5 +164,7 @@ int		ft_conc_space(char curr, char next);
 bool	ft_is_quote(char c);
 void	ft_quote_state(int c, int *state);
 int		ft_is_spec(char *str);
+
+void	ft_print_cmd(t_cmd *cmd);
 
 #endif

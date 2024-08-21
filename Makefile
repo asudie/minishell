@@ -23,7 +23,9 @@ SRCS			= ${SRCSDIR}main.c \
 				  ${UTILDIR}ft_error_parse_ext.c \
 				  ${UTILDIR}ft_str_utils.c \
 				  ${UTILDIR}ft_arr_utils.c \
+				  ${UTILDIR}ft_cmd_utils.c \
 				  ${UTILDIR}ft_utils.c \
+				  ${UTILDIR}ft_clear.c \
 				  ${UTILDIR}ft_split_savediv.c \
 				  ${UTILDIR}ft_init_env.c \
 				  ${UTILDIR}ft_env_utils.c \

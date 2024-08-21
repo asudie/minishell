@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 19:11:40 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/21 18:46:13 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/21 20:53:15 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ void	ft_print_cmd(t_cmd *cmd)
 
 t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *out_rd, int append, int heredoc);
 void	ft_fill_cmd(t_mhell *mhell, int *i, t_cmd *cmd);
-void	ft_cmdadd_back(t_cmd **lst, t_cmd *new);
 
 void	ft_create_cmd(t_mhell *mhell)
 {
@@ -100,78 +99,49 @@ void	ft_fill_cmd(t_mhell *mhell, int *i, t_cmd *cmd)
 	ft_cmdadd_back(&mhell->cmd, cmd);
 }
 
-t_cmd	*ft_cmdlast(t_cmd *lst);
-
-void	ft_cmdadd_back(t_cmd **lst, t_cmd *new)
-{
-	t_cmd	*tmp;
-
-	if (lst)
-	{
-		if (*lst == NULL)
-			*lst = new;
-		else
-		{
-			tmp = ft_cmdlast(*lst);
-			tmp->next = new;
-		}
-	}
-}
-
-t_cmd	*ft_cmdlast(t_cmd *lst)
-{
-	while (lst)
-	{
-		if (!lst->next)
-			return (lst);
-		lst = lst->next;
-	}
-	return (lst);
-}
-
 t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *out_rd, int append, int heredoc)
 {
     // Step 1: Allocate memory for the t_cmd structure
-    t_cmd *cmd = (t_cmd *)malloc(sizeof(t_cmd));
+    t_cmd *cmd = (t_cmd *)ft_malloc(sizeof(t_cmd));
     if (!cmd) {
         return NULL; // Allocation failed
     }
 
     // Step 2: Allocate memory for the args array
-    cmd->args = (char **)malloc((num_args + 1) * sizeof(char *)); // +1 for NULL terminator
+    cmd->args = (char **)ft_malloc((num_args + 1) * sizeof(char *)); // +1 for NULL terminator
     if (!cmd->args) {
-        free(cmd);
+        ft_free(cmd);
         return NULL; // Allocation failed
     }
 
     // Step 3: Allocate memory for each string in the args array
     for (int i = 0; i < num_args; i++) {
-        cmd->args[i] = (char *)malloc(256 * sizeof(char)); // Assuming max length of 256 for each argument
+        cmd->args[i] = (char *)ft_malloc(256 * sizeof(char)); // Assuming max length of 256 for each argument
         if (!cmd->args[i]) {
             // Free previously allocated memory in case of failure
             for (int j = 0; j < i; j++) {
-                free(cmd->args[j]);
+                ft_free(cmd->args[j]);
             }
-            free(cmd->args);
-            free(cmd);
+            ft_free(cmd->args);
+            ft_free(cmd);
             return NULL; // Allocation failed
         }
     }
 	int j = -1;
 	while (args[++j])
 		cmd->args[j] = args[j];
-    cmd->args[num_args] = NULL; // NULL terminator
+	cmd->args[num_args] = NULL; // NULL terminator
 
     // Step 4: Allocate memory for in_rd and out_rd if they are not NULL
     if (in_rd) {
-        cmd->in_rd = strdup(in_rd);
+        cmd->in_rd = ft_strdup(in_rd);
         if (!cmd->in_rd) {
             // Free previously allocated memory in case of failure
             for (int i = 0; i < num_args; i++) {
-                free(cmd->args[i]);
+                ft_free(cmd->args[i]);
             }
-            free(cmd->args);
-            free(cmd);
+            ft_free(cmd->args);
+            ft_free(cmd);
             return NULL; // Allocation failed
         }
     } else {
@@ -179,15 +149,15 @@ t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *ou
     }
 
     if (out_rd) {
-        cmd->out_rd = strdup(out_rd);
+        cmd->out_rd = ft_strdup(out_rd);
         if (!cmd->out_rd) {
             // Free previously allocated memory in case of failure
-            free(cmd->in_rd);
+           	ft_free(cmd->in_rd);
             for (int i = 0; i < num_args; i++) {
-                free(cmd->args[i]);
+                ft_free(cmd->args[i]);
             }
-            free(cmd->args);
-            free(cmd);
+            ft_free(cmd->args);
+            ft_free(cmd);
             return NULL; // Allocation failed
         }
     } else {
