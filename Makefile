@@ -22,7 +22,6 @@ SRCS			= ${SRCSDIR}main.c \
 				  ${UTILDIR}ft_error_parse.c \
 				  ${UTILDIR}ft_error_parse_ext.c \
 				  ${UTILDIR}ft_str_utils.c \
-				  ${UTILDIR}ft_token_utils.c \
 				  ${UTILDIR}ft_arr_utils.c \
 				  ${UTILDIR}ft_utils.c \
 				  ${UTILDIR}ft_split_savediv.c \

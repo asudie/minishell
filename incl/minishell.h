@@ -94,6 +94,15 @@ typedef struct s_tkn
 	t_type	type;
 }	t_tkn;
 
+typedef struct s_cmd_alloc
+{
+	int			num_args;
+	const char	*in_rd;
+	const char	*out_rd;
+	int			append;
+	int			heredoc;
+}	t_cmd_alloc;
+
 typedef struct s_cmd
 {
 	char			**args;	// An array of command arguments["ls", "-l", NULL]
