@@ -30,9 +30,10 @@ static int	ft_minihell(t_mhell *mhell)
 	while (1)
 	{
 		mhell->cmd_line = ft_input_prompt(mhell);
+		mhell->cmd->envp = mhell->envp;
 		if (ft_input_parse(mhell))
 		{
-			// mhell->exit_code = execute_cmd(mhell->cmd, envp);
+			mhell->exit_code = execute_cmd(mhell->cmd);
 		}
 		// ft_clean_cmd_data(mhell);
 		ft_free(mhell->cmd_line);

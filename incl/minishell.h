@@ -111,6 +111,7 @@ typedef struct s_cmd
 	int				append;	// Flag for append mode (1 for >>, 0 for >)
 	int				heredoc;
 	struct s_cmd	*next;	// Pointer to the next command in case of pipes
+	char			**envp;
 }	t_cmd;
 
 // PARSER
@@ -126,6 +127,7 @@ int in_rd(t_cmd *cmd);
 int print_file_by_fd(int fd);
 int	execute_builtin(t_cmd *cmd);
 int start_exec(t_cmd *cmd);
+int	execute_cmd(t_cmd *cmd);
 
 // PIPEX
 void	ft_validate_cmd(char **argv);

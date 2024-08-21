@@ -1,7 +1,7 @@
 NAME 			= minishell
 HDRDIR			= incl/
 
-EXECDIR			= exec/
+EXECDIR			= ${SRCSDIR}exec/
 # EXECSRCS		= ${EXECDIR}executor.c
 
 PARSEDIR		= ${SRCSDIR}parse/
@@ -10,6 +10,8 @@ PARSEDIR		= ${SRCSDIR}parse/
 
 UTILDIR			= ${SRCSDIR}utils/
 # UTILSRCS		= ${UTILDIR}ft_utils.c ft_env_utils.c
+
+PRINTFDIR			= 42_pipex/ft_printf/
 
 SRCSDIR			= srcs/
 SRCS			= ${SRCSDIR}main.c \
@@ -27,7 +29,10 @@ SRCS			= ${SRCSDIR}main.c \
 				  ${UTILDIR}ft_split_savediv.c \
 				  ${UTILDIR}ft_init_env.c \
 				  ${UTILDIR}ft_env_utils.c \
-				  ${UTILDIR}ft_path_utils.c
+				  ${UTILDIR}ft_path_utils.c \
+				  ${EXECDIR}executor.c \
+				  ${PRINTFDIR}ft_printf.c
+
 
 VPATH			= ${SRCSDIR} ${SRCSDIR}parse/ ${SRCSDIR}utils/
 OBJS			= $(SRCS:.c=.o)
