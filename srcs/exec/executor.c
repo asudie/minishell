@@ -228,6 +228,7 @@ int builtin_unset(t_cmd *cmd) {
 
 int resolve_full_path(t_cmd *cmd, char **full_path) {
     // Check for absolute
+    
     if (access(cmd->args[0], X_OK) == 0)
     {
         *full_path = cmd->args[0];
@@ -242,12 +243,16 @@ int resolve_full_path(t_cmd *cmd, char **full_path) {
     
     char *dir = strtok(path, ":");
     while (dir != NULL) {
+        
         snprintf(*full_path, PATH_MAX, "%s/%s", dir, cmd->args[0]); // change for forbidden
+        printf("DIR %s\n", *full_path);                                     // DOEDN'T PRINT~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if (access(*full_path, X_OK) == 0) {
+            // printf("HERE\n");
             return 0;
         }
         dir = strtok(NULL, ":");
     }
+   
     return -1;
 }
 
@@ -260,12 +265,15 @@ int custom(t_cmd *cmd)
     //     perror("fork");
     //     return -1;
     // }
+    
     // if (pid == 0) { // Child process
         if (resolve_full_path(cmd, &full_path) == -1) {
+            
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
             // printf("CUSTOM RETURN 1 HERE\n");
             return 1;
         }
+        
         full_path = malloc(sizeof(char) * PATH_MAX);
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
@@ -283,6 +291,7 @@ int custom(t_cmd *cmd)
     //         return 1;
     //     }
     // }
+    
     return(0);
 }
 
@@ -458,7 +467,7 @@ int	execute_cmd(t_cmd *cmd)
             // printf("")
             exit_status = start_exec(it); // this happens twice!
             // printf("here\n");
-            printf("HOW MANY TIMES exit_status = %d\n", exit_status);
+            // printf("HOW MANY TIMES exit_status = %d\n", exit_status);
             exit(exit_status);
             return (0); 
         }
@@ -544,93 +553,93 @@ int out_rd(t_cmd *cmd)
 // }
 
 
-// int	main(int argc, char **argv, char **envp)
-// {
-// 	t_cmd	*cmd = malloc(sizeof(t_cmd));
+int	main(int argc, char **argv, char **envp)
+{
+	t_cmd	*cmd = malloc(sizeof(t_cmd));
 
-// 	// Initialize environment variables
-// 	// init_environment(envp);
+	// Initialize environment variables
+	// init_environment(envp);
 
-//     // Set up signal handlers
-//     // signal(SIGINT, sigint_handler);  // Handle Ctrl+C
-//     // signal(SIGQUIT, sigquit_handler);  // Ignore Ctrl+\/
+    // Set up signal handlers
+    // signal(SIGINT, sigint_handler);  // Handle Ctrl+C
+    // signal(SIGQUIT, sigquit_handler);  // Ignore Ctrl+\/
 
-// 	// while (1)
-// 	// {
+	// while (1)
+	// {
 
-//     // Read input (you would implement your actual input handling here)
-//         char buffer[1024];
-//         // if (fgets(buffer, sizeof(buffer), stdin) == NULL) {  CTRL-D
-//         //     if (feof(stdin)) {
-//         //         break;
-//         //     }
-//         // }
+    // Read input (you would implement your actual input handling here)
+        // char buffer[1024];
+        // if (fgets(buffer, sizeof(buffer), stdin) == NULL) {  CTRL-D
+        //     if (feof(stdin)) {
+        //         break;
+        //     }
+        // }
 		
-// 		// cmd = malloc(sizeof(t_cmd));
-//         // EXAMPLE: ls -l > output.txt
-// 		// cmd.cmd = "ls";
-// 		// cmd.args = (char *[]){"ls", "-l", NULL};
-// 		// cmd->in_rd = NULL;
-// 		// cmd.out_rd = "output.txt";
-// 		// cmd.append = 0;
-// 		// cmd.next = NULL;
+		// cmd = malloc(sizeof(t_cmd));
+        // EXAMPLE: ls -l > output.txt
+		// cmd.cmd = "ls";
+		// cmd.args = (char *[]){"ls", "-l", NULL};
+		// cmd->in_rd = NULL;
+		// cmd.out_rd = "output.txt";
+		// cmd.append = 0;
+		// cmd.next = NULL;
 
-// 		// cmd.cmd = "echo";
-// 		// cmd.args = (char *[]){"echo", "Hello!", NULL};
-// 		// cmd.cmd = "cd";
-// 		// cmd.args = (char *[]){"cd", "/bin"};
+		// cmd.cmd = "echo";
+		// cmd.args = (char *[]){"echo", "Hello!", NULL};
+		// cmd.cmd = "cd";
+		// cmd.args = (char *[]){"cd", "/bin"};
 		
-//         //PWD
-// 		cmd->args = (char *[]){"/home", NULL};
+        //PWD
+		cmd->args = (char *[]){"cat", "custom.c", NULL};
 
-//         // ENV
-// 		// cmd.args = (char *[]){"env", NULL};
+        // ENV
+		// cmd.args = (char *[]){"env", NULL};
         
-// 		// cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
-// 		cmd->out_rd = NULL;
-// 		cmd->append = 0;
-// 		cmd->next = NULL;
-// 		cmd->envp = envp;
-//         cmd->in_rd = NULL;
+		// cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
+		cmd->out_rd = NULL;
+		cmd->append = 0;
+		cmd->next = NULL;
+		cmd->envp = envp;
+        cmd->in_rd = NULL;
 
-//         // cmd->next->args = (char *[]){"grep", ".c", NULL};
-//         // cmd->next->out_rd = NULL;
-// 		// cmd->next->append = 0;
-// 		// cmd->next->next = NULL;
-// 		// cmd->next->envp = envp;
-//         // cmd->next->in_rd = NULL;
+        // cmd->next->args = (char *[]){"grep", ".c", NULL};
+        // cmd->next->out_rd = NULL;
+		// cmd->next->append = 0;
+		// cmd->next->next = NULL;
+		// cmd->next->envp = envp;
+        // cmd->next->in_rd = NULL;
 
-// 		// display_prompt(&cmd); 
-// 		// Execute cmd
-// 		// execute_cmd(&cmd);
-//         // cmd.cmd = "unset";
-// 		// cmd.args = (char *[]){"unset", "USER", NULL};
-//         // cmd.cmd = "export";
-//         // cmd.args = (char *[]){"export", "MYVAR=3", NULL};
-//         // if(execute_cmd(&cmd))
-//         //    return 0;
-//         // cmd.cmd = "exit";
-//         // cmd.args = (char *[]){"exit", NULL};
-//         // if(execute_cmd(&cmd))
-//         //     return 0;
-// 		// cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
-//         if(execute_cmd(cmd))
-//         {
+		// display_prompt(&cmd); 
+		// Execute cmd
+		// execute_cmd(&cmd);
+        // cmd.cmd = "unset";
+		// cmd.args = (char *[]){"unset", "USER", NULL};
+        // cmd.cmd = "export";
+        // cmd.args = (char *[]){"export", "MYVAR=3", NULL};
+        // if(execute_cmd(&cmd))
+        //    return 0;
+        // cmd.cmd = "exit";
+        // cmd.args = (char *[]){"exit", NULL};
+        // if(execute_cmd(&cmd))
+        //     return 0;
+		// cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
+        if(execute_cmd(cmd))
+        {
             
-//             return 0; 
-//         }
-//             printf("FINALE %d\n", exit_status); // WHY HER IT'S 0??????????????????????????????????????????????????????
-//         // cmd->next->args = (char *[]){"echo", "$?" NULL};
-//         // cmd.append = 1;
-//         // if(execute_cmd(&cmd))
-//         //     return 0;
-// 		// display_prompt(&cmd);
-// 		// ft_free allocated memory
-// 		// free_input(input);
-// 		// free_cmd(cmd);
-// 	// }
-// 	return (0);
-// }
+            return 0; 
+        }
+            // printf("FINALE %d\n", exit_status); // WHY HER IT'S 0??????????????????????????????????????????????????????
+        // cmd->next->args = (char *[]){"echo", "$?" NULL};
+        // cmd.append = 1;
+        // if(execute_cmd(&cmd))
+        //     return 0;
+		// display_prompt(&cmd);
+		// ft_free allocated memory
+		// free_input(input);
+		// free_cmd(cmd);
+	// }
+	return (0);
+}
 
 
 // LEFT TO IMPLEMENT
@@ -643,4 +652,4 @@ int out_rd(t_cmd *cmd)
 
 // • remove global var for exit code $?-> do when merging with severyn
 
-// gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c -g
+// gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c ../../ft_destructor/*.c -g
