@@ -22,7 +22,6 @@ int	main(int argc, char **argv, char **envp)
 	if (argv && argc > 1)
 		return (printf(ER ER_ARG), EXIT_FAILURE);
 	ft_alloc_init();
-	mhell.cmd->envp = envp;
 	return (ft_minihell(ft_init_minihell(&mhell, envp)));
 }
 
@@ -34,6 +33,7 @@ static int	ft_minihell(t_mhell *mhell)
 		
 		if (ft_input_parse(mhell))
 		{
+			mhell->cmd->envp = mhell->envp;
 			mhell->exit_code = execute_cmd(mhell->cmd);
 		}
 		// ft_clean_cmd_data(mhell);

@@ -158,6 +158,8 @@ int builtin_pwd() {
 }
 
 int builtin_env(t_cmd *cmd) {
+    printf("HERE\n");
+    // printf("HERE ENV %s\n",cmd->envp[0]);
     for (int i = 0; cmd->envp[i] != NULL; i++) {
         // Print each environment variable
         ft_printf("%s\n", cmd->envp[i]);
