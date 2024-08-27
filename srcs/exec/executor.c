@@ -50,11 +50,13 @@ int builtin_cd(t_cmd *cmd) {
     char *oldpwd;
     char cwd[1024];
 
+    
+
     // If no arguments are provided, change to the home directory
     if (cmd->args[1] == NULL) {
         home_dir = get_env_var(cmd->envp, "HOME");
         if (home_dir == NULL) {
-            fprintf(stderr, "cd: HOME not set\n");
+            fprintf(stderr, "cd: HOME not set\n"); // change forbidden
             return 1;
         }
         if (chdir(home_dir) != 0) {
@@ -74,11 +76,13 @@ int builtin_cd(t_cmd *cmd) {
         }
         printf("%s\n", oldpwd);
     } else {
+        
         // Change to the directory provided in args[1]
         if (chdir(cmd->args[1]) != 0) {
             perror("cd");
             return 1;
         }
+        
     }
 
     // Update the PWD and OLDPWD environment variables
@@ -88,6 +92,7 @@ int builtin_cd(t_cmd *cmd) {
     }
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Here %s\n", cwd);
         set_env_var(cmd->envp, "PWD", cwd);
     } else {
         perror("getcwd");
@@ -158,8 +163,6 @@ int builtin_pwd() {
 }
 
 int builtin_env(t_cmd *cmd) {
-    printf("HERE\n");
-    // printf("HERE ENV %s\n",cmd->envp[0]);
     for (int i = 0; cmd->envp[i] != NULL; i++) {
         // Print each environment variable
         ft_printf("%s\n", cmd->envp[i]);
@@ -269,14 +272,12 @@ int custom(t_cmd *cmd)
         if (resolve_full_path(cmd, &full_path) == -1) {
             
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
-            // printf("CUSTOM RETURN 1 HERE\n");
             return 1;
         }
         
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
             
-            // printf("%s\n", full_path);
             free(full_path);
             perror("execve");
             return 1;
@@ -327,11 +328,7 @@ int in_rd(t_cmd *cmd) // check if it's working!
 
 int	execute_builtin(t_cmd *cmd)
 {
-	if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
-	{
-		return (builtin_cd(cmd));
-	}
-	else if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
+	if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
 	{
         return (builtin_echo(cmd));
 	}
@@ -432,6 +429,11 @@ int	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	while (it)
 	{
+        if (ft_strncmp(it->args[0], "cd", 2) == 0)
+	{
+        printf("HERE\n");
+		return (builtin_cd(it));
+	}
         pid = fork();
         if (pid == -1) {
             perror("fork");
@@ -551,6 +553,7 @@ int out_rd(t_cmd *cmd)
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
 // • HEREDOC
+// cd . and ..
 
 // • remove global var for exit code $?-> do when merging with severyn
 

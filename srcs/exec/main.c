@@ -38,7 +38,7 @@ int	main(int argc, char **argv, char **envp)
 		
         //PWD
         printf("CMD: cat Makefile\n");
-		cmd->args = (char *[]){"env", NULL};
+		cmd->args = (char *[]){"cd", "srcs", NULL};
         printf("OUTPUT:\n");
 
         // ENV
