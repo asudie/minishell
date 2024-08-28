@@ -1,7 +1,7 @@
 NAME 			= minishell
 HDRDIR			= incl/
 
-EXECDIR			= exec/
+EXECDIR			= ${SRCSDIR}exec/
 # EXECSRCS		= ${EXECDIR}executor.c
 
 PARSEDIR		= ${SRCSDIR}parse/
@@ -10,6 +10,8 @@ PARSEDIR		= ${SRCSDIR}parse/
 
 UTILDIR			= ${SRCSDIR}utils/
 # UTILSRCS		= ${UTILDIR}ft_utils.c ft_env_utils.c
+
+PRINTFDIR			= 42_pipex/ft_printf/
 
 SRCSDIR			= srcs/
 SRCS			= ${SRCSDIR}main.c \
@@ -29,7 +31,10 @@ SRCS			= ${SRCSDIR}main.c \
 				  ${UTILDIR}ft_split_savediv.c \
 				  ${UTILDIR}ft_init_env.c \
 				  ${UTILDIR}ft_env_utils.c \
-				  ${UTILDIR}ft_path_utils.c
+				  ${UTILDIR}ft_path_utils.c \
+				  ${EXECDIR}executor.c \
+				  ${PRINTFDIR}ft_printf.c
+
 
 VPATH			= ${SRCSDIR} ${SRCSDIR}parse/ ${SRCSDIR}utils/
 OBJS			= $(SRCS:.c=.o)
@@ -62,6 +67,9 @@ clean:
 
 fclean: clean
 	rm -f $(NAME)
+
+test:
+	gcc srcs/exec/executor.c srcs/exec/main.c srcs/utils/*c libft/*.c 42_pipex/ft_printf/*.c ft_destructor/*.c -g -o executor
 
 re: fclean $(NAME)
 

@@ -12,42 +12,6 @@
 
 int exit_status = 0;
 
-// void	handle_signal(int sig)
-// {
-// 	if (sig == SIGINT)
-// 	{
-// 		write(1, "\n", 1);
-// 		display_prompt();
-// 	}
-// }
-
-// void	setup_signal_handling(void)
-// {
-// 	signal(SIGINT, handle_signal);
-// 	signal(SIGQUIT, SIG_IGN);
-// }
-
-// void	handle_redirections(t_command *cmd)
-// {
-// 	int	fd;
-// 	int	fd;
-
-// 	if (cmd->in_redirect)
-// 	{
-// 		fd = open(cmd->in_file, O_RDONLY);
-// 		dup2(fd, STDIN_FILENO);
-// 		close(fd);
-// 	}
-// 	if (cmd->out_redirect)
-// 	{
-// 		fd = open(cmd->out_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-// 		dup2(fd, STDOUT_FILENO);
-// 		close(fd);
-// 	}
-// }
-
-
-
 char *get_env_var(char **envr, const char *name) {
     size_t len = strlen(name);
     for (int i = 0; envr[i] != NULL; i++) {
@@ -86,11 +50,13 @@ int builtin_cd(t_cmd *cmd) {
     char *oldpwd;
     char cwd[1024];
 
+    
+
     // If no arguments are provided, change to the home directory
     if (cmd->args[1] == NULL) {
         home_dir = get_env_var(cmd->envp, "HOME");
         if (home_dir == NULL) {
-            fprintf(stderr, "cd: HOME not set\n");
+            fprintf(stderr, "cd: HOME not set\n"); // change forbidden
             return 1;
         }
         if (chdir(home_dir) != 0) {
@@ -110,11 +76,13 @@ int builtin_cd(t_cmd *cmd) {
         }
         printf("%s\n", oldpwd);
     } else {
+        
         // Change to the directory provided in args[1]
         if (chdir(cmd->args[1]) != 0) {
             perror("cd");
             return 1;
         }
+        
     }
 
     // Update the PWD and OLDPWD environment variables
@@ -124,6 +92,7 @@ int builtin_cd(t_cmd *cmd) {
     }
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Here %s\n", cwd);
         set_env_var(cmd->envp, "PWD", cwd);
     } else {
         perror("getcwd");
@@ -159,25 +128,25 @@ int builtin_echo(t_cmd *cmd) {
     return 1;
 }
 
-int builtin_cat(t_cmd *cmd) {
-    char *envp[] = { NULL }; // environment variables (none in this example)
+// int builtin_cat(t_cmd *cmd) {
+//     char *envp[] = { NULL }; // environment variables (none in this example)
     
-    // Path to the executable
-    char *path = "/bin/cat";
+//     // Path to the executable
+//     char *path = "/bin/cat";
     
-    // Arguments for the executable, including the command itself as the first argument
-    if (execve(path, cmd->args, cmd->envp) == -1) {
-        perror("execve failed");
-		return 0;
-    }
-	return (1);
+//     // Arguments for the executable, including the command itself as the first argument
+//     if (execve(path, cmd->args, cmd->envp) == -1) {
+//         perror("execve failed");
+// 		return 0;
+//     }
+// 	return (1);
+// }
+
+void builtin_exit() {
+    exit(1);
 }
 
-int builtin_exit(t_cmd *cmd) {
-    exit;
-}
-
-int builtin_pwd(t_cmd *cmd) {
+int builtin_pwd() {
     char cwd[PATH_MAX]; // Buffer to store the current working directory
 
     // Get the current working directory
@@ -264,6 +233,8 @@ int builtin_unset(t_cmd *cmd) {
 
 int resolve_full_path(t_cmd *cmd, char **full_path) {
     // Check for absolute
+    char	*tmp;
+    
     if (access(cmd->args[0], X_OK) == 0)
     {
         *full_path = cmd->args[0];
@@ -271,54 +242,48 @@ int resolve_full_path(t_cmd *cmd, char **full_path) {
     } 
             
     char *path = getenv("PATH");
-    
     if (!path) {
         return -1;
     }
-    
-    char *dir = strtok(path, ":");
-    while (dir != NULL) {
-        snprintf(*full_path, PATH_MAX, "%s/%s", dir, cmd->args[0]); // change for forbidden
-        if (access(*full_path, X_OK) == 0) {
+    char	**paths = ft_split(path + 5, ':');
+    int		i = 0;
+    while (paths[i] != NULL)
+	{
+		tmp = ft_strjoin(paths[i], "/");
+		*full_path = ft_strjoin(tmp, cmd->args[0]);
+		free(tmp);
+		if (access(*full_path, X_OK) == 0) {
+           
+            ft_free_array(paths);
             return 0;
         }
-        dir = strtok(NULL, ":");
-    }
-    return -1;
+		free(*full_path);
+		i++;
+	}
+	ft_free_array(paths);
+	return (-1);
 }
 
 
 int custom(t_cmd *cmd)
 {
     char *full_path;
-    // pid_t pid = fork();
-    // if (pid == -1) {
-    //     perror("fork");
-    //     return -1;
-    // }
-    // if (pid == 0) { // Child process
+    
         if (resolve_full_path(cmd, &full_path) == -1) {
+            
             fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
-            // printf("CUSTOM RETURN 1 HERE\n");
             return 1;
         }
-        full_path = malloc(sizeof(char) * PATH_MAX);
+        
         // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
-            // printf("HERE\n");
-            // printf("%s\n", full_path);
+            
             free(full_path);
             perror("execve");
             return 1;
         }
         free(full_path);
-    // } else { // Parent process
-    //     // Wait for the child process to complete
-    //     if (wait(NULL) == -1) {
-    //         perror("wait");
-    //         return 1;
-    //     }
-    // }
+    
     return(0);
 }
 
@@ -358,25 +323,23 @@ int in_rd(t_cmd *cmd) // check if it's working!
         close(fd);
         wait(NULL); // Wait for the child process to finish
     }
+    return (0);
 }
 
 int	execute_builtin(t_cmd *cmd)
 {
-	if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
-	{
-		return (builtin_cd(cmd));
-	}
-	else if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
+	if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
 	{
         return (builtin_echo(cmd));
 	}
 	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0)
 	{
-		return (1);
+        builtin_exit();
+		return (0);
 	}
     else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
 	{
-		return (builtin_pwd(cmd));
+		return (builtin_pwd());
 	}
     else if (ft_strncmp(cmd->args[0], "export", 6) == 0)
 	{
@@ -466,6 +429,11 @@ int	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	while (it)
 	{
+        if (ft_strncmp(it->args[0], "cd", 2) == 0)
+	{
+        printf("HERE\n");
+		return (builtin_cd(it));
+	}
         pid = fork();
         if (pid == -1) {
             perror("fork");
@@ -492,7 +460,7 @@ int	execute_cmd(t_cmd *cmd)
             // printf("")
             exit_status = start_exec(it); // this happens twice!
             // printf("here\n");
-            printf("HOW MANY TIMES exit_status = %d\n", exit_status);
+            // printf("HOW MANY TIMES exit_status = %d\n", exit_status);
             exit(exit_status);
             return (0); 
         }
@@ -566,105 +534,16 @@ int out_rd(t_cmd *cmd)
     return res;
 }
 
-void sigint_handler(int signum) {
-    (void)signum;  // Avoid unused parameter warning
-    // Print a newline and a new prompt
-    write(STDOUT_FILENO, "\n", 1);
-    // write(STDOUT_FILENO, "minishell$ ", 11); NEW PROMPT!!!
-}
+// void sigint_handler(int signum) {
+//     (void)signum;  // Avoid unused parameter warning
+//     // Print a newline and a new prompt
+//     write(STDOUT_FILENO, "\n", 1);
+//     // write(STDOUT_FILENO, "minishell$ ", 11); NEW PROMPT!!!
+// }
 
-void sigquit_handler(int signum) {
-    (void)signum;  // Ignore the signal
-}
-
-
-int	main(int argc, char **argv, char **envp)
-{
-	t_cmd	*cmd = malloc(sizeof(t_cmd));
-
-	// Initialize environment variables
-	// init_environment(envp);
-
-    // Set up signal handlers
-    // signal(SIGINT, sigint_handler);  // Handle Ctrl+C
-    // signal(SIGQUIT, sigquit_handler);  // Ignore Ctrl+\/
-
-	// while (1)
-	// {
-
-    // Read input (you would implement your actual input handling here)
-        char buffer[1024];
-        // if (fgets(buffer, sizeof(buffer), stdin) == NULL) {  CTRL-D
-        //     if (feof(stdin)) {
-        //         break;
-        //     }
-        // }
-		
-		// cmd = malloc(sizeof(t_cmd));
-        // EXAMPLE: ls -l > output.txt
-		// cmd.cmd = "ls";
-		// cmd.args = (char *[]){"ls", "-l", NULL};
-		// cmd->in_rd = NULL;
-		// cmd.out_rd = "output.txt";
-		// cmd.append = 0;
-		// cmd.next = NULL;
-
-		// cmd.cmd = "echo";
-		// cmd.args = (char *[]){"echo", "Hello!", NULL};
-		// cmd.cmd = "cd";
-		// cmd.args = (char *[]){"cd", "/bin"};
-		
-        //PWD
-		cmd->args = (char *[]){"/home", NULL};
-
-        // ENV
-		// cmd.args = (char *[]){"env", NULL};
-        
-		// cmd.in_rd = "/home/asmolnya/Projects/minishell/srcs/exec/input.txt";
-		cmd->out_rd = NULL;
-		cmd->append = 0;
-		cmd->next = NULL;
-		cmd->envp = envp;
-        cmd->in_rd = NULL;
-
-        // cmd->next->args = (char *[]){"grep", ".c", NULL};
-        // cmd->next->out_rd = NULL;
-		// cmd->next->append = 0;
-		// cmd->next->next = NULL;
-		// cmd->next->envp = envp;
-        // cmd->next->in_rd = NULL;
-
-		// display_prompt(&cmd); 
-		// Execute cmd
-		// execute_cmd(&cmd);
-        // cmd.cmd = "unset";
-		// cmd.args = (char *[]){"unset", "USER", NULL};
-        // cmd.cmd = "export";
-        // cmd.args = (char *[]){"export", "MYVAR=3", NULL};
-        // if(execute_cmd(&cmd))
-        //    return 0;
-        // cmd.cmd = "exit";
-        // cmd.args = (char *[]){"exit", NULL};
-        // if(execute_cmd(&cmd))
-        //     return 0;
-		// cmd.args = (char *[]){"copy", "/home/asmolnya/Projects/minishell/srcs/exec/input.txt", NULL};  // if doesn't work add the PATH
-        if(execute_cmd(cmd))
-        {
-            
-            return 0; 
-        }
-            printf("FINALE %d\n", exit_status); // WHY HER IT'S 0??????????????????????????????????????????????????????
-        // cmd->next->args = (char *[]){"echo", "$?" NULL};
-        // cmd.append = 1;
-        // if(execute_cmd(&cmd))
-        //     return 0;
-		// display_prompt(&cmd);
-		// ft_free allocated memory
-		// free_input(input);
-		// free_cmd(cmd);
-	// }
-	return (0);
-}
+// void sigquit_handler(int signum) {
+//     (void)signum;  // Ignore the signal
+// }
 
 
 // LEFT TO IMPLEMENT
@@ -674,7 +553,8 @@ int	main(int argc, char **argv, char **envp)
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
 // • HEREDOC
+// cd . and ..
 
 // • remove global var for exit code $?-> do when merging with severyn
 
-// gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c -g
+// gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c ../../ft_destructor/*.c -g
