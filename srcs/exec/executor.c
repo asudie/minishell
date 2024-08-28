@@ -10,8 +10,6 @@
 
 #define PATH_MAX 4096
 
-int exit_status = 0;
-
 char *get_env_var(char **envr, const char *name) {
     size_t len = strlen(name);
     for (int i = 0; envr[i] != NULL; i++) {
