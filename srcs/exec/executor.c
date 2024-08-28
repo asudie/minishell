@@ -332,22 +332,9 @@ int	execute_builtin(t_cmd *cmd)
 	{
         return (builtin_echo(cmd));
 	}
-	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0)
-	{
-        builtin_exit();
-		return (0);
-	}
     else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
 	{
 		return (builtin_pwd());
-	}
-    else if (ft_strncmp(cmd->args[0], "export", 6) == 0)
-	{
-		return (builtin_export(cmd));
-	}
-    else if (ft_strncmp(cmd->args[0], "unset", 5) == 0)
-	{
-		return (builtin_unset(cmd));
 	}
     else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
 	{
@@ -407,6 +394,17 @@ int count_commands(t_cmd *cmd)
     return num_cmds;
 }
 
+int env_builtins(t_cmd *cmd)
+{
+    if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
+        return (builtin_cd(cmd));
+    else if (ft_strncmp(cmd->args[0], "export", 6) == 0)
+		return (builtin_export(cmd));
+    else if (ft_strncmp(cmd->args[0], "unset", 5) == 0)
+		return (builtin_unset(cmd));
+    return (1);
+}
+
 int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
@@ -429,10 +427,10 @@ int	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	while (it)
 	{
-        if (ft_strncmp(it->args[0], "cd", 2) == 0)
+        if (ft_strncmp(it->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0], "export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
 	{
-        printf("HERE\n");
-		return (builtin_cd(it));
+        return(env_builtins(it));
+		
 	}
         pid = fork();
         if (pid == -1) {

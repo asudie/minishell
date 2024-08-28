@@ -62,6 +62,7 @@ $(ALLOC):
 
 clean:
 	rm -f $(OBJS)
+	rm minishell
 	make fclean -C $(LIBFTDIR)
 	make fclean -C $(ALLOCDIR)
 
