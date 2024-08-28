@@ -455,12 +455,7 @@ int	execute_cmd(t_cmd *cmd)
                 close(pipefd[j]);
             }
             // Execute the command
-            // printf("")
-            exit_status = start_exec(it); // this happens twice!
-            // printf("here\n");
-            // printf("HOW MANY TIMES exit_status = %d\n", exit_status);
-            exit(exit_status);
-            return (0); 
+            return(start_exec(it)); 
         }
         
         // Parent process, move to the next command
