@@ -34,7 +34,7 @@ void set_env_var(char **envr, const char *name, const char *value) {
     while (1) {
         if (envr[i] == NULL) {
             envr[i] = ft_malloc(sizeof(char *));
-            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value); // SEGA
+            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value);
             envr[i + 1] = ft_malloc(sizeof(char *));
             envr[i + 1] = NULL;
             return;
@@ -125,20 +125,6 @@ int builtin_echo(t_cmd *cmd) {
 
     return 1;
 }
-
-// int builtin_cat(t_cmd *cmd) {
-//     char *envp[] = { NULL }; // environment variables (none in this example)
-    
-//     // Path to the executable
-//     char *path = "/bin/cat";
-    
-//     // Arguments for the executable, including the command itself as the first argument
-//     if (execve(path, cmd->args, cmd->envp) == -1) {
-//         perror("execve failed");
-// 		return 0;
-//     }
-// 	return (1);
-// }
 
 void builtin_exit() {
     exit(1);
@@ -544,7 +530,6 @@ int out_rd(t_cmd *cmd)
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
 // • HEREDOC
-// cd . and ..
 
 // • remove global var for exit code $?-> do when merging with severyn
 

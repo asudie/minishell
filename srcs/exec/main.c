@@ -38,7 +38,7 @@ int	main(int argc, char **argv, char **envp)
 		
         //PWD
         printf("CMD: cat Makefile\n");
-		cmd->args = (char *[]){"cd", "srcs", NULL};
+		cmd->args = (char *[]){"echo", "hi", NULL};
         printf("OUTPUT:\n");
 
         // ENV
@@ -51,12 +51,12 @@ int	main(int argc, char **argv, char **envp)
 		cmd->envp = envp;
         cmd->in_rd = NULL;
 
-        // cmd->next->args = (char *[]){"grep", ".c", NULL};
-        // cmd->next->out_rd = NULL;
-		// cmd->next->append = 0;
-		// cmd->next->next = NULL;
-		// cmd->next->envp = envp;
-        // cmd->next->in_rd = NULL;
+        cmd->next->args = (char *[]){"wc", "-l", NULL};
+        cmd->next->out_rd = NULL;
+		cmd->next->append = 0;
+		cmd->next->next = NULL;
+		cmd->next->envp = envp;
+        cmd->next->in_rd = NULL;
 
 		// display_prompt(&cmd); 
 		// Execute cmd
