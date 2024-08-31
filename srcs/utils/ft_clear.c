@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 20:12:24 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/21 20:49:43 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/28 17:06:13 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ void	ft_free_mhell_data(t_mhell *mhell)
 		ft_cmdclear(&mhell->cmd, ft_free);
 		mhell->cmd_l = 0;
 	}
-	printf("Cleared\n");
-	ft_print_cmd(mhell->cmd);
+	// printf("Cleared\n");
+	// ft_print_cmd(mhell->cmd);
 }
 
 static void	ft_clear_tkn(t_tkn **tkn, int *len)

@@ -120,6 +120,7 @@ char	*ft_input_prompt(t_mhell *mhell);
 bool	ft_input_parse(t_mhell *mhell);
 void	ft_substr_dollar(t_mhell *mhell, char **str, int *state);
 void	ft_tokenize(t_mhell *mhell, char *str);
+char	*ft_get_prompt(t_mhell *mhell);
 
 // EXECUTOR
 int out_rd(t_cmd *cmd);
