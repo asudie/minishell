@@ -439,7 +439,7 @@ int	execute_cmd(t_cmd *cmd)
                 close(pipefd[j]);
             }
             // Execute the command
-            return(start_exec(it)); 
+            exit(start_exec(it));  
         }
         
         // Parent process, move to the next command
@@ -456,6 +456,8 @@ int	execute_cmd(t_cmd *cmd)
     for (i = 0; i < num_cmds; i++) {
         waitpid(pid, &status, 0);
     }
+    if (WIFEXITED(status)) 
+            return(WEXITSTATUS(status));
     // printf("Exit status: %d\n", exit_status);
     return (0);
 }
