@@ -513,16 +513,21 @@ int out_rd(t_cmd *cmd)
     return res;
 }
 
-// void sigint_handler(int signum) {
-//     (void)signum;  // Avoid unused parameter warning
-//     // Print a newline and a new prompt
-//     write(STDOUT_FILENO, "\n", 1);
-//     // write(STDOUT_FILENO, "minishell$ ", 11); NEW PROMPT!!!
-// }
+void sigint_handler(int signum) {
+    (void)signum; // Suppress unused parameter warning
 
-// void sigquit_handler(int signum) {
-//     (void)signum;  // Ignore the signal
-// }
+    // Write a newline to simulate the user pressing Enter
+    write(STDOUT_FILENO, "\n", 1);
+
+    // Tell readline to redisplay the prompt on a new line
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
+}
+
+void sigquit_handler(int signum) {
+    (void)signum;  // Ignore the signal
+}
 
 
 // LEFT TO IMPLEMENT
@@ -530,7 +535,6 @@ int out_rd(t_cmd *cmd)
 // ◦ ctrl-C displays a new prompt on a new line.
 // ◦ ctrl-D exits the shell.
 // ◦ ctrl-\ does nothing.
-// • Handle $? which should expand to the exit status of the most recently executed
 // • HEREDOC
 
 // • remove global var for exit code $?-> do when merging with severyn

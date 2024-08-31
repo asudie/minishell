@@ -130,6 +130,8 @@ int	execute_builtin(t_cmd *cmd);
 int start_exec(t_cmd *cmd);
 int	execute_cmd(t_cmd *cmd);
 int env_builtins(t_cmd *cmd);
+void sigint_handler(int signum);
+void sigquit_handler(int signum);
 
 // PIPEX
 void	ft_validate_cmd(char **argv);
