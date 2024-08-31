@@ -29,8 +29,15 @@ static int	ft_minihell(t_mhell *mhell)
 {
 	while (1)
 	{
-		mhell->cmd_line = ft_input_prompt(mhell);
-		
+		mhell->cmd_line = readline(ft_get_prompt(mhell));
+		if (!mhell->cmd_line)
+		{
+			ft_free(mhell->cmd_line);
+			printf("exit\n");
+			exit(EXIT_SUCCESS);
+		}
+		if (mhell->cmd_line && *mhell->cmd_line)
+			add_history(mhell->cmd_line);
 		if (ft_input_parse(mhell))
 		{
 			if (ft_strcmp(mhell->cmd->args[0], "exit") == 0)
