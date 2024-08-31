@@ -10,8 +10,6 @@
 
 #define PATH_MAX 4096
 
-int exit_status = 0;
-
 char *get_env_var(char **envr, const char *name) {
     size_t len = strlen(name);
     for (int i = 0; envr[i] != NULL; i++) {
@@ -36,7 +34,7 @@ void set_env_var(char **envr, const char *name, const char *value) {
     while (1) {
         if (envr[i] == NULL) {
             envr[i] = ft_malloc(sizeof(char *));
-            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value); // SEGA
+            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value);
             envr[i + 1] = ft_malloc(sizeof(char *));
             envr[i + 1] = NULL;
             return;
@@ -127,20 +125,6 @@ int builtin_echo(t_cmd *cmd) {
 
     return 1;
 }
-
-// int builtin_cat(t_cmd *cmd) {
-//     char *envp[] = { NULL }; // environment variables (none in this example)
-    
-//     // Path to the executable
-//     char *path = "/bin/cat";
-    
-//     // Arguments for the executable, including the command itself as the first argument
-//     if (execve(path, cmd->args, cmd->envp) == -1) {
-//         perror("execve failed");
-// 		return 0;
-//     }
-// 	return (1);
-// }
 
 void builtin_exit() {
     exit(1);
@@ -332,22 +316,9 @@ int	execute_builtin(t_cmd *cmd)
 	{
         return (builtin_echo(cmd));
 	}
-	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0)
-	{
-        builtin_exit();
-		return (0);
-	}
     else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
 	{
 		return (builtin_pwd());
-	}
-    else if (ft_strncmp(cmd->args[0], "export", 6) == 0)
-	{
-		return (builtin_export(cmd));
-	}
-    else if (ft_strncmp(cmd->args[0], "unset", 5) == 0)
-	{
-		return (builtin_unset(cmd));
 	}
     else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
 	{
@@ -407,6 +378,17 @@ int count_commands(t_cmd *cmd)
     return num_cmds;
 }
 
+int env_builtins(t_cmd *cmd)
+{
+    if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
+        return (builtin_cd(cmd));
+    else if (ft_strncmp(cmd->args[0], "export", 6) == 0)
+		return (builtin_export(cmd));
+    else if (ft_strncmp(cmd->args[0], "unset", 5) == 0)
+		return (builtin_unset(cmd));
+    return (1);
+}
+
 int	execute_cmd(t_cmd *cmd)
 {
 	pid_t	pid;
@@ -429,10 +411,10 @@ int	execute_cmd(t_cmd *cmd)
 	// Iterate through each command
 	while (it)
 	{
-        if (ft_strncmp(it->args[0], "cd", 2) == 0)
+        if (ft_strncmp(it->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0], "export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
 	{
-        printf("HERE\n");
-		return (builtin_cd(it));
+        return(env_builtins(it));
+		
 	}
         pid = fork();
         if (pid == -1) {
@@ -550,7 +532,6 @@ int out_rd(t_cmd *cmd)
 // ◦ ctrl-\ does nothing.
 // • Handle $? which should expand to the exit status of the most recently executed
 // • HEREDOC
-// cd . and ..
 
 // • remove global var for exit code $?-> do when merging with severyn
 
