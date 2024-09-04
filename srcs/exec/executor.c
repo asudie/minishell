@@ -13,28 +13,33 @@
 char *get_env_var(char **envr, const char *name) {
     size_t len = strlen(name);
     for (int i = 0; envr[i] != NULL; i++) {
-        if (strncmp(envr[i], name, len) == 0 && envr[i][len] == '=') {
+        if (ft_strncmp(envr[i], name, len) == 0 && envr[i][len] == '=') {
             return envr[i] + len + 1;
         }
     }
     return NULL;
 }
-
-// Helper function to set an environment variable
 void set_env_var(char **envr, const char *name, const char *value) {
-    size_t len = strlen(name);
+    size_t len = ft_strlen(name);
+    size_t size = ft_strlen(name) + ft_strlen(value) + 1;
+
     for (int i = 0; envr[i] != NULL; i++) {
-        if (strncmp(envr[i], name, len) == 0 && envr[i][len] == '=') {
-            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value);
+        if (ft_strncmp(envr[i], name, len) == 0 && envr[i][len] == '=') { 
+            ft_strcpy(envr[i], (char*)name);
+
+            // Append the '=' character
+            ft_strlcat(envr[i], "=", size);
+
+            // Append the value
+            ft_strlcat(envr[i], value, size);
             return;
         }
     }
-    // If not found, add new environment variable
     int i = 0;
     while (1) {
         if (envr[i] == NULL) {
             envr[i] = ft_malloc(sizeof(char *));
-            snprintf(envr[i], strlen(name) + strlen(value) + 2, "%s=%s", name, value);
+            snprintf(envr[i], ft_strlen(name) + ft_strlen(value) + 2, "%s=%s", name, value);
             envr[i + 1] = ft_malloc(sizeof(char *));
             envr[i + 1] = NULL;
             return;
@@ -48,49 +53,40 @@ int builtin_cd(t_cmd *cmd) {
     char *oldpwd;
     char cwd[1024];
 
-    
-
-    // If no arguments are provided, change to the home directory
     if (cmd->args[1] == NULL) {
         home_dir = get_env_var(cmd->envp, "HOME");
         if (home_dir == NULL) {
-            fprintf(stderr, "cd: HOME not set\n"); // change forbidden
+            ft_printf("cd: HOME not set\n");
             return 1;
         }
         if (chdir(home_dir) != 0) {
             perror("cd");
             return 1;
         }
-    } else if (strcmp(cmd->args[1], "-") == 0) {
-        // Handle 'cd -' to change to the previous directory
+    } else if (ft_strcmp(cmd->args[1], "-") == 0) {
         oldpwd = get_env_var(cmd->envp, "OLDPWD");
         if (oldpwd == NULL) {
-            fprintf(stderr, "cd: OLDPWD not set\n");
+            ft_printf("cd: OLDPWD not set\n");
             return 1;
         }
         if (chdir(oldpwd) != 0) {
             perror("cd");
             return 1;
         }
-        printf("%s\n", oldpwd);
+        ft_printf("%s\n", oldpwd);
     } else {
-        
-        // Change to the directory provided in args[1]
         if (chdir(cmd->args[1]) != 0) {
             perror("cd");
             return 1;
         }
         
     }
-
-    // Update the PWD and OLDPWD environment variables
     oldpwd = get_env_var(cmd->envp, "PWD");
     if (oldpwd != NULL) {
         set_env_var(cmd->envp, "OLDPWD", oldpwd);
     }
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf("Here %s\n", cwd);
         set_env_var(cmd->envp, "PWD", cwd);
     } else {
         perror("getcwd");
@@ -101,26 +97,23 @@ int builtin_cd(t_cmd *cmd) {
 }
 
 int builtin_echo(t_cmd *cmd) {
-    int newline = 1; // Flag to determine if we should print a newline
-    int i = 1; // Start with the first argument after the program name
+    int newline = 1;
+    int i = 1;
 
-    // Check for the -n option
     if (ft_strncmp(cmd->args[1], "-n", 3) == 0) {
         newline = 0;
-        i = 2; // Skip the -n argument
+        i = 2;
     }
 
-    // Print the arguments
     for (; cmd->args[i]; i++) {
         ft_printf("%s", cmd->args[i]);
         if (cmd->args[i + 1] != NULL) { 
-            ft_printf(" "); // Print a space between arguments
+            ft_printf(" ");
         }
     }
 
-    // Print the newline if the -n option was not provided
     if (newline) {
-        printf("\n");
+        ft_printf("\n");
     }
 
     return 1;
@@ -131,14 +124,11 @@ void builtin_exit() {
 }
 
 int builtin_pwd() {
-    char cwd[PATH_MAX]; // Buffer to store the current working directory
+    char cwd[PATH_MAX];
 
-    // Get the current working directory
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        // Print the current working directory
         ft_printf("%s\n", cwd);
     } else {
-        // Handle the error
         perror("getcwd() error");
         return 0;
     }
@@ -148,75 +138,59 @@ int builtin_pwd() {
 
 int builtin_env(t_cmd *cmd) {
     for (int i = 0; cmd->envp[i] != NULL; i++) {
-        // Print each environment variable
         ft_printf("%s\n", cmd->envp[i]);
     }
 	return (1);
 }
 
 int builtin_export(t_cmd *cmd) {
-    int i = 1; // args[0] is "export", so start with args[1]
+    int i = 1;
 
-    // Loop through all provided arguments
     while (cmd->args[i]) {
         char *name = strdup(cmd->args[i]);
         char *value = ft_strchr(name, '=');
 
         if (value) {
-            // Separate name and value
             *value = '\0';
             value++;
-
-            // Set the environment variable
             set_env_var(cmd->envp, name, value);
                
         } else {
-            // Just export the existing variable
             if (getenv(name)) {
-                // Do nothing, it's already in the environment
             } else {
-                fprintf(stderr, "export: %s: not found\n", name);
-                return 1; // Return error status if the variable is not found
+                ft_printf("export: %s: not found\n", name);
+                return 1; 
             }
         }
         i++;
     }
 
-    return 0; // Return success status
+    return 0; 
 }
 
 int builtin_unset(t_cmd *cmd) {
     
      if (cmd->args[0] == NULL || *(cmd->args[0]) == '\0' || strchr(cmd->args[0], '=') != NULL) {
-        fprintf(stderr, "unsetenv: invalid variable name\n");
-        return -1;  // Invalid variable name
+        ft_printf("unsetenv: invalid variable name\n");
+        return -1;
     }
 
     size_t len = strlen(cmd->args[1]);
     char **env = cmd->envp;
     char **next_env = cmd->envp;
 
-    // Iterate over the environ array
     while (*env) {
-        // Compare the variable name with the current environment variable
-        if (strncmp(*env, cmd->args[1], len) == 0 && (*env)[len] == '=') {
-            // Found the environment variable to remove
+        if (ft_strncmp(*env, cmd->args[1], len) == 0 && (*env)[len] == '=') {
             env++;
             continue;
         }
-        // Move the next_env pointer
         *next_env++ = *env++;
     }
-
-    // Null-terminate the new environment array
     *next_env = NULL;
-    
-
-    return 0;  // Success
+    return 0;
 }
 
 int resolve_full_path(t_cmd *cmd, char **full_path) {
-    // Check for absolute
     char	*tmp;
     
     if (access(cmd->args[0], X_OK) == 0)
@@ -255,11 +229,9 @@ int custom(t_cmd *cmd)
     
         if (resolve_full_path(cmd, &full_path) == -1) {
             
-            fprintf(stderr, "Command not found: %s\n", cmd->args[0]);
+            ft_printf("Command not found: %s\n", cmd->args[0]);
             return 1;
         }
-        
-        // Replace the current process image with a new process image
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
             
             free(full_path);
@@ -271,7 +243,7 @@ int custom(t_cmd *cmd)
     return(0);
 }
 
-int in_rd(t_cmd *cmd) // check if it's working!
+int in_rd(t_cmd *cmd)
 {
     int fd = open(cmd->in_rd, O_RDONLY);
     if (fd == -1) {
@@ -279,23 +251,19 @@ int in_rd(t_cmd *cmd) // check if it's working!
         return (1);
     }
 
-       // Fork a child process
     pid_t pid = fork();
     if (pid == -1) {
         perror("fork");
         return (1);
     }
 
-    if (pid == 0) { // Child process
-        // Redirect stdin to the file descriptor
+    if (pid == 0) {
         if (dup2(fd, STDIN_FILENO) == -1) {
             perror("dup2");
             close(fd);
             return (1);
         }
         close(fd);
-
-        // Execute the command
         if (execute_builtin(cmd)) {
             
             perror("builtin");
@@ -303,9 +271,9 @@ int in_rd(t_cmd *cmd) // check if it's working!
         }
         
         return 0;
-    } else { // Parent process
+    } else { 
         close(fd);
-        wait(NULL); // Wait for the child process to finish
+        wait(NULL); 
     }
     return (0);
 }
@@ -326,9 +294,7 @@ int	execute_builtin(t_cmd *cmd)
 	}
     else
     {
-        // printf("exec_buildin: %d\n", custom(cmd));
         return (custom(cmd)); 
-        // return 1;
     }
 	return (0);
 }
@@ -337,9 +303,7 @@ int print_file_by_fd(int fd) {
     char buffer[1024];
     ssize_t bytes_read;
 
-    // Read from the file descriptor in a loop until the end of the file
     while ((bytes_read = read(fd, buffer, sizeof(buffer))) > 0) {
-        // Write the buffer content to the standard output
         if (write(STDOUT_FILENO, buffer, bytes_read) != bytes_read) {
             perror("write");
             return (1);
@@ -359,9 +323,7 @@ int start_exec(t_cmd *cmd)
         return(out_rd(cmd));
     if(cmd->in_rd)
         return(in_rd(cmd));
-    // printf("start_execres = %d\n", execute_builtin(cmd));
     return (execute_builtin(cmd));
-    // return 0;
 }
 
 
@@ -398,7 +360,6 @@ int	execute_cmd(t_cmd *cmd)
     int pipefd[2 * (num_cmds - 1)];
     int i, j;
 
-    // Create pipes
     for (i = 0; i < (num_cmds - 1); i++) {
         if (pipe(pipefd + i * 2) == -1) {
             perror("pipe");
@@ -406,9 +367,8 @@ int	execute_cmd(t_cmd *cmd)
         }
     }
 
-    i = 0; // Initialize i to 0 before loop
+    i = 0; 
 
-	// Iterate through each command
 	while (it)
 	{
         if (ft_strncmp(it->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0], "export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
@@ -422,43 +382,28 @@ int	execute_cmd(t_cmd *cmd)
             return (1);
         } else if (pid == 0) 
         {
-            // Child process
-
-            // Redirect input from previous pipe if not the first command
             if (i > 0) {
                 dup2(pipefd[(i - 1) * 2], STDIN_FILENO);
             }
-
-            // Redirect output to next pipe if not the last command
             if (i < num_cmds - 1) {
                 dup2(pipefd[i * 2 + 1], STDOUT_FILENO);
             }
-
-            // Close all pipe file descriptors
             for (j = 0; j < 2 * (num_cmds - 1); j++) {
                 close(pipefd[j]);
             }
-            // Execute the command
             exit(start_exec(it));  
         }
-        
-        // Parent process, move to the next command
         it = it->next;
         i++;
     }
-
-    // Close all pipe file descriptors in the parent
     for (j = 0; j < 2 * (num_cmds - 1); j++) {
         close(pipefd[j]);
     }
-
-    // Wait for all child processes to finish
     for (i = 0; i < num_cmds; i++) {
         waitpid(pid, &status, 0);
     }
     if (WIFEXITED(status)) 
             return(WEXITSTATUS(status));
-    // printf("Exit status: %d\n", exit_status);
     return (0);
 }
 
@@ -477,7 +422,6 @@ int out_rd(t_cmd *cmd)
         return (1);
     }
 
-    // Duplicate the file descriptor to stdout
     int saved_stdout = dup(STDOUT_FILENO);
     if (saved_stdout == -1) {
         perror("dup");
@@ -491,48 +435,36 @@ int out_rd(t_cmd *cmd)
         close(saved_stdout);
         return (1);
     }
-
-    // Close the target file descriptor as it's no longer needed
     close(fd);
-
     if(cmd->in_rd)
         res = in_rd(cmd);
     else
-        res = execute_builtin(cmd); // here execute
-    // print_file_by_fd(saved_stdout);
-    // Restore the original stdout
+        res = execute_builtin(cmd); 
     if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
         perror("dup2");
         close(saved_stdout);
         return (1);
     }
-
-    // Close the saved stdout file descriptor
     close(saved_stdout);
 
     return res;
 }
 
-// void sigint_handler(int signum) {
-//     (void)signum;  // Avoid unused parameter warning
-//     // Print a newline and a new prompt
-//     write(STDOUT_FILENO, "\n", 1);
-//     // write(STDOUT_FILENO, "minishell$ ", 11); NEW PROMPT!!!
-// }
+void sigint_handler(int signum) {
+    (void)signum;
+    write(STDOUT_FILENO, "\n", 1);
 
-// void sigquit_handler(int signum) {
-//     (void)signum;  // Ignore the signal
-// }
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
+}
+
+void sigquit_handler(int signum) {
+    (void)signum;  
+}
 
 
 // LEFT TO IMPLEMENT
-
-// ◦ ctrl-C displays a new prompt on a new line.
-// ◦ ctrl-D exits the shell.
-// ◦ ctrl-\ does nothing.
-// • Handle $? which should expand to the exit status of the most recently executed
 // • HEREDOC
-
-// • remove global var for exit code $?-> do when merging with severyn
 
 // gcc executor.c ../../libft/*.c ../../42_pipex/ft_printf/*.c ../../ft_destructor/*.c -g

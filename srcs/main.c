@@ -27,6 +27,19 @@ int	main(int argc, char **argv, char **envp)
 
 static int	ft_minihell(t_mhell *mhell)
 {
+	// Set up signal handlers
+    struct sigaction sa;
+
+    // Setup the signal handler for SIGINT (Ctrl+C)
+    sa.sa_handler = sigint_handler;
+    sa.sa_flags = SA_RESTART; // Automatically restart interrupted syscalls
+    sigemptyset(&sa.sa_mask);
+
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+    signal(SIGQUIT, sigquit_handler);  // Ignore Ctrl+\/
 	while (1)
 	{
 		mhell->cmd_line = readline(ft_get_prompt(mhell));
