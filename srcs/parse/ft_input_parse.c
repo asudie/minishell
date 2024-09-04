@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 22:22:44 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/21 20:09:40 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/04 18:08:02 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,10 @@ bool	ft_input_parse(t_mhell *mhell)
 	if (!*input)
 		return (mhell->exit_code = 0, ft_free(input), false);
 	ft_tokenize(mhell, input);
-	// order = ft_token_order(mhell);
-	// if (order >= 0)
-	// {
-	// 	if (ft_hrdc(mhell, order))
-	// 		return (false);
-	// }
+	if (!ft_handle_heredocs(mhell))
+		return (false);
 	ft_open_quotes(mhell);
-	// if (order < 0)
-		ft_create_cmd(mhell);
+	ft_create_cmd(mhell);
 	mhell->exit_code = 0;
 	return (ft_free(input), true);
 }

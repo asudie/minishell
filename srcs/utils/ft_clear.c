@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 20:12:24 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/28 17:06:13 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/04 18:36:42 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,3 @@ static void	ft_clear_tkn(t_tkn **tkn, int *len)
 	*tkn = NULL;
 	*len = 0;
 }
-

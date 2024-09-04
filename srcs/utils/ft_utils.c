@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/15 15:22:44 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/05 20:01:03 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/04 18:11:19 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,4 +48,18 @@ int	ft_strchr_pos(char *s, int c)
 	if (s[i] == (unsigned char)c)
 		return (++i);
 	return (-1);
+}
+
+void	ft_get_exit_code(int *exit_code, int stat_loc, bool first_encounter)
+{
+	if (WIFEXITED(stat_loc))
+	{
+		if (first_encounter && WEXITSTATUS(stat_loc))
+			*exit_code = WEXITSTATUS(stat_loc);
+	}
+	else if (WIFSIGNALED(stat_loc))
+	{
+		if (first_encounter)
+			*exit_code = WTERMSIG(stat_loc) + 128;
+	}
 }

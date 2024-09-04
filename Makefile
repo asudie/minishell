@@ -21,6 +21,8 @@ SRCS			= ${SRCSDIR}main.c \
 				  ${PARSEDIR}ft_tokenize.c \
 				  ${PARSEDIR}ft_quotes.c \
 				  ${PARSEDIR}ft_cmd.c \
+				  ${PARSEDIR}ft_hrdc.c \
+				  ${PARSEDIR}ft_hrdc_files.c \
 				  ${UTILDIR}ft_error_parse.c \
 				  ${UTILDIR}ft_error_parse_ext.c \
 				  ${UTILDIR}ft_str_utils.c \
