@@ -148,6 +148,7 @@ void set_env_var(char **envr, const char *name, const char *value);
 int resolve_full_path(t_cmd *cmd, char **full_path);
 int out_rd(t_cmd *cmd);
 int in_rd(t_cmd *cmd);
+int open_for_fd(int *fd, t_cmd *cmd, int *saved_stdout);
 
 
 // PIPEX
