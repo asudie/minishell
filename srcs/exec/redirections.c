@@ -51,40 +51,47 @@ int	open_for_fd(int *fd, t_cmd *cmd, int *saved_stdout)
 	return (0);
 }
 
-int	in_rd(t_cmd *cmd)
+int open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid)
 {
-	int		fd;
-	pid_t	pid;
+ *fd = open(cmd->in_rd, O_RDONLY);
+ if (*fd == -1)
+ {
+  perror("open");
+  return (1);
+ }
+ *pid = fork();
+ if (*pid == -1)
+ {
+  perror("fork");
+  return (1);
+ }
+ return (0);
+}
 
-	fd = open(cmd->in_rd, O_RDONLY);
-	if (fd == -1)
-	{
-		perror("open");
-		return (1);
-	}
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("fork");
-		return (1);
-	}
-	if (pid == 0)
-	{
-		if (dup2(fd, STDIN_FILENO) == -1)
-		{
-			perror("dup2");
-			close(fd);
-			return (1);
-		}
-		close(fd);
-		if (execute_builtin(cmd))
-		{
-			perror("builtin");
-			return (1);
-		}
-		return (0);
-	}
-		close(fd);
-		wait(NULL);
-	return (0);
+int in_rd(t_cmd *cmd)
+{
+ int  fd;
+ pid_t pid;
+
+ if(open_file_ro_and_pid(&fd, cmd, &pid))
+  return (1);
+ if (pid == 0)
+ {
+  if (dup2(fd, STDIN_FILENO) == -1)
+  {
+   perror("dup2");
+   close(fd);
+   return (1);
+  }
+  close(fd);
+  if (execute_builtin(cmd))
+  {
+   perror("builtin");
+   return (1);
+  }
+  return (0);
+ }
+  close(fd);
+  wait(NULL);
+ return (0);
 }

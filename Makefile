@@ -55,7 +55,7 @@ CC 				= cc
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT) $(ALLOC)
-	$(CC) $(CFLAGS) $(SRCS) $(LIBFT) $(ALLOC) -o $(NAME) -lreadline
+	$(CC) $(CFLAGS) $(SRCS) $(LIBFT) $(ALLOC) -o $(NAME) -lreadline -g
 
 $(LIBFT):
 	make -C $(LIBFTDIR)

@@ -13,10 +13,13 @@ int resolve_full_path(t_cmd *cmd, char **full_path) {
     if (!path) {
         return -1;
     }
-    char	**paths = ft_split(path + 5, ':');
+    
+    char	**paths = ft_split(path + 5, ':'); // SEGA HERE
     int		i = 0;
+    
     while (paths[i] != NULL)
 	{
+        
 		tmp = ft_strjoin(paths[i], "/");
 		*full_path = ft_strjoin(tmp, cmd->args[0]);
 		free(tmp);

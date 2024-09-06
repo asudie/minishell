@@ -149,6 +149,7 @@ int resolve_full_path(t_cmd *cmd, char **full_path);
 int out_rd(t_cmd *cmd);
 int in_rd(t_cmd *cmd);
 int open_for_fd(int *fd, t_cmd *cmd, int *saved_stdout);
+int open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid);
 
 
 // PIPEX

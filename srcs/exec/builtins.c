@@ -147,6 +147,7 @@ int custom(t_cmd *cmd)
             ft_printf("Command not found: %s\n", cmd->args[0]);
             return 1;
         }
+        
         if (execve(full_path, cmd->args, cmd->envp) == -1) {
             
             free(full_path);
