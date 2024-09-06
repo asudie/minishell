@@ -74,7 +74,7 @@ fclean: clean
 	rm -f $(NAME)
 
 test:
-	gcc srcs/exec/executor.c srcs/exec/main.c srcs/utils/ft_arr_utils.c libft/*.c 42_pipex/ft_printf/*.c ft_destructor/*.c -g -o executor
+	gcc srcs/exec/*.c srcs/utils/ft_arr_utils.c libft/*.c 42_pipex/ft_printf/*.c ft_destructor/*.c -lreadline -g -o executor
 
 re: fclean $(NAME)
 
