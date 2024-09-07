@@ -4,35 +4,54 @@ int builtin_cd(t_cmd *cmd) {
     char *home_dir;
     char *oldpwd;
     char cwd[1024];
+    char *path;
 
+    // If no argument, cd to the HOME directory
     if (cmd->args[1] == NULL) {
         home_dir = get_env_var(cmd->envp, "HOME");
         if (home_dir == NULL) {
             ft_printf("cd: HOME not set\n");
             return 1;
         }
-        if (chdir(home_dir) != 0) {
-            perror("cd");
-            return 1;
-        }
+        path = home_dir;
     } else if (ft_strcmp(cmd->args[1], "-") == 0) {
+        // Handle 'cd -' to change to the previous directory
         oldpwd = get_env_var(cmd->envp, "OLDPWD");
         if (oldpwd == NULL) {
             ft_printf("cd: OLDPWD not set\n");
             return 1;
         }
-        if (chdir(oldpwd) != 0) {
-            perror("cd");
-            return 1;
-        }
-        ft_printf("%s\n", oldpwd);
+        path = oldpwd;
     } else {
-        if (chdir(cmd->args[1]) != 0) {
-            perror("cd");
-            return 1;
+        // Check if the path starts with '~'
+        if (cmd->args[1][0] == '~') {
+            home_dir = get_env_var(cmd->envp, "HOME");
+            if (home_dir == NULL) {
+                ft_printf("cd: HOME not set\n");
+                return 1;
+            }
+            // Allocate enough space for the expanded path
+            path = malloc(ft_strlen(home_dir) + ft_strlen(cmd->args[1]));
+            if (path == NULL) {
+                perror("malloc");
+                return 1;
+            }
+            // Concatenate the home directory with the rest of the path (skip the '~')
+            ft_strcpy(path, home_dir);
+            ft_strlcat(path, cmd->args[1] + 1, ft_strlen(home_dir) + ft_strlen(cmd->args[1]));
+        } else {
+            path = cmd->args[1];
         }
-        
     }
+
+    // Change directory to the expanded path
+    if (chdir(path) != 0) {
+        perror("cd");
+        if (cmd->args[1][0] == '~') free(path); // Free memory if '~' expansion was used
+        return 1;
+    }
+    
+    // Update the OLDPWD and PWD environment variables
     oldpwd = get_env_var(cmd->envp, "PWD");
     if (oldpwd != NULL) {
         set_env_var(cmd->envp, "OLDPWD", oldpwd);
@@ -45,8 +64,14 @@ int builtin_cd(t_cmd *cmd) {
         return 1;
     }
 
+    // Free memory if '~' expansion was used
+    if (cmd->args[1] && cmd->args[1][0] == '~') {
+        free(path);
+    }
+
     return 0;
 }
+
 
 int builtin_echo(t_cmd *cmd) {
     int newline = 1;
