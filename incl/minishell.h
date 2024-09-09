@@ -118,13 +118,12 @@ typedef struct s_cmd
 
 // PARSER
 void	ft_init_env(t_mhell *mhell, char **envp);
-char	*ft_input_prompt(t_mhell *mhell);
+// char	*ft_input_prompt(t_mhell *mhell);
 bool	ft_input_parse(t_mhell *mhell);
 void	ft_substr_dollar(t_mhell *mhell, char **str, int *state);
 void	ft_tokenize(t_mhell *mhell, char *str);
 char	*ft_get_prompt(t_mhell *mhell);
 bool	ft_handle_heredocs(t_mhell *mhell);
-bool	ft_create_files(t_mhell *mhell, char **hrdc);
 
 // EXECUTOR
 int out_rd(t_cmd *cmd);
@@ -176,6 +175,5 @@ void	ft_quote_state(int c, int *state);
 int		ft_is_spec(char *str);
 
 void	ft_print_cmd(t_cmd *cmd);
-void	ft_get_exit_code(int *exit_code, int stat_loc, bool first_encounter);
 
 #endif
