@@ -51,21 +51,50 @@ int	open_for_fd(int *fd, t_cmd *cmd, int *saved_stdout)
 	return (0);
 }
 
+void ft_heredoc(t_cmd *cmd)
+{
+    char	*line;
+	char	*limiter;
+	int		tmp_fd;
+
+	limiter = cmd->in_rd;
+	tmp_fd = open("/tmp/heredoc_tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	while (1)
+	{
+		line = readline("heredoc> ");
+		if (!line || ft_strcmp(line, limiter) == 0)
+		{
+			free(line);
+			break ;
+		}
+		write(tmp_fd, line, ft_strlen(line));
+		write(tmp_fd, "\n", 1);
+		free(line);
+	}
+	close(tmp_fd);
+}
+
 int open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid)
 {
- *fd = open(cmd->in_rd, O_RDONLY);
- if (*fd == -1)
- {
-  perror("open");
-  return (1);
- }
- *pid = fork();
- if (*pid == -1)
- {
-  perror("fork");
-  return (1);
- }
- return (0);
+	if(cmd->heredoc)
+    {
+        ft_heredoc(cmd);
+        *fd = open("/tmp/heredoc_tmp", O_RDONLY, 0644);
+    }
+    else
+ 		*fd = open(cmd->in_rd, O_RDONLY);
+	if (*fd == -1)
+	{
+		perror("open");
+		return (1);
+	}
+	*pid = fork();
+	if (*pid == -1)
+	{
+		perror("fork");
+		return (1);
+	}
+	return (0);
 }
 
 int in_rd(t_cmd *cmd)

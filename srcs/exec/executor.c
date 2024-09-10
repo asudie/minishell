@@ -97,11 +97,11 @@ int	execute_cmd(t_cmd *cmd)
 	i = 0;
 	while (it)
 	{
-		if (ft_strncmp(it->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0],
-				"export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
+		if (cmd->args[0])
 		{
-			return (env_builtins(it));
-		}
+            if (ft_strncmp(it->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0], "export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
+                return(env_builtins(it));
+        }
 		pid = fork();
 		if (pid == -1)
 		{
