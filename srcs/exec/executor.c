@@ -243,9 +243,39 @@ int custom(t_cmd *cmd)
     return(0);
 }
 
+void ft_heredoc(t_cmd *cmd)
+{
+    char	*line;
+	char	*limiter;
+	int		tmp_fd;
+
+	limiter = cmd->in_rd;
+	tmp_fd = open("/tmp/heredoc_tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	while (1)
+	{
+		line = readline("heredoc> ");
+		if (!line || ft_strcmp(line, limiter) == 0)
+		{
+			free(line);
+			break ;
+		}
+		write(tmp_fd, line, ft_strlen(line));
+		write(tmp_fd, "\n", 1);
+		free(line);
+	}
+	close(tmp_fd);
+}
+
 int in_rd(t_cmd *cmd)
 {
-    int fd = open(cmd->in_rd, O_RDONLY);
+    int fd;
+    if(cmd->heredoc)
+    {
+        ft_heredoc(cmd);
+        fd = open("/tmp/heredoc_tmp", O_RDONLY, 0644);
+    }
+    else
+        fd = open(cmd->in_rd, O_RDONLY);
     if (fd == -1) {
         perror("open");
         return (1);
@@ -371,11 +401,11 @@ int	execute_cmd(t_cmd *cmd)
 
 	while (it)
 	{
-        if (ft_strncmp(it->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0], "export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
-	{
-        return(env_builtins(it));
-		
-	}
+        if (cmd->args[0])
+		{
+            if (ft_strncmp(it->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0], "export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
+                return(env_builtins(it));
+        }
         pid = fork();
         if (pid == -1) {
             perror("fork");

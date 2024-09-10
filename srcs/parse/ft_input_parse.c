@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 22:22:44 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/09/09 18:09:21 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/10 17:37:56 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ static void	ft_replace_dollar(t_mhell *mhell, char **str);
 bool	ft_input_parse(t_mhell *mhell)
 {
 	char	*input;
-	// int		order;
 
 	if (!ft_input_error(mhell, mhell->cmd_line))
 		return (false);
@@ -31,8 +30,8 @@ bool	ft_input_parse(t_mhell *mhell)
 	ft_tokenize(mhell, input);
 	ft_open_quotes(mhell);
 	ft_create_cmd(mhell);
-	if (!ft_handle_heredocs(mhell))
-		return (false);
+	// if (!ft_handle_heredocs(mhell))
+	// 	return (false);
 	mhell->exit_code = 0;
 	return (ft_free(input), true);
 }

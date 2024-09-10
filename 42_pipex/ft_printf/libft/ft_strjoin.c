@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 15:37:45 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/22 13:36:57 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/09 19:16:34 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,10 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	int		n;
 	char	*str;
 
+	if (!s1 && !s2)
+		return (NULL);
 	str = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	if (str == NULL || s1 == NULL || s2 == NULL)
+	if (!str)
 		return (NULL);
 	i = 0;
 	n = 0;

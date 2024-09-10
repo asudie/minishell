@@ -42,7 +42,8 @@ static int	ft_minihell(t_mhell *mhell)
     signal(SIGQUIT, sigquit_handler);  // Ignore Ctrl+\/
 	while (1)
 	{
-		mhell->cmd_line = readline(ft_get_prompt(mhell));
+		// mhell->cmd_line = readline(ft_get_prompt(mhell));
+		mhell->cmd_line = readline(YELLOW"minishell$ "RESET);
 		if (!mhell->cmd_line)
 		{
 			ft_free(mhell->cmd_line);
@@ -53,8 +54,11 @@ static int	ft_minihell(t_mhell *mhell)
 			add_history(mhell->cmd_line);
 		if (ft_input_parse(mhell))
 		{
-			if (ft_strcmp(mhell->cmd->args[0], "exit") == 0)
-				return (printf("exit\n"), ft_free_mhell_data(mhell), ft_destructor(), EXIT_SUCCESS);
+			if (mhell->cmd->args[0])
+			{
+				if (ft_strcmp(mhell->cmd->args[0], "exit") == 0)
+					return (printf("exit\n"), ft_free_mhell_data(mhell), ft_destructor(), EXIT_SUCCESS);
+			}
 			mhell->cmd->envp = mhell->envp;
 			mhell->exit_code = execute_cmd(mhell->cmd);
 		}
