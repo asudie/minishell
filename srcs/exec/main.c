@@ -38,7 +38,7 @@ int	main(int argc, char **argv, char **envp)
 		
         //PWD
         printf("CMD: cat Makefile\n");
-		cmd->args = (char *[]){"cd", "/", NULL};
+		cmd->args = (char *[]){"gcc", "srcs/exec/extra/print_file.c", "-o", "print", NULL};
         printf("OUTPUT:\n");
 
         // ENV

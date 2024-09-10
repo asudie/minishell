@@ -33,6 +33,10 @@ SRCS			= ${SRCSDIR}main.c \
 				  ${UTILDIR}ft_env_utils.c \
 				  ${UTILDIR}ft_path_utils.c \
 				  ${EXECDIR}executor.c \
+				  ${EXECDIR}builtins.c \
+				  ${EXECDIR}env_funcs.c \
+				  ${EXECDIR}exec_utils.c \
+				  ${EXECDIR}redirections.c \
 				  ${PRINTFDIR}ft_printf.c
 
 
@@ -51,7 +55,7 @@ CC 				= cc
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT) $(ALLOC)
-	$(CC) $(CFLAGS) $(SRCS) $(LIBFT) $(ALLOC) -o $(NAME) -lreadline
+	$(CC) $(CFLAGS) $(SRCS) $(LIBFT) $(ALLOC) -o $(NAME) -lreadline -g
 
 $(LIBFT):
 	make -C $(LIBFTDIR)
@@ -69,7 +73,7 @@ fclean: clean
 	rm -f $(NAME)
 
 test:
-	gcc srcs/exec/executor.c srcs/exec/main.c srcs/utils/*c libft/*.c 42_pipex/ft_printf/*.c ft_destructor/*.c -g -o executor
+	gcc srcs/exec/*.c srcs/utils/ft_arr_utils.c libft/*.c 42_pipex/ft_printf/*.c ft_destructor/*.c -lreadline -g -o executor
 
 re: fclean $(NAME)
 
