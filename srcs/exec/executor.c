@@ -41,7 +41,7 @@ int	execute_builtin(t_cmd *cmd)
 
 int	start_exec(t_cmd *cmd)
 {
-	if (cmd->out_rd)
+	if (cmd->out_rd && !cmd->heredoc)
 		return (out_rd(cmd));
 	if (cmd->in_rd)
 		return (in_rd(cmd));

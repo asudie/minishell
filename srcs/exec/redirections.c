@@ -80,6 +80,12 @@ int open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid)
     {
         ft_heredoc(cmd);
         *fd = open("/tmp/heredoc_tmp", O_RDONLY, 0644);
+		if(cmd->out_rd)
+		{
+			cmd->in_rd = "/tmp/heredoc_tmp";
+			cmd->heredoc = 0;
+			return (out_rd(cmd));
+		}
     }
     else
  		*fd = open(cmd->in_rd, O_RDONLY);
