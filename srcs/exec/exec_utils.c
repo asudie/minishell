@@ -9,12 +9,11 @@ int resolve_full_path(t_cmd *cmd, char **full_path) {
         return 0;
     } 
             
-    char *path = getenv("PATH");
+    char *path = get_env_var(cmd->envp, "PATH");
     if (!path) {
-        return -1;
+        return 1;
     }
-    
-    char	**paths = ft_split(path + 5, ':'); // SEGA HERE
+    char	**paths = ft_split(path + 5, ':');
     int		i = 0;
     
     while (paths[i] != NULL)
@@ -32,5 +31,5 @@ int resolve_full_path(t_cmd *cmd, char **full_path) {
 		i++;
 	}
 	ft_free_array(paths);
-	return (-1);
+	return (1);
 }

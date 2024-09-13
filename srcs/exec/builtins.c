@@ -167,7 +167,8 @@ int custom(t_cmd *cmd)
 {
     char *full_path;
     
-        if (resolve_full_path(cmd, &full_path) == -1) {
+    
+        if (resolve_full_path(cmd, &full_path) == 1) {
             
             ft_printf("Command not found: %s\n", cmd->args[0]);
             return 1;
