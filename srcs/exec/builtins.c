@@ -174,7 +174,7 @@ int custom(t_cmd *cmd)
             return 1;
         }
         
-        if (execve(full_path, cmd->args, cmd->envp) == -1) {
+        if (execve(full_path, cmd->args, cmd->envp) == 1) {
             
             free(full_path);
             perror("execve");
