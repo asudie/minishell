@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:14:17 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/14 19:04:42 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/14 18:03:36 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static void	ft_tkn_quotes(t_tkn *tkn)
 	int		j;
 
 	i = 0;
-	j = 0;
+	j = -1;
 	state = 0;
 	if (tkn->type > _text)
 		return ;
@@ -40,11 +40,10 @@ static void	ft_tkn_quotes(t_tkn *tkn)
 	while (tkn->token[i])
 	{
 		ft_quote_state(tkn->token[i], &state);
-		if (((state == 1 && tkn->token[i] != '\'') || (state == 2 && tkn->token[i] != '"')) || (state == 0 && ft_is_spec(&tkn->token[i]) == 0))
-		{
-			str[j] = tkn->token[i];
-			j++;
-		}
+		if (((state == 1 && tkn->token[i] != '\'') || \
+			(state == 2 && tkn->token[i] != '"')) || \
+			(state == 0 && ft_is_spec(&tkn->token[i]) == 0))
+			str[++j] = tkn->token[i];
 		ft_quote_state(tkn->token[i], &state);
 		i++;
 	}
@@ -62,7 +61,9 @@ static char	*ft_alloc_new_tkn(t_tkn tkn)
 	state = 0;
 	while (*tkn.token && tkn.type == _text)
 	{
-		if (((state == 1 && *tkn.token != '\'') || (state == 2 && *tkn.token != '"')) || (state == 0 && ft_is_spec(&*tkn.token) == 0))
+		if (((state == 1 && *tkn.token != '\'') || \
+			(state == 2 && *tkn.token != '"')) || \
+			(state == 0 && ft_is_spec(&*tkn.token) == 0))
 			len++;
 		ft_quote_state(*tkn.token, &state);
 		tkn.token++;

@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 20:34:46 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/21 20:48:26 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/14 17:57:41 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,3 @@ void	ft_cmddelone(t_cmd *lst, void (*del)(void*))
 	del(lst->out_rd);
 	ft_free(lst);
 }
-

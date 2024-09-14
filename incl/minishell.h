@@ -35,7 +35,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-#define PATH_MAX 4096
+# define PATH_MAX 4096
 
 // COLORS
 # define RESET		"\033[0m"
@@ -133,27 +133,26 @@ bool	ft_handle_heredocs(t_mhell *mhell);
 
 // EXECUTOR
 // int print_file_by_fd(int fd);
-int	execute_builtin(t_cmd *cmd);
-int start_exec(t_cmd *cmd);
-int	execute_cmd(t_cmd *cmd);
-int env_builtins(t_cmd *cmd);
-void sigint_handler(int signum);
-void sigquit_handler(int signum);
-int builtin_cd(t_cmd *cmd);
-int builtin_echo(t_cmd *cmd);
-int builtin_pwd();
-int builtin_env(t_cmd *cmd);
-int builtin_export(t_cmd *cmd);
-int builtin_unset(t_cmd *cmd);
-int custom(t_cmd *cmd);
-char *get_env_var(char **envr, const char *name);
-void set_env_var(char **envr, const char *name, const char *value);
-int resolve_full_path(t_cmd *cmd, char **full_path);
-int out_rd(t_cmd *cmd);
-int in_rd(t_cmd *cmd);
-int open_for_fd(int *fd, t_cmd *cmd, int *saved_stdout);
-int open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid);
-
+int		execute_builtin(t_cmd *cmd);
+int		start_exec(t_cmd *cmd);
+int		execute_cmd(t_cmd *cmd);
+int		env_builtins(t_cmd *cmd);
+void	sigint_handler(int signum);
+void	sigquit_handler(int signum);
+int		builtin_cd(t_cmd *cmd);
+int		builtin_echo(t_cmd *cmd);
+int		builtin_pwd(void);
+int		builtin_env(t_cmd *cmd);
+int		builtin_export(t_cmd *cmd);
+int		builtin_unset(t_cmd *cmd);
+int		custom(t_cmd *cmd);
+char	*get_env_var(char **envr, const char *name);
+void	set_env_var(char **envr, const char *name, const char *value);
+int		resolve_full_path(t_cmd *cmd, char **full_path);
+int		out_rd(t_cmd *cmd);
+int		in_rd(t_cmd *cmd);
+int		open_for_fd(int *fd, t_cmd *cmd, int *saved_stdout);
+int		open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid);
 
 // PIPEX
 void	ft_validate_cmd(char **argv);
