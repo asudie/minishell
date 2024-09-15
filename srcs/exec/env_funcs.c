@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env_func.c		                                        :+:      :+:    :+:   */
+/*   env_func.c		                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ****** <******@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -15,42 +15,58 @@
 char	*get_env_var(char **envr, const char *name)
 {
 	size_t	len;
+	int		i;
 
+	i = 0;
 	len = ft_strlen(name);
-	for (int i = 0; envr[i] != NULL; i++)
+	while (envr[i] != NULL)
 	{
 		if (ft_strncmp(envr[i], name, len) == 0 && envr[i][len] == '=')
 			return (envr[i] + len + 1);
+		i++;
 	}
 	return (NULL);
 }
 
-void set_env_var(char **envr, const char *name, const char *value)
+void	add_new_env_var(char **envr, const char *name,
+				const char *value, size_t size)
 {
-	size_t len = ft_strlen(name);
-	size_t size = ft_strlen(name) + ft_strlen(value) + 2;
+	int	i;
 
-	for (int i = 0; envr[i] != NULL; i++) {
-		if (ft_strncmp(envr[i], name, len) == 0 && envr[i][len] == '=') { 
-			ft_strcpy(envr[i], (char*)name);
-
-			// Append the '=' character
-			ft_strlcat(envr[i], "=", size);
-
-			// Append the value
-			ft_strlcat(envr[i], value, size);
-			return;
-		}
-	}
-	int i = 0;
-	while (1) {
-		if (envr[i] == NULL) {
+	i = 0;
+	while (1)
+	{
+		if (envr[i] == NULL)
+		{
 			envr[i] = ft_malloc(sizeof(char *));
-			snprintf(envr[i], ft_strlen(name) + ft_strlen(value) + 2, "%s=%s", name, value);
+			snprintf(envr[i], size, "%s=%s", name, value);
 			envr[i + 1] = ft_malloc(sizeof(char *));
 			envr[i + 1] = NULL;
 			return ;
 		}
 		i++;
 	}
+}
+
+void	set_env_var(char **envr, const char *name, const char *value)
+{
+	size_t	len;
+	size_t	size;
+	int		i;
+
+	i = 0;
+	len = ft_strlen(name);
+	size = ft_strlen(name) + ft_strlen(value) + 2;
+	while (envr[i] != NULL)
+	{
+		if (ft_strncmp(envr[i], name, len) == 0 && envr[i][len] == '=')
+		{
+			ft_strcpy(envr[i], (char *)name);
+			ft_strlcat(envr[i], "=", size);
+			ft_strlcat(envr[i], value, size);
+			return ;
+		}
+		i++;
+	}
+	add_new_env_var(envr, name, value, size);
 }
