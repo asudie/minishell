@@ -18,7 +18,6 @@ int builtin_cd(t_cmd *cmd) {
     char cwd[1024];
     char *path;
 
-    // If no argument, cd to the HOME directory
     if (cmd->args[1] == NULL) {
         home_dir = get_env_var(cmd->envp, "HOME");
         if (home_dir == NULL) {
@@ -27,7 +26,6 @@ int builtin_cd(t_cmd *cmd) {
         }
         path = home_dir;
     } else if (ft_strcmp(cmd->args[1], "-") == 0) {
-        // Handle 'cd -' to change to the previous directory
         oldpwd = get_env_var(cmd->envp, "OLDPWD");
         if (oldpwd == NULL) {
             ft_printf("cd: OLDPWD not set\n");
@@ -35,35 +33,28 @@ int builtin_cd(t_cmd *cmd) {
         }
         path = oldpwd;
     } else {
-        // Check if the path starts with '~'
         if (cmd->args[1][0] == '~') {
             home_dir = get_env_var(cmd->envp, "HOME");
             if (home_dir == NULL) {
                 ft_printf("cd: HOME not set\n");
                 return 1;
             }
-            // Allocate enough space for the expanded path
             path = malloc(ft_strlen(home_dir) + ft_strlen(cmd->args[1]));
             if (path == NULL) {
                 perror("malloc");
                 return 1;
             }
-            // Concatenate the home directory with the rest of the path (skip the '~')
             ft_strcpy(path, home_dir);
             ft_strlcat(path, cmd->args[1] + 1, ft_strlen(home_dir) + ft_strlen(cmd->args[1]));
         } else {
             path = cmd->args[1];
         }
     }
-
-    // Change directory to the expanded path
     if (chdir(path) != 0) {
         perror("cd");
-        if (cmd->args[1][0] == '~') free(path); // Free memory if '~' expansion was used
+        if (cmd->args[1][0] == '~') free(path);
         return 1;
     }
-    
-    // Update the OLDPWD and PWD environment variables
     oldpwd = get_env_var(cmd->envp, "PWD");
     if (oldpwd != NULL) {
         set_env_var(cmd->envp, "OLDPWD", oldpwd);
@@ -75,8 +66,6 @@ int builtin_cd(t_cmd *cmd) {
         perror("getcwd");
         return 1;
     }
-
-    // Free memory if '~' expansion was used
     if (cmd->args[1] && cmd->args[1][0] == '~') {
         free(path);
     }
@@ -84,22 +73,37 @@ int builtin_cd(t_cmd *cmd) {
     return 0;
 }
 
+int is_valid_n_flag(char *arg) {
+    if (arg[0] != '-')
+        return 0;
+
+    for (int i = 1; arg[i]; i++) {
+        if (arg[i] != 'n')
+            return 0;
+    }
+
+    return 1;
+}
+
+void print_arguments(char **args, int start) {
+    for (int i = start; args[i]; i++) {
+        ft_printf("%s", args[i]);
+        if (args[i + 1] != NULL) {
+            ft_printf(" ");
+        }
+    }
+}
 
 int builtin_echo(t_cmd *cmd) {
     int newline = 1;
     int i = 1;
 
-    if (ft_strncmp(cmd->args[1], "-n", 3) == 0) {
+    while (cmd->args[i] && is_valid_n_flag(cmd->args[i])) {
         newline = 0;
-        i = 2;
+        i++;
     }
 
-    for (; cmd->args[i]; i++) {
-        ft_printf("%s", cmd->args[i]);
-        if (cmd->args[i + 1] != NULL) { 
-            ft_printf(" ");
-        }
-    }
+    print_arguments(cmd->args, i);
 
     if (newline) {
         ft_printf("\n");
