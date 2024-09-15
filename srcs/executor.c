@@ -1,7 +1,5 @@
 #include "../../incl/minishell.h"
 
-int	g_signal;
-
 int	execute_builtin(t_cmd *cmd)
 {
 	if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
@@ -83,13 +81,7 @@ int	execute_cmd(t_cmd *cmd)
 	t_cmd	*it;
 	int		num_cmds;
 	
-	
-	it = cmd;
-	while(it->next)
-	{
-		it->next->envp = it->envp;
-		it = it->next;
-	}
+
 	it = cmd;
 	num_cmds = count_commands(cmd);
     int		pipefd[2 * (num_cmds - 1)];
@@ -150,22 +142,11 @@ int	execute_cmd(t_cmd *cmd)
 
 void	sigint_handler(int signum)
 {
-	if (signum == SIGCHLD)
-		g_signal = SIGCHLD;
-	else if (signum == SIGINT)
-	{
-		write(1, "\n", 1);
-		wait(NULL);
-		if (g_signal == SIGCHLD)
-		{
-			g_signal = 0;
-			return ;
-		}
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-		g_signal = 0;
-	}
+	(void)signum;
+	write(STDOUT_FILENO, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
 void	sigquit_handler(int signum)
@@ -175,4 +156,3 @@ void	sigquit_handler(int signum)
 
 // LEFT TO IMPLEMENT
 // • Эксит с аргументами
-

@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 20:12:24 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/09/14 17:58:38 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/15 15:11:03 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static void	ft_clear_tkn(t_tkn **tkn, int *len);
 
-void	ft_free_mhell_data(t_mhell *mhell)
+void	ft_free_mhell(t_mhell *mhell)
 {
 	if (mhell->tkn && mhell->tkn_l)
 		ft_clear_tkn(&mhell->tkn, &mhell->tkn_l);
@@ -23,6 +23,7 @@ void	ft_free_mhell_data(t_mhell *mhell)
 		ft_cmdclear(&mhell->cmd, ft_free);
 		mhell->cmd_l = 0;
 	}
+	free(mhell->cmd_line);
 }
 
 static void	ft_clear_tkn(t_tkn **tkn, int *len)
