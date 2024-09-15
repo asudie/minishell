@@ -6,39 +6,41 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 19:11:40 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/09/10 14:35:05 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/14 18:11:26 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../incl/minishell.h"
 
-void	ft_print_tkn(t_mhell *mhell)
-{
-	int	i = 0;
-	while (i < mhell->tkn_l)
-	{
-		printf("Token: %s\tType: %d\n", mhell->tkn[i].token, mhell->tkn[i].type);
-		i++;
-	}
-}
+// void	ft_print_tkn(t_mhell *mhell)
+// {
+// 	int	i;
 
-void	ft_print_cmd(t_cmd *cmd)
-{
-	t_cmd *tmp = cmd;
-	while (tmp)
-	{
-		printf("\n");
-		for (int i = 0; tmp->args[i]; i++)
-				printf("args[%i]: %s\n", i, tmp->args[i]);
-		printf("rdin: %s\n", tmp->in_rd);
-		printf("rdout: %s\n", tmp->out_rd);
-		printf("append: %i\n", tmp->append);
-		printf("heredoc: %i\n", tmp->heredoc);
-		tmp = tmp->next;
-	}
-}
+// 	i = 0;
+// 	while (i < mhell->tkn_l)
+// 	{
+// 	printf("Token: %s\tType: %d\n", mhell->tkn[i].token, mhell->tkn[i].type);
+// 		i++;
+// 	}
+// }
 
-t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *out_rd, int append, int heredoc);
+// void	ft_print_cmd(t_cmd *cmd)
+// {
+// 	t_cmd *tmp = cmd;
+// 	while (tmp)
+// 	{
+// 		printf("\n");
+// 		for (int i = 0; tmp->args[i]; i++)
+// 				printf("args[%i]: %s\n", i, tmp->args[i]);
+// 		printf("rdin: %s\n", tmp->in_rd);
+// 		printf("rdout: %s\n", tmp->out_rd);
+// 		printf("append: %i\n", tmp->append);
+// 		printf("heredoc: %i\n", tmp->heredoc);
+// 		tmp = tmp->next;
+// 	}
+// }
+
+t_cmd *ft_allocate_cmd(t_cmd_alloc *allocs, char **args);
 void	ft_fill_cmd(t_mhell *mhell, int *i, t_cmd *cmd);
 
 void	ft_create_cmd(t_mhell *mhell)
@@ -96,11 +98,11 @@ void	ft_fill_cmd(t_mhell *mhell, int *i, t_cmd *cmd)
 		}
 		(*i)++;
 	}
-	cmd = allocate_cmd(allocs->num_args, args, allocs->in_rd, allocs->out_rd, allocs->append, allocs->heredoc);
+	cmd = ft_allocate_cmd(allocs, args);
 	ft_cmdadd_back(&mhell->cmd, cmd);
 }
 
-t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *out_rd, int append, int heredoc)
+t_cmd *ft_allocate_cmd(t_cmd_alloc *allocs, char **args)
 {
     // Step 1: Allocate memory for the t_cmd structure
     t_cmd *cmd = (t_cmd *)ft_malloc(sizeof(t_cmd));
@@ -109,14 +111,14 @@ t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *ou
     }
 
     // Step 2: Allocate memory for the args array
-    cmd->args = (char **)ft_malloc((num_args + 1) * sizeof(char *)); // +1 for NULL terminator
+    cmd->args = (char **)ft_malloc((allocs->num_args + 1) * sizeof(char *)); // +1 for NULL terminator
     if (!cmd->args) {
         ft_free(cmd);
         return NULL; // Allocation failed
     }
 
     // Step 3: Allocate memory for each string in the args array
-    for (int i = 0; i < num_args; i++) {
+    for (int i = 0; i < allocs->num_args; i++) {
         cmd->args[i] = (char *)ft_malloc(256 * sizeof(char)); // Assuming max length of 256 for each argument
         if (!cmd->args[i]) {
             // Free previously allocated memory in case of failure
@@ -131,14 +133,14 @@ t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *ou
 	int j = -1;
 	while (args[++j])
 		cmd->args[j] = args[j];
-	cmd->args[num_args] = NULL; // NULL terminator
+	cmd->args[allocs->num_args] = NULL; // NULL terminator
 
     // Step 4: Allocate memory for in_rd and out_rd if they are not NULL
-    if (in_rd) {
-        cmd->in_rd = ft_strdup(in_rd);
+    if (allocs->in_rd) {
+        cmd->in_rd = ft_strdup(allocs->in_rd);
         if (!cmd->in_rd) {
             // Free previously allocated memory in case of failure
-            for (int i = 0; i < num_args; i++) {
+            for (int i = 0; i < allocs->num_args; i++) {
                 ft_free(cmd->args[i]);
             }
             ft_free(cmd->args);
@@ -149,12 +151,12 @@ t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *ou
         cmd->in_rd = NULL;
     }
 
-    if (out_rd) {
-        cmd->out_rd = ft_strdup(out_rd);
+    if (allocs->out_rd) {
+        cmd->out_rd = ft_strdup(allocs->out_rd);
         if (!cmd->out_rd) {
             // Free previously allocated memory in case of failure
            	ft_free(cmd->in_rd);
-            for (int i = 0; i < num_args; i++) {
+            for (int i = 0; i < allocs->num_args; i++) {
                 ft_free(cmd->args[i]);
             }
             ft_free(cmd->args);
@@ -166,8 +168,8 @@ t_cmd *allocate_cmd(int num_args, char **args, const char *in_rd, const char *ou
     }
 
     // Set other fields
-    cmd->append = append;
-    cmd->heredoc = heredoc;
+    cmd->append = allocs->append;
+    cmd->heredoc = allocs->heredoc;
     cmd->next = NULL;
 
     return cmd;

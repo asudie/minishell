@@ -23,6 +23,7 @@ SRCS			= ${SRCSDIR}main.c \
 				  ${PARSEDIR}ft_cmd.c \
 				  ${PARSEDIR}ft_hrdc.c \
 				  ${UTILDIR}ft_error_parse.c \
+				  ${UTILDIR}ft_error_parse_ext.c \
 				  ${UTILDIR}ft_str_utils.c \
 				  ${UTILDIR}ft_arr_utils.c \
 				  ${UTILDIR}ft_cmd_utils.c \
@@ -74,6 +75,9 @@ fclean: clean
 
 test:
 	gcc srcs/exec/*.c srcs/utils/ft_arr_utils.c libft/*.c 42_pipex/ft_printf/*.c ft_destructor/*.c -lreadline -g -o executor
+
+runb:
+	valgrind ./minishell
 
 re: fclean $(NAME)
 

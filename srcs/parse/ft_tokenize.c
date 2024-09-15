@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 15:22:12 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/08/14 15:09:46 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/14 18:02:30 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,8 @@ static int	ft_strskip(char *str)
 		if (state != 0)
 		{
 			i++;
-			while (str[i] && ((state == 1 && str[i] != '\'') || (state == 2 && str[i] != '"')))
+			while (str[i] && ((state == 1 && str[i] != '\'') || \
+			(state == 2 && str[i] != '"')))
 				i++;
 			ft_quote_state(str[i], &state);
 		}

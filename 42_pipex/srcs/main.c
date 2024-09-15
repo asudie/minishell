@@ -84,9 +84,9 @@ static t_pipex	ft_init_pipex(char **argv, char **envp)
 static void	ft_input_process(t_cmd *cmd, int input, int *fd)
 {
 	close(fd[0]);
-	dup2(fd[1], STDOUT_FILENO); // WHAT IS THIS!!!!!!!
+	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
-	dup2(input, STDIN_FILENO); // WHAT IS THIS!!!!!!!
+	dup2(input, STDIN_FILENO);
 	close(input);
 	if (start_exec(cmd) != 0)
 		ft_error_output(NULL, "input process fails\n", 1);
@@ -96,13 +96,14 @@ static void	ft_output_process(t_cmd *cmd, int output, int *fd)
 {
 	pid_t	pid;
 	int		status;
+
 	pid = fork();
 	if (pid == 0)
 	{
 		close(fd[1]);
-		dup2(fd[0], STDIN_FILENO); // WHAT IS THIS!!!!!!!
+		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
-		dup2(output, STDOUT_FILENO); // WHAT IS THIS!!!!!!!
+		dup2(output, STDOUT_FILENO);
 		close(output);
 		if (start_exec(cmd) != 0)
 			ft_error_output(NULL, "output process fails\n", 1);
@@ -118,7 +119,7 @@ static void	ft_output_process(t_cmd *cmd, int output, int *fd)
 // void execute_pipeline(char **commands, char **envp) {
 //     int num_cmds = 0;
 //     while (commands[num_cmds] != NULL) num_cmds++;
-    
+
 //     int pipefd[2 * (num_cmds - 1)];
 //     pid_t pid;
 //     int i, j;
