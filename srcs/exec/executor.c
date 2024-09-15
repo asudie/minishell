@@ -1,5 +1,7 @@
 #include "../../incl/minishell.h"
 
+int	g_signal;
+
 int	execute_builtin(t_cmd *cmd)
 {
 	if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
@@ -142,11 +144,22 @@ int	execute_cmd(t_cmd *cmd)
 
 void	sigint_handler(int signum)
 {
-	(void)signum;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	if (signum == SIGCHLD)
+		g_signal = SIGCHLD;
+	else if (signum == SIGINT)
+	{
+		write(1, "\n", 1);
+		wait(NULL);
+		if (g_signal == SIGCHLD)
+		{
+			g_signal = 0;
+			return ;
+		}
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		g_signal = 0;
+	}
 }
 
 void	sigquit_handler(int signum)

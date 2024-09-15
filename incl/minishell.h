@@ -62,6 +62,8 @@
 # define ER_SX_CHR	"syntax error near unexpected token `%c'\n\033[0m"
 # define ER_SX_STR	"syntax error near unexpected token `%s'\n\033[0m"
 
+extern int				g_sig;
+
 typedef struct s_env	t_env;
 typedef struct s_tkn	t_tkn;
 typedef struct s_cmd	t_cmd;
@@ -104,6 +106,7 @@ typedef struct s_tkn
 
 typedef struct s_cmd_alloc
 {
+	char		**args;
 	int			num_args;
 	const char	*in_rd;
 	const char	*out_rd;
@@ -166,7 +169,7 @@ char	**ft_separate(char *a, char d);
 bool	ft_input_error(t_mhell *mhell, char	*input);
 void	ft_open_quotes(t_mhell *mhell);
 void	ft_create_cmd(t_mhell *mshell);
-void	ft_free_mhell_data(t_mhell *mhell);
+void	ft_free_mhell(t_mhell *mhell);
 
 void	ft_cmdadd_back(t_cmd **lst, t_cmd *new);
 t_cmd	*ft_cmdlast(t_cmd *lst);

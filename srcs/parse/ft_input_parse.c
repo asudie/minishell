@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 22:22:44 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/09/14 18:00:15 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/15 15:01:47 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,8 @@ static bool	ft_check_tokens(t_mhell *mhell)
 		else if (tkn[i].type > _pipe && (i + 1) >= mhell->tkn_l)
 			return (printf(ER_MHELL ER_SX_STR, "newline"), false);
 		else if (tkn[i].type > _pipe && mhell->tkn[i + 1].type > 1)
+			return (printf(ER_MHELL ER_SX_STR, tkn[i + 1].token), false);
+		else if (tkn[i].type == _pipe && tkn[i + 1].type == _pipe)
 			return (printf(ER_MHELL ER_SX_STR, tkn[i + 1].token), false);
 		i++;
 	}
