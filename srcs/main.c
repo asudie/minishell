@@ -106,5 +106,5 @@ static bool	ft_check_exit(t_mhell *mhell)
 		else if (mhell->cmd->args[1])
 			exit(ft_atoi(mhell->cmd->args[1]));
 	}
-	return (true);
+	return (false);
 }
