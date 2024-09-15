@@ -137,7 +137,6 @@ char	*ft_get_prompt(t_mhell *mhell);
 bool	ft_handle_heredocs(t_mhell *mhell);
 
 // EXECUTOR
-// int print_file_by_fd(int fd);
 int		execute_builtin(t_cmd *cmd);
 int		start_exec(t_cmd *cmd);
 int		execute_cmd(t_cmd *cmd);
@@ -158,6 +157,14 @@ int		out_rd(t_cmd *cmd);
 int		in_rd(t_cmd *cmd);
 int		open_for_fd(int *fd, t_cmd *cmd, int *saved_stdout);
 int		open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid);
+void	setup_env(t_cmd *cmd);
+int		create_pipes(int **pipefd, int num_cmds);
+int		handle_builtin_commands(t_cmd *cmd);
+void	close_all_pipes(int *pipefd, int num_cmds);
+int		setup_child_pipes(int *pipefd, int i, int num_cmds);
+int		count_commands(t_cmd *cmd);
+int		fork_and_execute(t_cmd *it, int *pipefd, int i, int num_cmds);
+void	wait_for_children(int num_cmds);
 
 // PIPEX
 void	ft_validate_cmd(char **argv);

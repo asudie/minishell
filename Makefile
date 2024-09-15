@@ -39,6 +39,8 @@ SRCS			= ${SRCSDIR}main.c \
 				  ${EXECDIR}env_funcs.c \
 				  ${EXECDIR}exec_utils.c \
 				  ${EXECDIR}redirections.c \
+				  ${EXECDIR}exec_utils2.c \
+				  ${EXECDIR}exec_utils3.c \
 				  ${PRINTFDIR}ft_printf.c
 
 

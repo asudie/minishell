@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   executor.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: asmolnya <asmolnya@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/15 21:22:00 by asmolnya          #+#    #+#             */
+/*   Updated: 2024/09/15 21:35:41 by asmolnya         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../incl/minishell.h"
 
-int	g_sig;
+int			g_sig;
 
 int	execute_builtin(t_cmd *cmd)
 {
@@ -23,128 +35,30 @@ int	execute_builtin(t_cmd *cmd)
 	return (0);
 }
 
-// int print_file_by_fd(int fd) {
-//     char buffer[1024];
-//     ssize_t bytes_read;
-
-//     while ((bytes_read = read(fd, buffer, sizeof(buffer))) > 0) {
-//         if (write(STDOUT_FILENO, buffer, bytes_read) != bytes_read) {
-//             perror("write");
-//             return (1);
-//         }
-//     }
-
-//     if (bytes_read == -1) {
-//         perror("read");
-//         return (1);
-//     }
-//     return (0);
-// }
-
-int	start_exec(t_cmd *cmd)
-{
-	if (cmd->out_rd && !cmd->heredoc)
-		return (out_rd(cmd));
-	if (cmd->in_rd)
-		return (in_rd(cmd));
-	return (execute_builtin(cmd));
-}
-
-int	count_commands(t_cmd *cmd)
-{
-	t_cmd	*it;
-	int		num_cmds;
-
-	it = cmd;
-	num_cmds = 0;
-	while (it != NULL)
-	{
-		num_cmds++;
-		it = it->next;
-	}
-	return (num_cmds);
-}
-
-int	env_builtins(t_cmd *cmd)
-{
-	if (ft_strncmp(cmd->args[0], "cd", 2) == 0)
-		return (builtin_cd(cmd));
-	else if (ft_strncmp(cmd->args[0], "export", 6) == 0)
-		return (builtin_export(cmd));
-	else if (ft_strncmp(cmd->args[0], "unset", 5) == 0)
-		return (builtin_unset(cmd));
-	return (1);
-}
-
 int	execute_cmd(t_cmd *cmd)
 {
-	pid_t	pid;
-	int		status;
 	t_cmd	*it;
 	int		num_cmds;
-	
-	
-	it = cmd;
-	while(it->next)
-	{
-		it->next->envp = it->envp;
-		it = it->next;
-	}
+	int		*pipefd;
+	int		i;
+
 	it = cmd;
 	num_cmds = count_commands(cmd);
-    int		pipefd[2 * (num_cmds - 1)];
-	int i, j;
-	for (i = 0; i < (num_cmds - 1); i++)
-	{
-		if (pipe(pipefd + i * 2) == -1)
-		{
-			perror("pipe");
-			return (1);
-		}
-	}
+	setup_env(cmd);
+	if (create_pipes(&pipefd, num_cmds))
+		return (1);
 	i = 0;
 	while (it)
 	{
-		if (cmd->args[0])
-		{
-            if (ft_strncmp(it->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0], "export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
-                return(env_builtins(it));
-        }
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("fork");
+		if (handle_builtin_commands(it))
+			return (env_builtins(it));
+		if (fork_and_execute(it, pipefd, i, num_cmds))
 			return (1);
-		}
-		else if (pid == 0)
-		{
-			if (i > 0)
-			{
-				dup2(pipefd[(i - 1) * 2], STDIN_FILENO);
-			}
-			if (i < num_cmds - 1)
-			{
-				dup2(pipefd[i * 2 + 1], STDOUT_FILENO);
-			}
-			for (j = 0; j < 2 * (num_cmds - 1); j++)
-			{
-				close(pipefd[j]);
-			}
-			exit(start_exec(it));
-		}
 		it = it->next;
 		i++;
 	}
-	for (j = 0; j < 2 * (num_cmds - 1); j++)
-	{
-		close(pipefd[j]);
-	}
-	for (i = 0; i < num_cmds; i++)
-	{
-		waitpid(pid, &status, 0);
-	}
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
+	close_all_pipes(pipefd, num_cmds);
+	wait_for_children(num_cmds);
 	return (0);
 }
 
@@ -172,7 +86,3 @@ void	sigquit_handler(int signum)
 {
 	(void)signum;
 }
-
-// LEFT TO IMPLEMENT
-// • Эксит с аргументами
-
