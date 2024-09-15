@@ -51,9 +51,9 @@ int	open_for_fd(int *fd, t_cmd *cmd, int *saved_stdout)
 	return (0);
 }
 
-void ft_heredoc(t_cmd *cmd)
+void	ft_heredoc(t_cmd *cmd)
 {
-    char	*line;
+	char	*line;
 	char	*limiter;
 	int		tmp_fd;
 
@@ -74,21 +74,21 @@ void ft_heredoc(t_cmd *cmd)
 	close(tmp_fd);
 }
 
-int open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid)
+int	open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid)
 {
-	if(cmd->heredoc)
-    {
-        ft_heredoc(cmd);
-        *fd = open("/tmp/heredoc_tmp", O_RDONLY, 0644);
-		if(cmd->out_rd)
+	if (cmd->heredoc)
+	{
+		ft_heredoc(cmd);
+		*fd = open("/tmp/heredoc_tmp", O_RDONLY, 0644);
+		if (cmd->out_rd)
 		{
 			cmd->in_rd = "/tmp/heredoc_tmp";
 			cmd->heredoc = 0;
 			return (out_rd(cmd));
 		}
-    }
-    else
- 		*fd = open(cmd->in_rd, O_RDONLY);
+	}
+	else
+		*fd = open(cmd->in_rd, O_RDONLY, 0644);
 	if (*fd == -1)
 	{
 		perror("open");
@@ -103,30 +103,30 @@ int open_file_ro_and_pid(int *fd, t_cmd *cmd, pid_t *pid)
 	return (0);
 }
 
-int in_rd(t_cmd *cmd)
+int	in_rd(t_cmd *cmd)
 {
- int  fd;
- pid_t pid;
+	pid_t	pid;
+	int		fd;
 
- if(open_file_ro_and_pid(&fd, cmd, &pid))
-  return (1);
- if (pid == 0)
- {
-  if (dup2(fd, STDIN_FILENO) == -1)
-  {
-   perror("dup2");
-   close(fd);
-   return (1);
-  }
-  close(fd);
-  if (execute_builtin(cmd))
-  {
-   perror("builtin");
-   return (1);
-  }
-  return (0);
- }
-  close(fd);
-  wait(NULL);
- return (0);
+	if (open_file_ro_and_pid(&fd, cmd, &pid))
+		return (1);
+	if (pid == 0)
+	{
+		if (dup2(fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2");
+			close(fd);
+			return (1);
+		}
+		close(fd);
+		if (execute_builtin(cmd))
+		{
+			perror("builtin");
+			return (1);
+		}
+		return (0);
+	}
+	close(fd);
+	wait(NULL);
+	return (0);
 }

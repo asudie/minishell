@@ -97,7 +97,7 @@ int builtin_echo(t_cmd *cmd) {
         ft_printf("\n");
     }
 
-    return 1;
+    return 0;
 }
 
 int builtin_pwd() {
@@ -107,17 +107,17 @@ int builtin_pwd() {
         ft_printf("%s\n", cwd);
     } else {
         perror("getcwd() error");
-        return 0;
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
 
 int builtin_env(t_cmd *cmd) {
     for (int i = 0; cmd->envp[i] != NULL; i++) {
         ft_printf("%s\n", cmd->envp[i]);
     }
-	return (1);
+	return (0);
 }
 
 int builtin_export(t_cmd *cmd) {
@@ -173,7 +173,7 @@ int custom(t_cmd *cmd)
         if (resolve_full_path(cmd, &full_path) == 1) {
             
             ft_printf("Command not found: %s\n", cmd->args[0]);
-            return 1;
+            return 127;
         }
         
         if (execve(full_path, cmd->args, cmd->envp) == 1) {
