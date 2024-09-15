@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asmolnya <asmolnya@student.42.fr>          +#+  +:+       +#+        */
+/*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/15 21:27:31 by asmolnya          #+#    #+#             */
-/*   Updated: 2024/09/15 21:29:12 by asmolnya         ###   ########.fr       */
+/*   Updated: 2024/09/15 21:45:27 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	create_pipes(int **pipefd, int num_cmds)
 {
 	int	i;
 
-	*pipefd = (int *)malloc(2 * (num_cmds - 1) * sizeof(int));
+	*pipefd = (int *)ft_malloc(2 * (num_cmds - 1) * sizeof(int));
 	if (!*pipefd)
 	{
 		perror("malloc");
@@ -51,8 +51,8 @@ int	handle_builtin_commands(t_cmd *cmd)
 {
 	if (cmd->args[0])
 	{
-		if (ft_strncmp(cmd->args[0], "cd", 2) == 0 || ft_strncmp(cmd->args[0],
-				"export", 6) == 0 || ft_strncmp(cmd->args[0], "unset", 5) == 0)
+		if (ft_strcmp(cmd->args[0], "cd") == 0 || ft_strcmp(cmd->args[0],
+				"export") == 0 || ft_strcmp(cmd->args[0], "unset") == 0)
 			return (1);
 	}
 	return (0);
@@ -68,6 +68,7 @@ void	close_all_pipes(int *pipefd, int num_cmds)
 		close(pipefd[j]);
 		j++;
 	}
+	ft_free(pipefd);
 }
 
 int	setup_child_pipes(int *pipefd, int i, int num_cmds)

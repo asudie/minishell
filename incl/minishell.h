@@ -164,7 +164,7 @@ void	close_all_pipes(int *pipefd, int num_cmds);
 int		setup_child_pipes(int *pipefd, int i, int num_cmds);
 int		count_commands(t_cmd *cmd);
 int		fork_and_execute(t_cmd *it, int *pipefd, int i, int num_cmds);
-void	wait_for_children(int num_cmds);
+int		wait_for_children(int num_cmds);
 
 // PIPEX
 void	ft_validate_cmd(char **argv);

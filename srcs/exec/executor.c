@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asmolnya <asmolnya@student.42.fr>          +#+  +:+       +#+        */
+/*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/15 21:22:00 by asmolnya          #+#    #+#             */
-/*   Updated: 2024/09/15 21:37:47 by asmolnya         ###   ########.fr       */
+/*   Updated: 2024/09/15 22:05:03 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@ int	execute_builtin(t_cmd *cmd)
 {
 	if (cmd->args[0])
 	{
-		if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
+		if (ft_strcmp(cmd->args[0], "echo") == 0)
 			return (builtin_echo(cmd));
-		else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
+		else if (ft_strcmp(cmd->args[0], "pwd") == 0)
 			return (builtin_pwd());
-		else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
+		else if (ft_strcmp(cmd->args[0], "env") == 0)
 			return (builtin_env(cmd));
 		else
 			return (custom(cmd));
@@ -35,9 +35,11 @@ int	execute_cmd(t_cmd *cmd)
 	t_cmd	*it;
 	int		num_cmds;
 	int		*pipefd;
+	int		exit;
 	int		i;
 
 	it = cmd;
+	exit = 0;
 	num_cmds = count_commands(cmd);
 	setup_env(cmd);
 	if (create_pipes(&pipefd, num_cmds))
@@ -53,8 +55,8 @@ int	execute_cmd(t_cmd *cmd)
 		i++;
 	}
 	close_all_pipes(pipefd, num_cmds);
-	wait_for_children(num_cmds);
-	return (0);
+	exit = wait_for_children(num_cmds);
+	return (exit);
 }
 
 void	sigint_handler(int signum)
@@ -75,9 +77,4 @@ void	sigint_handler(int signum)
 		rl_redisplay();
 		g_sig = 0;
 	}
-}
-
-void	sigquit_handler(int signum)
-{
-	(void)signum;
 }
