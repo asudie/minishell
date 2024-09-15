@@ -46,10 +46,11 @@ static int	ft_minihell(t_mhell *mhell)
 	ft_signals();
 	while (1)
 	{
+		g_sig = 0;
 		mhell->cmd_line = readline(YELLOW"minishell$ "RESET);
 		if (!mhell->cmd_line)
 		{
-			ft_free(mhell->cmd_line);
+			free(mhell->cmd_line);
 			printf("exit\n");
 			exit(EXIT_SUCCESS);
 		}
@@ -57,8 +58,8 @@ static int	ft_minihell(t_mhell *mhell)
 			add_history(mhell->cmd_line);
 		if (ft_input_parse(mhell))
 		{
-			if (!ft_check_exit(mhell))
-				return (ft_free_mhell(mhell), ft_destructor(), EXIT_SUCCESS);
+			if (ft_check_exit(mhell))
+				continue ;
 			mhell->cmd->envp = mhell->envp;
 			mhell->exit_code = execute_cmd(mhell->cmd);
 		}
@@ -83,10 +84,27 @@ static void	ft_signals(void)
 
 static bool	ft_check_exit(t_mhell *mhell)
 {
-	if (mhell->cmd->args[0])
+	if (mhell->cmd->args[0] && ft_strcmp(mhell->cmd->args[0], "exit") == 0)
 	{
-		if (ft_strcmp(mhell->cmd->args[0], "exit") == 0)
-			return (printf("exit\n"), false);
+		ft_free(mhell->cmd_line);
+		printf("exit\n");
+		if (!mhell->cmd->args[1])
+			exit(mhell->exit_code);
+		else if (mhell->cmd->args[1]
+			&& !ft_isdigit_loop(mhell->cmd->args[1]))
+		{
+			printf(ER_MHELL ER_EXIT);
+			exit (2);
+		}
+		else if (mhell->cmd->args[2])
+		{
+			printf(ER_MHELL ER_EXIT_AR);
+			mhell->exit_code = 1;
+			ft_free_mhell(mhell);
+			return (true);
+		}
+		else if (mhell->cmd->args[1])
+			exit(ft_atoi(mhell->cmd->args[1]));
 	}
 	return (true);
 }

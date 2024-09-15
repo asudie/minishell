@@ -1,6 +1,6 @@
 #include "../../incl/minishell.h"
 
-int	g_signal;
+int	g_sig;
 
 int	execute_builtin(t_cmd *cmd)
 {
@@ -151,20 +151,20 @@ int	execute_cmd(t_cmd *cmd)
 void	sigint_handler(int signum)
 {
 	if (signum == SIGCHLD)
-		g_signal = SIGCHLD;
+		g_sig = SIGCHLD;
 	else if (signum == SIGINT)
 	{
 		write(1, "\n", 1);
 		wait(NULL);
-		if (g_signal == SIGCHLD)
+		if (g_sig == SIGCHLD)
 		{
-			g_signal = 0;
+			g_sig = 0;
 			return ;
 		}
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
-		g_signal = 0;
+		g_sig = 0;
 	}
 }
 

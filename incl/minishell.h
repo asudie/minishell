@@ -57,6 +57,8 @@
 # define ER_ALLOC	"Allocation failed\n\n\033[0m"
 # define ER_FORK	"Fork failed\n\n\033[0m"
 # define ER_OPEN	"Heredoc opening failed\n\n\033[0m"
+# define ER_EXIT	"exit: numeric argument required\n\033[0m"
+# define ER_EXIT_AR	"exit: too many arguments\n\033[0m"
 # define ER_QUOTE_S	"single quatation is not closed\n\033[0m"
 # define ER_QUOTE_D	"double quatation is not closed\n\033[0m"
 # define ER_SX_CHR	"syntax error near unexpected token `%c'\n\033[0m"
@@ -194,6 +196,7 @@ int		ft_conc_space(char curr, char next);
 bool	ft_is_quote(char c);
 void	ft_quote_state(int c, int *state);
 int		ft_is_spec(char *str);
+int		ft_isdigit_loop(char *str);
 
 void	ft_print_cmd(t_cmd *cmd);
 
