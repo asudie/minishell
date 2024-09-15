@@ -45,30 +45,25 @@ BNS 			= 	ft_lstnew_bonus.c \
 					ft_lstiter_bonus.c \
 					ft_lstmap_bonus.c
 
-OBJS			= 	${SRCS:%.c=%.o}
-BNSOBJS			=	${BNS:%.c=%.o}
+OBJS			= 	${SRCS:.c=.o}
+BNSOBJS			=	${BNS:.c=.o}
 
 CFLAGS 			= 	-Wall -Wextra -Werror
 CC 				= 	cc
-RM				= 	rm -rf
 
 all: $(NAME)
 
-bonus: $(BNSOBJS)
-	ar rcs $(NAME) $^
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
 $(NAME): $(OBJS)
-	ar rcs $(NAME) $(OBJS)
+	ar rc $(NAME) $(OBJS)
+
+bonus: $(BNSOBJS)
+	ar rc $(NAME) $(BNSOBJS)
 
 clean:
-	${RM} $(OBJS)
-	${RM} $(BNSOBJS)
+	rm -f $(OBJS) $(BNSOBJS)
 
 fclean:	clean
-	${RM} $(NAME)
+	rm -f $(NAME)
 
 re: fclean all
 

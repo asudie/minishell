@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 15:29:15 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/29 17:55:09 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/12 14:06:13 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 	new_list = NULL;
 	while (lst)
 	{
-		element = (t_list *)malloc(sizeof(*new_list));
+		element = (t_list *)ft_malloc(sizeof(*new_list));
 		if (element == NULL)
 		{
 			ft_lstclear(&new_list, del);

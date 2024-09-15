@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 16:49:40 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/12/04 14:09:05 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/12 14:05:47 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,10 +111,10 @@ static char	**ft_freemem(char **list)
 	i = 0;
 	while (list[i])
 	{
-		free(list[i]);
+		ft_free(list[i]);
 		i++;
 	}
-	free(list);
+	ft_free(list);
 	return (NULL);
 }
 
@@ -149,7 +149,7 @@ char	**ft_split(char const *s, char c)
 {
 	char	**list;
 
-	list = (char **)malloc((ft_wordcount(s, c) + 1) * sizeof(char *));
+	list = (char **)ft_malloc((ft_wordcount(s, c) + 1) * sizeof(char *));
 	if (list == NULL || s == NULL)
 		return (NULL);
 	list = ft_split_2(s, c, list);

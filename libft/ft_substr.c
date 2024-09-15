@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 14:22:22 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/23 14:34:44 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/17 16:57:55 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	n = ft_strlen(s + start);
 	if (n < len)
 		len = n;
-	str = (char *)malloc((len + 1) * sizeof(char));
+	str = (char *)ft_malloc((len + 1) * sizeof(char));
 	if (str == NULL || s == NULL)
 		return (NULL);
 	i = 0;
@@ -64,6 +64,34 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	}
 	str[i] = '\0';
 	return (str);
+}
+
+char	*ft_substr_rem(char *str, char *sub)
+{
+	char	*res;
+	char	*found;
+	int		sub_len;
+	int		str_len;
+	int		i;
+
+	res = NULL;
+	found = ft_strstr(str, sub);
+	if (!str || !sub)
+		return (NULL);
+	if (found)
+	{
+		sub_len = ft_strlen(sub);
+		str_len = ft_strlen(str) - sub_len;
+		res = ft_malloc((str_len + 1) * sizeof(char));
+		if (res)
+		{
+			i = found - str;
+			ft_strncpy(res, str, i);
+			ft_strncpy(res + i, found + sub_len, str_len - i);
+			res[str_len] = '\0';
+		}
+	}
+	return (res);
 }
 
 // #include <stdio.h>

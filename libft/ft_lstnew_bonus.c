@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstnew.c                                        :+:      :+:    :+:   */
+/*   ft_lstnew_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/23 16:48:40 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/27 21:37:48 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/08/02 20:47:12 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ t_list	*ft_lstnew(void *content)
 {
 	t_list	*node;
 
-	node = (t_list *)malloc(sizeof(*node));
+	node = ft_malloc(sizeof(t_list));
 	if (node == NULL)
 		return (NULL);
 	node->content = content;

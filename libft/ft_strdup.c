@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/14 16:25:51 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/22 13:37:03 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/12 14:05:15 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ char	*ft_strdup(const char *s1)
 	char	*dst;
 	int		i;
 
-	dst = malloc(ft_strlen(s1) + 1 * sizeof(char));
+	dst = ft_malloc(ft_strlen(s1) + 1 * sizeof(char));
 	if (dst == NULL)
 		return (NULL);
 	i = 0;

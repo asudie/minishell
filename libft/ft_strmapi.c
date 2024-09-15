@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/23 13:14:45 by svalchuk          #+#    #+#             */
-/*   Updated: 2023/11/23 13:54:46 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/07/12 14:05:01 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 	unsigned int	i;
 
 	i = 0;
-	str = (char *)malloc(sizeof(char) * (ft_strlen(s) + 1));
+	str = (char *)ft_malloc(sizeof(char) * (ft_strlen(s) + 1));
 	if (str == NULL || s == NULL)
 		return (NULL);
 	while (s[i])
