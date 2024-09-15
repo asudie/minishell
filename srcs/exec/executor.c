@@ -1,45 +1,52 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   executor.c		                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ****** <******@student.42wolfsburg.de>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/17 22:22:44 by ******           #+#    #+#              */
+/*   Updated: 2024/07/22 00:43:38 by ******           ###   ########.fr       */
+/*                                                                           */
+/* ************************************************************************** */
+
 #include "../../incl/minishell.h"
 
 int	g_sig;
 
 int	execute_builtin(t_cmd *cmd)
 {
-	if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
+	if (cmd->args[0])
 	{
-		return (builtin_echo(cmd));
-	}
-	else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
-	{
-		return (builtin_pwd());
-	}
-	else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
-	{
-		return (builtin_env(cmd));
-	}
-	else
-	{
-		return (custom(cmd));
+		if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
+			return (builtin_echo(cmd));
+		else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
+			return (builtin_pwd());
+		else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
+			return (builtin_env(cmd));
+		else
+			return (custom(cmd));
 	}
 	return (0);
 }
 
-// int print_file_by_fd(int fd) {
-//     char buffer[1024];
-//     ssize_t bytes_read;
+/* int print_file_by_fd(int fd) {
+    char buffer[1024];
+    ssize_t bytes_read;
 
-//     while ((bytes_read = read(fd, buffer, sizeof(buffer))) > 0) {
-//         if (write(STDOUT_FILENO, buffer, bytes_read) != bytes_read) {
-//             perror("write");
-//             return (1);
-//         }
-//     }
+    while ((bytes_read = read(fd, buffer, sizeof(buffer))) > 0) {
+        if (write(STDOUT_FILENO, buffer, bytes_read) != bytes_read) {
+            perror("write");
+            return (1);
+        }
+    }
 
-//     if (bytes_read == -1) {
-//         perror("read");
-//         return (1);
-//     }
-//     return (0);
-// }
+    if (bytes_read == -1) {
+        perror("read");
+        return (1);
+    }
+    return (0);
+} */
 
 int	start_exec(t_cmd *cmd)
 {
@@ -85,6 +92,7 @@ int	execute_cmd(t_cmd *cmd)
 	
 	
 	it = cmd;
+	status = 0;
 	while(it->next)
 	{
 		it->next->envp = it->envp;
@@ -172,7 +180,3 @@ void	sigquit_handler(int signum)
 {
 	(void)signum;
 }
-
-// LEFT TO IMPLEMENT
-// • Эксит с аргументами
-

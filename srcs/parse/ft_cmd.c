@@ -6,7 +6,7 @@
 /*   By: svalchuk <svalchuk@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 19:11:40 by svalchuk          #+#    #+#             */
-/*   Updated: 2024/09/15 19:02:11 by svalchuk         ###   ########.fr       */
+/*   Updated: 2024/09/15 19:32:16 by svalchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ void	ft_create_cmd(t_mhell *mhell)
 		ft_fill_cmd(mhell, &i, cmd);
 		i++;
 	}
-	/* ft_print_cmd(mhell->cmd); */
 }
 
 void	ft_fill_cmd(t_mhell *mhell, int *i, t_cmd *cmd)
