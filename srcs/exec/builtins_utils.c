@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_utils.c		                                :+:      :+:    :+:   */
+/*   builtins_utils.c		                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ****** <******@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,31 +12,51 @@
 
 #include "../../incl/minishell.h"
 
-int	resolve_full_path(t_cmd *cmd, char **full_path)
+int	is_valid_n_flag(char *arg)
 {
-	char	**paths;
-	char	*path;
-	char	*tmp;
-	int		i;
+	int	i;
 
 	i = 0;
-	path = NULL;
-	if (access(cmd->args[0], X_OK) == 0)
-		return (*full_path = cmd->args[0], 0);
-	path = get_env_var(cmd->envp, "PATH");
-	if (!path)
-		return (1);
-	paths = ft_split(path + 5, ':');
-	while (paths[i] != NULL)
+	if (arg[0] != '-')
+		return (0);
+	while (arg[i])
 	{
-		tmp = ft_strjoin(paths[i], "/");
-		*full_path = ft_strjoin(tmp, cmd->args[0]);
-		free(tmp);
-		if (access(*full_path, X_OK) == 0)
-			return (ft_free_array(paths), 0);
-		free(*full_path);
+		if (arg[i] != 'n')
+			return (0);
 		i++;
 	}
-	ft_free_array(paths);
 	return (1);
+}
+
+void	print_arguments(char **args, int start)
+{
+	int	i;
+
+	i = start;
+	while (args[i])
+	{
+		ft_printf("%s", args[i]);
+		if (args[i + 1] != NULL)
+			ft_printf(" ");
+		i++;
+	}
+}
+
+int	custom(t_cmd *cmd)
+{
+	char	*full_path;
+
+	if (resolve_full_path(cmd, &full_path) == 1)
+	{
+		ft_printf("Command not found: %s\n", cmd->args[0]);
+		return (127);
+	}
+	if (execve(full_path, cmd->args, cmd->envp) == 1)
+	{
+		free(full_path);
+		perror("execve");
+		return (1);
+	}
+	free(full_path);
+	return (0);
 }

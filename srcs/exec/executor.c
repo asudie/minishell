@@ -6,7 +6,7 @@
 /*   By: asmolnya <asmolnya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/15 21:22:00 by asmolnya          #+#    #+#             */
-/*   Updated: 2024/09/15 21:35:41 by asmolnya         ###   ########.fr       */
+/*   Updated: 2024/09/15 21:37:47 by asmolnya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,16 @@ int			g_sig;
 
 int	execute_builtin(t_cmd *cmd)
 {
-	if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
+	if (cmd->args[0])
 	{
-		return (builtin_echo(cmd));
-	}
-	else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
-	{
-		return (builtin_pwd());
-	}
-	else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
-	{
-		return (builtin_env(cmd));
-	}
-	else
-	{
-		return (custom(cmd));
+		if (ft_strncmp(cmd->args[0], "echo", 4) == 0)
+			return (builtin_echo(cmd));
+		else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0)
+			return (builtin_pwd());
+		else if (ft_strncmp(cmd->args[0], "env", 3) == 0)
+			return (builtin_env(cmd));
+		else
+			return (custom(cmd));
 	}
 	return (0);
 }
