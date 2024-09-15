@@ -81,7 +81,13 @@ int	execute_cmd(t_cmd *cmd)
 	t_cmd	*it;
 	int		num_cmds;
 	
-
+	
+	it = cmd;
+	while(it->next)
+	{
+		it->next->envp = it->envp;
+		it = it->next;
+	}
 	it = cmd;
 	num_cmds = count_commands(cmd);
     int		pipefd[2 * (num_cmds - 1)];

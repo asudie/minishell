@@ -1,9 +1,8 @@
 #include "../../incl/minishell.h"
 
 char *get_env_var(char **envr, const char *name) {
-    // printf("HERE\n");
-    size_t len = ft_strlen(name); // here ot breaks
     
+    size_t len = ft_strlen(name);
     for (int i = 0; envr[i] != NULL; i++) {
         if (ft_strncmp(envr[i], name, len) == 0 && envr[i][len] == '=') {
             return envr[i] + len + 1;
@@ -25,7 +24,6 @@ void set_env_var(char **envr, const char *name, const char *value) {
 
             // Append the value
             ft_strlcat(envr[i], value, size);
-            // printf("VAR: %s\n", envr[i]);
             return;
         }
     }

@@ -2,17 +2,15 @@
 
 int resolve_full_path(t_cmd *cmd, char **full_path) {
     char	*tmp;
+    char    *path = NULL;
     
     if (access(cmd->args[0], X_OK) == 0)
     {
         *full_path = cmd->args[0];
         return 0;
-    } 
-          
-    // char *path = get_env_var(cmd->envp, "PATH"); 
-    
-    char *path = getenv("PATH");
-    // printf("PATH: %s\n", path);
+    }
+    path = get_env_var(cmd->envp, "PATH"); 
+
     if (!path) {
         return 1;
     }
