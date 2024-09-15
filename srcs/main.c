@@ -62,6 +62,7 @@ static int	ft_minihell(t_mhell *mhell)
 				continue ;
 			mhell->cmd->envp = mhell->envp;
 			mhell->exit_code = execute_cmd(mhell->cmd);
+			printf("exit code: %d\n", mhell->exit_code);
 		}
 		ft_free_mhell(mhell);
 	}
