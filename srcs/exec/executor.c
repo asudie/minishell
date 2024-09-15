@@ -155,5 +155,5 @@ void	sigquit_handler(int signum)
 }
 
 // LEFT TO IMPLEMENT
-// • HEREDOC
+// • Эксит с аргументами
 

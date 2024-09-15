@@ -8,8 +8,11 @@ int resolve_full_path(t_cmd *cmd, char **full_path) {
         *full_path = cmd->args[0];
         return 0;
     } 
-            
-    char *path = get_env_var(cmd->envp, "PATH");
+          
+    // char *path = get_env_var(cmd->envp, "PATH"); 
+    
+    char *path = getenv("PATH");
+    // printf("PATH: %s\n", path);
     if (!path) {
         return 1;
     }
